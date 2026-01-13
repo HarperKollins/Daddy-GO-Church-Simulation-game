@@ -9,8 +9,13 @@ import { useState, useEffect } from 'react';
 import { useGameStore } from '@/store/useGameStore';
 import { getAvailableEvents, getAvailableChoices, getNextStoryEvent, rollForRandomEvent } from '@/engine/eventSystem';
 import { act1Events } from '@/data/events/act1Events';
+import { randomEvents } from '@/data/events/randomEvents';
+import { specialEvents } from '@/data/events/specialEvents';
 import type { GameEvent, EventChoice, GuestMinister, VenueTier, Asset, Partner } from '@/types/game';
 import { Icons } from '@/components/Icons';
+
+// Merge all event pools for maximum variety
+const allEvents: GameEvent[] = [...act1Events, ...randomEvents, ...specialEvents];
 
 import StatsBar from '@/components/StatsBar';
 import EventModal from '@/components/EventModal';
@@ -99,7 +104,7 @@ export default function GamePage() {
   // Trigger initial story event on first week if applicable
   useEffect(() => {
     if (isClient && week === 1 && !showNameModal) {
-      const introEvent = act1Events.find(e => e.id === 'intro_call' && !store.hasTriggeredEvent(e.id));
+      const introEvent = allEvents.find(e => e.id === 'BUS_STOP_MORNING_CRY' && !store.hasTriggeredEvent(e.id));
       if (introEvent) {
         triggerEvent(introEvent);
       }
@@ -126,16 +131,18 @@ export default function GamePage() {
 
   // Game Loop & Event Checking
   const checkForEvents = () => {
-    // 1. Story Events
-    const storyEvent = getNextStoryEvent(act1Events, store);
+    // 1. Story Events (high priority, plot-driven)
+    const storyEvent = getNextStoryEvent(allEvents, store);
     if (storyEvent) {
       triggerEvent(storyEvent);
+      store.markEventTriggered(storyEvent.id);
       return;
     }
-    // 2. Random Events (every 3 weeks approx)
-    if (week % 3 === 0) {
-      const randomEvt = rollForRandomEvent(act1Events, store);
-      if (randomEvt) triggerEvent(randomEvt);
+    // 2. Random Events (30% chance every week for variety)
+    const randomEvt = rollForRandomEvent(allEvents, store, 0.35);
+    if (randomEvt) {
+      triggerEvent(randomEvt);
+      if (randomEvt.oneTime) store.markEventTriggered(randomEvt.id);
     }
   };
 
@@ -450,7 +457,8 @@ export default function GamePage() {
               addToast(`Week ${week + 1} started!`, 'info');
             });
           }}
-          className="w-full mt-6 py-4 bg-black text-white rounded-xl font-bold text-lg shadow-lg hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+          className="btn-end-week"
+          style={{ width: '100%', marginTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
         >
           Start Next Week <Icons.TrendingUp size={20} />
         </button>
