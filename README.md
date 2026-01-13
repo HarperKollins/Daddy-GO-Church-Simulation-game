@@ -1,344 +1,147 @@
-# Daddy G.O. Simulator 🙏⛪
+# 🦅 daddy-go-simulator
+> *Where Faith Meets Finance: The Ultimate Nigerian Megachurch Simulation*
 
-A satirical BitLife-style life simulation game exploring money, faith, power, and scandal in Nigerian megachurch culture.
-
-> *"They said the Kingdom of God is not meat and drink, but right now, your stomach is singing a different song."*
-
-![Status](https://img.shields.io/badge/Status-v2.0%20Complete-brightgreen)
-![Next.js](https://img.shields.io/badge/Next.js-16-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Version](https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge&logo=none)
+![Build Status](https://img.shields.io/badge/build-passing-success?style=for-the-badge&logo=github-actions)
+![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![Tech Stack](https://img.shields.io/badge/stack-Next.js_16_%7C_TypeScript_%7C_Zustand-black?style=for-the-badge&logo=next.js)
 
 ---
 
-## 🎮 Play Now
+## 📖 The Vision
+**Daddy G.O. Simulator** is a satirical, text-based life simulation game that thrusts players into the chaotic, vibrant, and morally complex world of building a megachurch empire in Lagos, Nigeria. 
 
+Inspired by *BitLife*, this is not just a clicker game—it's a **strategic management RPG**. You start as a broke 200L university student with nothing but a Bible and a dream. Your goal? To build a ministry that rivals the giants of faith, all while balancing your spirituality, public image, and bank account.
+
+Will you remain a humble servant of the truth, or will the allure of private jets and "seed sowing" turn you into a controversial figure? The choice is yours.
+
+---
+
+## 🚀 Key Features (v2.0 Overhaul)
+
+### ⚡ The Energy System
+Gone are the days of infinite spam-clicking. Every action now has a cost, forcing strategic decision-making.
+- **Weekly Cap**: You have **100 Energy** per week. Spending it wisely is the key to growth.
+- **Action Costs**:
+  - `Preaching`: 20 Energy
+  - `Hold Service`: 50 Energy
+  - `Train Skill`: 30-50 Energy
+- **Strategic Depth**: Do you preach for quick cash, or study to improve your long-term stats?
+
+### 📚 RPG Skill Progression
+Your pastor is defined by 5 core stats, each scaling from Level 1 to 10.
+- **🎤 Preaching**: Determines offering efficiency and sermon impact.
+- **✨ Healing**: Increases miracle success rates and fame accumulation.
+- **💫 Charisma**: Crucial for member retention and viral social media moments.
+- **💼 Business**: Boosts returns on investments and reduces venue maintenance costs.
+- **🏛️ Politics**: Provides resistance against scandals and negative press.
+> *Note: Training higher levels requires significantly more energy (Diminishing Returns).*
+
+### 🎓 Education & Career Paths
+Your journey begins on campus.
+1.  **University Phase (Weeks 1-208)**:
+    - Juggle academic pressure with ministry growth.
+    - Unlock "Campus Fellowship" venues.
+    - **Risk**: Dropping out unlocks venues early but permanently caps your stats.
+2.  **Graduation Day (Week 208)**:
+    - **🌾 The Village Path (Hard Mode)**: Low cost, slow growth, high spiritual authenticity.
+    - **🏙️ The City Path (Empire Mode)**: High stakes, massive costs, viral potential.
+
+### 💰 Complex Economy
+- **Dual-Wallet System**: Manage **Personal Cash** (Lifestyle) vs. **Church Funds** (Ministry).
+- **Siphon Mechanic**: Tempted to "borrow" from the offering basket? You can, but it spikes your **Scandal** meter.
+- **Asset Market**: Buy cars, houses, and investments (Stocks, Crypto, Real Estate) to boost your Fame and passive income.
+- **Inflationary Venues**: From a humble **Bus Stop** (Free) to the **City State** (₦50 Billion).
+
+### 📱 Social Media & Fame
+- **YouTube Ministry**: Upload sermons to gain global subscribers and ad revenue.
+- **Spotify Podcast**: Passive income stream from worship hits.
+- **Content Creation**: Going viral requires a mix of high **Charisma** and **Fame**.
+
+---
+
+## 🛠️ Technical Architecture
+
+This project is built with a modern, type-safe stack designed for performance and scalability.
+
+| Technology | Purpose |
+|------------|---------|
+| **Next.js 16** (App Router) | High-performance React framework for the UI and routing. |
+| **TypeScript 5** | Strict type safety for complex game logic and state objects. |
+| **Zustand** | Lightweight, transient global state management for game data. |
+| **Tailwind CSS v4** | Utility-first styling for a responsive, "Dark Mode" aesthetic. |
+| **Local Storage** | Robust persistence layer to save game progress automatically. |
+
+### Directory Structure
 ```bash
-npm install
-npm run dev
-# Visit http://localhost:3000
-```
-
----
-
-## 🆕 VERSION 2.0 - STRATEGIC OVERHAUL
-
-**Major Update:** Transformed from quick casual game to deep strategic simulation!
-
-### What's New in v2.0
-
-#### ⚡ Energy System
-- **All actions cost energy** (20-50 per action)
-- Energy resets weekly
-- Strategic choice: Train skills OR do ministry
-- Forces long-term planning
-
-#### 📚 Skill Development System
-- **5 Pastor Skills**: Preaching, Healing, Charisma, Business, Politics
-- Train skills with energy (30-50 energy/session)
-- **Diminishing returns**: Harder to level high skills
-- **Level 1-10 progression** with visual progress bars
-- All actions now **skill-based** (low skills = poor results)
-
-#### 🎓 University Graduation System
-- **4-year progression**: 200L → 300L → 400L → 500L → Graduate
-- **Graduation at week 208** (4 years)
-- **Two paths after graduation**:
-  - **🌾 Village Path** (Hard Mode): Cheap venues, slow growth, forgiving community
-  - **🏙️ City Path** (Expensive Mode): Wealthy donors, fast growth, fierce competition
-- **Age tracking** - Pastor ages annually
-
-#### 💰 Economic Rebalancing
-- **10x cost increase** on all venues
-- **Realistic progression**:
-  - Classroom: ₦50K (was ₦5K)
-  - Tent: ₦500K (was ₦50K)
-  - Stadium: ₦5B (was ₦500M)
-- Takes **hours to progress**, not minutes
-- Skill-based offering income
-
-#### 🎮 Gameplay Duration
-- **Before**: 30 minutes to reach success
-- **After**: 3-5 hours of strategic grind
-- More addictive, longer sessions
-- Meaningful progression
-
----
-
-## 🚀 Features
-
-### Core Gameplay
-- **Week-by-week progression** via `[End Week]` button
-- **Energy management**: Strategic resource allocation
-- **Skill training**: Develop your pastor's abilities
-- **Five vital stats**: Health, Cash (Personal/Church), Anointing, Fame, Scandal, Energy
-- **Moral choices** with permanent consequences
-- **Auto-save** via localStorage
-
-### Energy System
-- **100 Energy per week**
-- Actions consume energy:
-  - Street Preach: 20 energy
-  - Hold Service: 50 energy
-  - Pray & Fast: 30 energy
-  - Train Skills: 30-50 energy (depends on skill level)
-- **No energy = Can't act** (must end week)
-
-### Skill System
-```typescript
-PastorSkills {
-  preaching: 1-10   // Affects cash from sermons
-  healing: 1-10     // Miracle success rate
-  charisma: 1-10    // Member recruitment multiplier
-  business: 1-10    // Investment returns
-  politics: 1-10    // Scandal resistance
-}
-```
-
-**Training Costs:**
-- Level 1-3: 30 energy, +0.3 skill
-- Level 4-6: 40 energy, +0.2 skill  
-- Level 7-9: 50 energy, +0.1 skill
-- Level 10: MAX (can't train further)
-
-**Skill Impact:**
-- **Low skills (1-3)**: Minimal member gains, low income
-- **Mid skills (4-6)**: Decent progress
-- **High skills (7-10)**: Excellent results, viral potential
-
-### Education & Life Paths
-
-#### University Phase (Weeks 1-208)
-- **Limited to campus venues** (Bus Stop, Classroom only)
-- Must balance **academics + ministry**
-- Graduate at week 208 (4 years)
-
-#### Post-Graduation Paths
-
-**🌾 Village Ministry**
-- **Difficulty**: HARD
-- 50% slower member growth
-- Offerings worth 30% of city
-- Venues cost 20% of city prices
-- More forgiving scandal tolerance
-- Harder to go viral
-
-**🏙️ City Ministry**
-- **Difficulty**: EXPENSIVE
-- 20% faster member growth
-- Offerings worth 200% of village
-- Venues cost 300% of village prices
-- Less forgiving scandal
-- Easier to go viral
-
-### Economy System
-- **Two-wallet economy**: Church vs Personal funds
-- **Siphon mechanics**: Transfer with scandal risk
-- **Venue upgrades**: Bus Stop → Classroom → Tent → Warehouse → Dome → Stadium → City State
-
-### Guest Ministers (10+ Parody Pastors)
-| Name | Archetype | Effect | Cost |
-|------|-----------|--------|------|
-| Brother Tochi | Motivational | +10 members | ₦500 |
-| Sister Blessing | Prosperity | +15 members, +₦5K | ₦2K |
-| Prophet Liquid | Controversial | +500 members, 25% scandal | ₦50K |
-| Daddy G.O. Humble | Fire Brand | +2000 members, +30 anointing | ₦500K |
-
-### Assets & Investments
-- **Vehicles**: Toyota Corolla → Mercedes G-Wagon → Rolls Royce
-- **Property**: Flat → Duplex → Banana Island Mansion
-- **Investments**: Stocks, Bitcoin, GloryCoin (30% rug pull risk!)
-
-### Relationships & Romance
-- **4 Archetypes**: Faithful Sister, Slay Queen, Pastor Daughter, Choir Mistress
-- **Procedural generation** with stats (Looks, Spirituality, Craziness)
-- **Hookup system** with scandal/pregnancy risks
-- **Drama events** with consequences
-
-### Social Media
-- **YouTube**: Upload sermons, grow subscribers
-- **Spotify**: Worship songs, passive income
-- **Viral moments** require high skills
-
----
-
-## 📁 Project Structure
-
-```
 src/
-├── app/
-│   ├── page.tsx         # Main game (skill-based actions)
-│   ├── layout.tsx       # Root layout
-│   └── globals.css      # BitLife design system
-├── components/
-│   ├── StatsBar.tsx     # Stats display (with age)
-│   ├── EventModal.tsx   # Story events
-│   ├── Toast.tsx        # Notifications
-│   ├── SkillsModal.tsx  # Skill training interface
-│   ├── GraduationModal.tsx  # Path choice
-│   ├── SiphonModal.tsx  # Wallet transfers
-│   └── GuestMinistersModal.tsx
-├── store/
-│   └── useGameStore.ts  # Zustand state (with skills, education)
-├── engine/
-│   └── eventSystem.ts   # Event triggers
-├── data/
-│   ├── events/
-│   │   ├── act1Events.ts
-│   │   ├── specialEvents.ts
-│   │   └── randomEvents.ts
-│   ├── guestMinisters.ts
-│   ├── assets.ts
-│   └── relationships.ts
-└── types/
-    └── game.ts          # TypeScript definitions
+├── app/                 # Next.js App Router pages
+├── components/          # Reusable UI components (Modals, Toasts, Cards)
+├── store/               # Zustand specific game state logic (useGameStore.ts)
+├── engine/              # Core game loop, event triggers, and probability logic
+├── data/                # Static data (Events, Assets, Guest Ministers)
+└── types/               # TypeScript interfaces (GameStore, PlayerState, Partner)
 ```
 
 ---
 
-## 🎯 Game Systems
+## 💿 Installation & Setup
 
-### Stats Engine
-```typescript
-CoreStats {
-  health: number;        // 0-100 (0 = death)
-  personalCash: number;  // Personal wealth
-  churchCash: number;    // Ministry funds
-  anointing: number;     // Spiritual power
-  fame: number;          // Public reputation
-  scandal: number;       // Risk meter (100 = jail)
-  energy: number;        // Weekly action points
-}
-```
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/HarperKollins/Daddy-GO-Church-Simulation-game.git
+    cd daddy-go-simulator
+    ```
 
-### Venue Progression (Updated v2.0)
-| Venue | Cost | Members Required | Education |
-|-------|------|------------------|-----------|
-| Bus Stop | Free | 0 | Any |
-| Classroom | ₦50K | 10 | Student/Graduate |
-| Crusade Tent | ₦500K | 50 | Graduate |
-| Warehouse | ₦50M | 1,000 | Graduate |
-| The Dome | ₦500M | 5,000 | Graduate |
-| Stadium | ₦5B | 20,000 | Graduate |
-| City State | ₦50B | 100,000 | Graduate |
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
 
----
+3.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
+    Open `http://localhost:3000` to start your ministry.
 
-## 📖 Story Events (Act 1)
-
-| Event | Theme | Permanent? |
-|-------|-------|------------|
-| The Morning Cry | Bus stop preaching | No |
-| The Roommate's Offer | Yahoo temptation | Yes |
-| The Offering Basket | Eat vs Sow seed | Yes |
-| The First Miracle | Real vs Fake | Yes |
+4.  **Build for Production**
+    ```bash
+    npm run build
+    npm start
+    ```
 
 ---
 
-## 🎮 Gameplay Tips
+## 🤝 Contributing
 
-### Early Game (Weeks 1-50)
-1. **Focus on health**: Eat regularly
-2. **Train Preaching skill**: Better sermon income
-3. **Street preach** to build base
-4. **Save energy** for skill training
+We welcome contributions from the community! Whether it's adding new "Nigerian-coded" random events, fixing bugs, or balancing the economy.
 
-### Mid Game (Weeks 50-208)
-1. **Balance skills**: Don't neglect any
-2. **Prepare for graduation**: Save ₦100K+
-3. **Choose path wisely**: Village = safe, City = ambitious
-4. **Build church slow**: Can't rush venues anymore
-
-### Late Game (Post-Graduation)
-1. **Specialize skills**: Max out 2-3 skills
-2. **Go viral**: Need Charisma 7+ and Fame 60+
-3. **Manage scandal**: Politics skill helps
-4. **Invest wisely**: Business skill matters
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
 ---
 
-## 🛣️ Changelog
+## 🔮 Roadmap
 
-### v2.0 - Strategic Overhaul (Current)
-- ✅ Energy system (100 per week)
-- ✅ Skill training (5 skills, Level 1-10)
-- ✅ Skill-based action outcomes
-- ✅ University graduation (week 208)
-- ✅ Village vs City path choice
-- ✅ 10x cost increase on venues
-- ✅ Age tracking (shown in stats bar)
-- ✅ Education-based venue restrictions
-- ✅ Diminishing returns on skill training
-
-### v1.0 - MVP
-- ✅ Phase 1: Engine Skeleton
-- ✅ Phase 2: Act 1 Survival Mode
-- ✅ Phase 3: Economy & Feedback
-- ✅ Phase 4: Content Databases
-
-### Roadmap
-- [ ] Phase 5: Village/City-specific events
-- [ ] Phase 6: Dropout path implementation
-- [ ] Phase 7: Acts 2-4, Multiple endings
-- [ ] Phase 8: Polish & balance tweaks
+- [ ] **Phase 3: The Miracle Service Update** - Interactive mini-games for healing sessions.
+- [ ] **Phase 4: Crusade Mode** - Regional expansion and stadium events.
+- [ ] **Phase 5: The "Papa" System** - Mentorship mechanics and succession planning.
+- [ ] **Mobile App Port** - React Native implementation.
 
 ---
 
-## 📜 Cultural Notes
+## 📜 License
 
-This game satirizes Nigerian megachurch culture:
-- **"Yahoo"** - Internet fraud
-- **"Sowing seed"** - Prosperity gospel giving
-- **"Arrangee"** - Staged miracles
-- **"Daddy G.O."** - Respectful pastor title
-- **"200L, 300L, 400L"** - Nigerian university year levels
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-## 🏗️ Technical Implementation
-
-### Skill System Architecture
-```typescript
-// Store function
-trainSkill(skill: keyof PastorSkills) => {
-  energyCost: 30-50 (based on level)
-  skillGain: 0.1-0.3 (diminishing returns)
-  maxLevel: 10
-}
-
-// Action multipliers
-memberGain = baseMemberGain * (1 + (skills.preaching + skills.charisma) / 20)
-cashGain = baseCashGain * (1 + skills.preaching / 10)
-```
-
-### Graduation System
-```typescript
-// Triggered at week 208
-if (week === 208 && occupation === 'Student') {
-  showGraduationModal();
-}
-
-// Path modifiers
-Village: {
-  memberGrowthRate: 0.5x
-  offeringMultiplier: 0.3x
-  venueCostMultiplier: 0.2x
-}
-
-City: {
-  memberGrowthRate: 1.2x
-  offeringMultiplier: 2.0x
-  venueCostMultiplier: 3.0x
-}
-```
-
----
-
-## 📄 License
-
-MIT License - Build your ministry.
-
----
-
-*From bus stop preacher to megachurch mogul. Will you keep the faith?*
-
-**Now with 10x more grind, strategy, and addiction!** ⚡
+<center>
+  <p>Crafted with ❤️ and 😂 by <b>Harper Kollins AI</b></p>
+  <p><i>"Touching lives, one offering at a time."</i></p>
+</center>
