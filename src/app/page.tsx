@@ -87,6 +87,24 @@ export default function GamePage() {
   const [showDropoutModal, setShowDropoutModal] = useState(false);
   const [showFarbesModal, setShowFarbesModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(false);
+
+  // Check if this is a new game (player hasn't set name yet)
+  useEffect(() => {
+    if (isClient && store.name === 'Pastor') {
+      setShowNameModal(true);
+    }
+  }, [isClient, store.name]);
+
+  // Trigger initial story event on first week if applicable
+  useEffect(() => {
+    if (isClient && week === 1 && !showNameModal) {
+      const introEvent = act1Events.find(e => e.id === 'intro_call' && !store.hasTriggeredEvent(e.id));
+      if (introEvent) {
+        triggerEvent(introEvent);
+      }
+    }
+  }, [isClient, week, showNameModal]);
 
   // Audio Placeholder
   const playSound = (sound: string) => {
@@ -439,6 +457,16 @@ export default function GamePage() {
       </div>
 
       {/* Modals Layer */}
+      {showNameModal && (
+        <NameInputModal
+          onConfirm={(name) => {
+            setPlayerName(name);
+            setShowNameModal(false);
+            addToast(`Welcome, ${name}! Your ministry begins.`, 'success');
+          }}
+        />
+      )}
+
       {currentEvent && <EventModal event={currentEvent} availableChoices={availableChoices} onChoiceSelect={handleChoiceSelect} />}
 
       {showMinistersModal && <GuestMinistersModal currentVenue={church.venue} churchCash={stats.churchCash} onBook={handleBookMinister} onClose={() => setShowMinistersModal(false)} />}
