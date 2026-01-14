@@ -1,147 +1,330 @@
-# 🦅 daddy-go-simulator
-> *Where Faith Meets Finance: The Ultimate Nigerian Megachurch Simulation*
+# Daddy G.O. Simulator 🇳🇬⛪
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge&logo=none)
-![Build Status](https://img.shields.io/badge/build-passing-success?style=for-the-badge&logo=github-actions)
-![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
-![Tech Stack](https://img.shields.io/badge/stack-Next.js_16_%7C_TypeScript_%7C_Zustand-black?style=for-the-badge&logo=next.js)
+> "If you are not winning souls, you are losing money." — *Daddy G.O.*
 
----
+**From Bus Stop to City State: The Ultimate Nigerian Mega-Church Tycoon Simulation.**
 
-## 📖 The Vision
-**Daddy G.O. Simulator** is a satirical, text-based life simulation game that thrusts players into the chaotic, vibrant, and morally complex world of building a megachurch empire in Lagos, Nigeria. 
-
-Inspired by *BitLife*, this is not just a clicker game—it's a **strategic management RPG**. You start as a broke 200L university student with nothing but a Bible and a dream. Your goal? To build a ministry that rivals the giants of faith, all while balancing your spirituality, public image, and bank account.
-
-Will you remain a humble servant of the truth, or will the allure of private jets and "seed sowing" turn you into a controversial figure? The choice is yours.
+[![Next.js](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-Proprietary-red)]()
 
 ---
 
-## 🚀 Key Features (v2.0 Overhaul)
+## 📖 Overview
 
-### ⚡ The Energy System
-Gone are the days of infinite spam-clicking. Every action now has a cost, forcing strategic decision-making.
-- **Weekly Cap**: You have **100 Energy** per week. Spending it wisely is the key to growth.
-- **Action Costs**:
-  - `Preaching`: 20 Energy
-  - `Hold Service`: 50 Energy
-  - `Train Skill`: 30-50 Energy
-- **Strategic Depth**: Do you preach for quick cash, or study to improve your long-term stats?
+Daddy G.O. Simulator is a **text-based, decision-driven life simulation RPG** that explores a provocative question: **What does it take to build a religious empire in Lagos, Nigeria?**
 
-### 📚 RPG Skill Progression
-Your pastor is defined by 5 core stats, each scaling from Level 1 to 10.
-- **🎤 Preaching**: Determines offering efficiency and sermon impact.
-- **✨ Healing**: Increases miracle success rates and fame accumulation.
-- **💫 Charisma**: Crucial for member retention and viral social media moments.
-- **💼 Business**: Boosts returns on investments and reduces venue maintenance costs.
-- **🏛️ Politics**: Provides resistance against scandals and negative press.
-> *Note: Training higher levels requires significantly more energy (Diminishing Returns).*
+You start as a broke 200-level university student with nothing but a Bible and a dream. Through strategic decisions, relationship management, and navigating the complex socio-economic landscape of Nigeria, you aim to become the General Overseer of a private city-state.
 
-### 🎓 Education & Career Paths
-Your journey begins on campus.
-1.  **University Phase (Weeks 1-208)**:
-    - Juggle academic pressure with ministry growth.
-    - Unlock "Campus Fellowship" venues.
-    - **Risk**: Dropping out unlocks venues early but permanently caps your stats.
-2.  **Graduation Day (Week 208)**:
-    - **🌾 The Village Path (Hard Mode)**: Low cost, slow growth, high spiritual authenticity.
-    - **🏙️ The City Path (Empire Mode)**: High stakes, massive costs, viral potential.
+But beware—the path to glory is paved with scandals, "arranged" miracles, political deals, EFCC investigations, and the occasional baby mama drama.
 
-### 💰 Complex Economy
-- **Dual-Wallet System**: Manage **Personal Cash** (Lifestyle) vs. **Church Funds** (Ministry).
-- **Siphon Mechanic**: Tempted to "borrow" from the offering basket? You can, but it spikes your **Scandal** meter.
-- **Asset Market**: Buy cars, houses, and investments (Stocks, Crypto, Real Estate) to boost your Fame and passive income.
-- **Inflationary Venues**: From a humble **Bus Stop** (Free) to the **City State** (₦50 Billion).
-
-### 📱 Social Media & Fame
-- **YouTube Ministry**: Upload sermons to gain global subscribers and ad revenue.
-- **Spotify Podcast**: Passive income stream from worship hits.
-- **Content Creation**: Going viral requires a mix of high **Charisma** and **Fame**.
+**Will you remain a faithful shepherd, or become a wolf in designer Agbada?**
 
 ---
 
-## 🛠️ Technical Architecture
+## 🎮 Core Gameplay Features
 
-This project is built with a modern, type-safe stack designed for performance and scalability.
+### Life Simulation Systems
 
-| Technology | Purpose |
-|------------|---------|
-| **Next.js 16** (App Router) | High-performance React framework for the UI and routing. |
-| **TypeScript 5** | Strict type safety for complex game logic and state objects. |
-| **Zustand** | Lightweight, transient global state management for game data. |
-| **Tailwind CSS v4** | Utility-first styling for a responsive, "Dark Mode" aesthetic. |
-| **Local Storage** | Robust persistence layer to save game progress automatically. |
+| System | Description |
+|--------|-------------|
+| **University Life** | Start as a 200L student, progress through 300L-500L, graduate or dropout |
+| **Career Progression** | Student → Graduate → Full-Time Pastor → General Overseer |
+| **Relationship System** | Date, get engaged, marry, or have secret affairs with consequences |
+| **Baby Mama Mechanic** | Hidden children with escalating weekly support costs and scandal threats |
+| **Skills Development** | Train Preaching, Healing, Charisma, Business, and Politics (1-10 scale) |
+| **Social Media Presence** | Build YouTube subscribers and Spotify listeners for passive income |
 
-### Directory Structure
-```bash
-src/
-├── app/                 # Next.js App Router pages
-├── components/          # Reusable UI components (Modals, Toasts, Cards)
-├── store/               # Zustand specific game state logic (useGameStore.ts)
-├── engine/              # Core game loop, event triggers, and probability logic
-├── data/                # Static data (Events, Assets, Guest Ministers)
-└── types/               # TypeScript interfaces (GameStore, PlayerState, Partner)
+### The Two-Wallet Economy 💰
+
+A core satirical mechanic reflecting real-world financial temptations:
+
+- **Church Account 🏦** — Tax-free offerings used for ministry growth
+- **Personal Account 💳** — Your private wealth (siphoning increases Scandal)
+
+### Ministry Progression
+
+```
+BUS_STOP → CLASSROOM → TENT → WAREHOUSE → DOME → STADIUM → CITY_STATE
+```
+
+Each venue tier unlocks new abilities, increases offerings, and attracts more members.
+
+### Location Paths
+
+Choose your ministry location after graduation:
+
+| Path | Difficulty | Offering Modifier | Description |
+|------|------------|------------------|-------------|
+| **Campus** | Easy | 0.8x | Student congregation, limited growth |
+| **Village** | Hard | 0.3x | Poor community, massive challenge |
+| **City** | Medium | 2.0x | Wealthy urban givers, high competition |
+
+---
+
+## ⚔️ Advanced Game Engines
+
+The game features **15+ interconnected simulation engines**:
+
+### 🕊️ Spiritual Warfare Engine
+RPG-style battles against demonic entities with tiered difficulty:
+- Minor demons → Major demons → Principalities → Territorial spirits
+- Prayer power, fasting bonuses, and deliverance sessions
+
+### 📜 Testimony System
+- Collect real testimonies from congregants
+- Fabricate fake testimonies (high scandal risk)
+- Share testimonies for fame/anointing boosts
+- Risk of exposure if fabricated testimonies are investigated
+
+### 🔮 Prophecy Engine
+- Generate safe (vague) or risky (specific) prophecies
+- Track fulfillment rates and prophetic reputation
+- Cover up failed prophecies or face public embarrassment
+
+### 🏛️ Church Politics Engine
+- Manage factions within your congregation
+- Handle power struggles, coups, and church splits
+- Reconcile or suppress dissent
+
+### 👶 Dynasty & Succession
+- Raise pastor children with unique personalities
+- Choose successors (biological, spiritual sons, outsiders)
+- Plan orderly transitions or face contested succession
+
+### 💹 Economy Engine (2026)
+- Realistic Nigerian economic simulation
+- Crypto trading (including scam coins with rug pull risk)
+- Black market dollar exchange
+- Inflation affects all prices weekly
+
+### 🎭 Nigerian Realism Engine
+- **Owambe Invitations** — Mandatory party attendance affecting reputation
+- **Infrastructure Failures** — NEPA cuts, fuel scarcity, network issues
+- **Construction Projects** — Build auditoriums with contractor drama
+- **Church Mothers** — Powerful women with demands and gossip networks
+
+### 🧠 Advanced ML-Lite Engine
+- Player behavior pattern detection
+- Dynamic difficulty adjustment
+- Frustration and engagement tracking
+- Predicted endings based on choices
+
+### ⚖️ Causality System
+- Every action has delayed consequences
+- Karma tracking (positive/negative ledger)
+- Actions in Year 1 create scandals in Year 10
+
+### 📊 Additional Systems
+- **Title Progression** — Earn titles from "Brother" to "His Holiness"
+- **Psychological Hooks** — Login streaks, FOMO events, sunk cost traps
+- **Seed Faith Campaigns** — Run offering drives with manipulation tactics
+- **Personal Development** — Read books, take courses, earn certifications
+- **Emotional Events** — Guilt, grief, triumph, fear, shame, and doubt narratives
+
+---
+
+## 🖥️ User Interface
+
+### Interactive Dashboards
+- **Church Visualizer** — Watch your venue evolve from dusty street to mega-complex
+- **Chirps Feed** — Satirical Nigerian Twitter reacting to your sermons
+- **Notification Center** — Real-time invites, alerts, and family requests
+- **Assets Manager** — Track properties, vehicles, and investments
+- **Testimony Manager** — Curate and share your testimony inventory
+
+### Dark Mode UI
+Premium dark theme with:
+- Glassmorphism effects
+- Smooth animations
+- Mobile-responsive design
+- Energy-based action system
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Next.js** | 16.1 | React framework (App Router) |
+| **TypeScript** | 5.0+ | Type-safe development |
+| **Tailwind CSS** | 4.0 | Utility-first styling |
+| **Zustand** | Latest | State management |
+| **Custom Engine** | - | Event triggers, probability logic, causality |
+
+### Project Structure
+
+```
+daddy-go-simulator/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   ├── components/             # React components
+│   │   ├── dashboards/         # Game dashboards (Testimony, Assets, etc.)
+│   │   └── visualizers/        # Church and stat visualizers
+│   ├── data/
+│   │   ├── assets.ts           # Vehicles, properties, investments
+│   │   ├── events/             # Event definitions by category
+│   │   └── guestMinisters.ts   # 30+ parody Nigerian pastors
+│   ├── engine/                 # 15+ game simulation engines
+│   ├── store/                  # Zustand state stores
+│   └── types/                  # TypeScript type definitions
+├── public/                     # Static assets
+└── package.json
 ```
 
 ---
 
-## 💿 Installation & Setup
+## 🚀 Getting Started
 
-1.  **Clone the Repository**
-    ```bash
-    git clone https://github.com/HarperKollins/Daddy-GO-Church-Simulation-game.git
-    cd daddy-go-simulator
-    ```
+### Prerequisites
 
-2.  **Install Dependencies**
-    ```bash
-    npm install
-    # or
-    yarn install
-    ```
+- **Node.js** 18.0 or higher
+- **npm** or **yarn** or **pnpm**
 
-3.  **Run Development Server**
-    ```bash
-    npm run dev
-    ```
-    Open `http://localhost:3000` to start your ministry.
+### Installation
 
-4.  **Build for Production**
-    ```bash
-    npm run build
-    npm start
-    ```
+```bash
+# Clone the repository
+git clone https://github.com/CeZarCorp/daddy-go-simulator.git
+
+# Navigate to project directory
+cd daddy-go-simulator
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Build for Production
+
+```bash
+# Create optimized production build
+npm run build
+
+# Start production server
+npm start
+```
+
+### Type Checking
+
+```bash
+# Run TypeScript compiler
+npx tsc --noEmit
+```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Whether it's adding new "Nigerian-coded" random events, fixing bugs, or balancing the economy.
+We welcome **"Laborers in the Vineyard"** (Contributors)!
 
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+### How to Contribute
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Contribution Ideas
+
+| Category | Examples |
+|----------|----------|
+| **Events** | Write new event cards (scandals, miracles, family drama) |
+| **Engines** | Improve simulation logic or add new mechanics |
+| **UI/UX** | Design new dashboards or improve mobile experience |
+| **Balancing** | Tune economic equations and difficulty curves |
+| **Content** | Add more guest ministers, testimonies, prophecies |
+| **Testing** | Write unit tests for game engines |
+
+### Code Style
+
+- Use TypeScript strict mode
+- Follow existing naming conventions
+- Document complex logic with comments
+- Keep components focused and reusable
+
+### Reporting Issues
+
+- Use GitHub Issues for bug reports
+- Include steps to reproduce
+- Attach screenshots if applicable
 
 ---
 
-## 🔮 Roadmap
+## 📋 Roadmap
 
-- [ ] **Phase 3: The Miracle Service Update** - Interactive mini-games for healing sessions.
-- [ ] **Phase 4: Crusade Mode** - Regional expansion and stadium events.
-- [ ] **Phase 5: The "Papa" System** - Mentorship mechanics and succession planning.
-- [ ] **Mobile App Port** - React Native implementation.
+### ✅ Completed
+- Full life cycle simulation (student to G.O.)
+- 15+ interconnected game engines
+- Venue progression system
+- Relationship and family mechanics
+- Crypto and investment systems
+- Dark mode UI with animations
+- Mobile-responsive design
+
+### 🔨 In Progress
+- Deep family trees with inheritable traits
+- Full Act 2 & 3 narrative storylines
+- Procedurally generated sermons
+
+### 🔮 Planned
+- Multi-branch expansion (London, Houston, Dubai)
+- Rival pastor system with beef mechanics
+- Judgement Day final evaluation
+- Multiplayer pastor competitions
+- Save/Load game functionality
 
 ---
 
-## 📜 License
+## 🎭 Tone & Intent
 
-Distributed under the MIT License. See `LICENSE` for more information.
+**This is Satire.**
+
+Created with love for Nigeria and deep respect for genuine faith, but with a sharp critical eye on the *business* of religion.
+
+- We laugh at the absurdity of "buying special prayers"
+- We critique systems that enable manipulation
+- We celebrate the resilience of the Nigerian spirit
+
+> *If you are offended, please pray for the developers. If you laugh, please star the repo.* ⭐
 
 ---
 
-<center>
-  <p>Crafted with ❤️ and 😂 by <b>Harper Kollins AI</b></p>
-  <p><i>"Touching lives, one offering at a time."</i></p>
-</center>
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+---
+
+## 👨‍💻 Author
+
+**Collins Somtochukwu (Harper Kollins)**
+
+- Founder & Lead Developer
+- [CeZar Corp](https://github.com/CeZarCorp)
+
+---
+
+## 🙏 Acknowledgments
+
+- The Nigerian church experience (for inspiration)
+- Every pastor who ever owned a private jet
+- Everyone who has ever "sowed a seed"
+- The resilience of Lagosians everywhere
+
+---
+
+<div align="center">
+
+**Built with ❤️ in Nigeria 🇳🇬**
+
+*© 2026 CeZar Corp. All rights reserved.*
+
+*No tithes were collected in the making of this software.*
+
+</div>

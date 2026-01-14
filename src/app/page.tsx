@@ -33,6 +33,9 @@ import GraduationModal from '@/components/GraduationModal';
 import DropoutModal from '@/components/DropoutModal';
 import FarbesModal from '@/components/FarbesModal';
 import SettingsModal from '@/components/SettingsModal';
+import NotificationCenter from '@/components/NotificationCenter';
+import RealismOverlay from '@/components/RealismOverlay';
+import ChurchVisualizer from '@/components/ChurchVisualizer';
 
 // Venue upgrade costs - 10x increase for realistic difficulty
 const venueUpgrades: Record<VenueTier, { next: VenueTier | null; cost: number; minMembers: number; educationRequired?: string }> = {
@@ -299,6 +302,14 @@ export default function GamePage() {
       />
 
       <div className="main-content">
+
+        {/* Church Venue Visualizer */}
+        <ChurchVisualizer
+          venue={church.venue}
+          members={church.members}
+          timeOfDay='day'
+        />
+
         <div className="toggle-container">
           <button
             className={`toggle-btn ${activeTab === 'ministry' ? 'active' : ''}`}
@@ -528,6 +539,10 @@ export default function GamePage() {
 
       {/* Toast Container */}
       <Toast messages={toasts} onDismiss={removeToast} />
+
+      {/* Realism Systems */}
+      <NotificationCenter />
+      <RealismOverlay />
 
     </div>
   );

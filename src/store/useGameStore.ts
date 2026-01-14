@@ -19,7 +19,7 @@ import type {
     CoreStats,
     HiddenFlags,
     ChurchState,
-    PlayerState,
+    ExtendedPlayerState,
     GameAct,
     VenueTier,
     PermanentChoice,
@@ -33,18 +33,38 @@ import type {
 } from '@/types/game';
 import { simulateInvestmentReturn } from '@/data/assets';
 
+// Engine Imports
+import { createEmptyTestimonyInventory } from '@/engine/testimonyEngine';
+import { createEmptyTrackRecord } from '@/engine/prophecyEngine';
+import { createEmptyRelationshipGraph } from '@/engine/npcMemoryEngine';
+import { TITLE_HIERARCHY, createDefaultAnointingState } from '@/engine/titleProgressionEngine';
+import { createDefaultStreak } from '@/engine/psychologicalHooksEngine';
+import { createDefaultPolitics } from '@/engine/churchPoliticsEngine';
+import { createEmptyDynasty } from '@/engine/dynastyEngine';
+import { createDefaultSpiritualState } from '@/engine/spiritualWarfareEngine';
+import { createEmptyPortfolio, ECONOMY_2026, CRYPTO_ASSETS, simulateCryptoPrices } from '@/engine/economyEngine';
+import { generateOwambeInvitation } from '@/engine/nigerianRealismEngine';
+import { createEmptyDevelopmentState } from '@/engine/personalDevelopmentEngine';
+import { createDeepProfile } from '@/engine/advancedMLEngine';
+import { LAWS } from '@/engine/universalLawsEngine';
+import { createEmptyKarmaLedger } from '@/engine/causalityEngine';
+import { createEmptyPersonality } from '@/engine/personalityEngine';
+import { ACHIEVEMENTS } from '@/engine/achievementsEngine';
+
 // ============================================================================
 // INITIAL STATE DEFAULTS
 // ============================================================================
 
 const DEFAULT_STATS: CoreStats = {
-    health: 70,           // Starting hungry but alive
-    personalCash: 500,    // Just enough for a week of garri
-    churchCash: 0,        // No church funds initially
-    anointing: 20,        // Some spiritual foundation
-    fame: 0,              // Nobody knows you yet
-    scandal: 0,           // Clean slate
-    energy: 100,          // Fresh start
+    health: 7000,          // Starting hungry but alive (70%)
+    personalCash: 500,     // Just enough for a week of garri
+    churchCash: 0,         // No church funds initially
+    anointing: 2000,       // Some spiritual foundation (20%)
+    fame: 0,               // Nobody knows you yet
+    scandal: 0,            // Clean slate
+    energy: 1000,          // Fresh start (max 1000)
+    stress: 3000,          // Student life stress (30%)
+    influence: 0,          // No political power yet
 };
 
 const DEFAULT_FLAGS: HiddenFlags = {
@@ -61,7 +81,7 @@ const DEFAULT_CHURCH: ChurchState = {
     reputation: 50,
 };
 
-const DEFAULT_PLAYER: PlayerState = {
+const DEFAULT_PLAYER: ExtendedPlayerState = {
     name: 'Pastor',
     age: 20,              // 200L student
     week: 1,
@@ -94,6 +114,42 @@ const DEFAULT_PLAYER: PlayerState = {
         sermonsUploaded: 0,
         weeklyViews: 0,
     },
+    engine: {
+        testimony: { inventory: createEmptyTestimonyInventory() },
+        prophecy: { trackRecord: createEmptyTrackRecord(), activeProphecies: [] },
+        npc: { graph: createEmptyRelationshipGraph() },
+        title: { current: TITLE_HIERARCHY[0], anointing: createDefaultAnointingState() },
+        psychology: { loginStreak: createDefaultStreak(), pendingResults: [], sunkCostTraps: [] },
+        politics: { state: createDefaultPolitics() },
+        seedFaith: { activeCampaign: null },
+        dynasty: { state: createEmptyDynasty('Pastor', 1) },
+        spiritual: { state: createDefaultSpiritualState() },
+        economy: { portfolio: createEmptyPortfolio(), marketState: ECONOMY_2026, activeInvestments: [], cryptoAssets: CRYPTO_ASSETS },
+        development: { state: createEmptyDevelopmentState() },
+        realism: { activeConstruction: null, activeStaff: [], activeMothers: [], upcomingOwambes: [] },
+        ml: { profile: createDeepProfile(), patterns: [] }
+    },
+
+    // Extended State Initializers
+    karma: createEmptyKarmaLedger(),
+    family: {
+        immediate: { mother: { id: 'mom', name: 'Mama Pastor', relationship: 'Mother', gender: 'female', personality: { supportiveness: 100, greediness: 10, religiosity: 90, dramaLevel: 20 }, healthStatus: 'healthy', financialStatus: 'poor', relationshipWithPlayer: 100, hasRequestedMoney: false, pendingFavor: null, lastInteractionWeek: 0 }, father: { id: 'dad', name: 'Papa Pastor', relationship: 'Father', gender: 'male', personality: { supportiveness: 50, greediness: 30, religiosity: 60, dramaLevel: 40 }, healthStatus: 'deceased', financialStatus: 'poor', relationshipWithPlayer: 0, hasRequestedMoney: false, pendingFavor: null, lastInteractionWeek: 0 }, siblings: [] },
+        extended: { uncles: [], aunties: [], grandparents: [], cousins: [] },
+        created: { spouse: null, children: [], inLaws: [] }
+    },
+    personality: createEmptyPersonality(),
+    consequenceChains: [],
+    pendingConsequences: [],
+    timeline: [],
+    achievements: ACHIEVEMENTS.map(a => ({ ...a })), // Deep copy basics
+    cityLocation: 'Lagos',
+    dailyStruggles: {
+        power: 50,
+        traffic: 80,
+        fuelPrice: 1200,
+        bankWorking: true,
+        networkSignal: 70
+    }
 };
 
 
@@ -157,7 +213,7 @@ interface GameActions {
     dropout: () => void;
 }
 
-interface GameStore extends PlayerState, GameActions { }
+interface GameStore extends ExtendedPlayerState, GameActions { }
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -277,29 +333,43 @@ export const useGameStore = create<GameStore>()(
                     return asset; // Real estate/Cars static for now or add depreciation later
                 });
 
-                // Health decay (hunger catches up)
+                // Health decay (hunger catches up) - scaled to 10000
                 // In Act 1, this is aggressive to create tension
-                const healthDecay = state.currentAct === 'SURVIVAL' ? 8 : 3;
+                const healthDecay = state.currentAct === 'SURVIVAL' ? 800 : 300;
 
                 // Anointing decay (spiritual discipline required)
-                const anointingDecay = 2;
+                const anointingDecay = 200;
 
                 // Fame decay (public forgets quickly)
-                const fameDecay = state.stats.fame > 50 ? 3 : 1;
+                const fameDecay = state.stats.fame > 5000 ? 300 : 100;
 
                 // Apply changes
                 set((s) => {
-                    const newHealth = clamp(s.stats.health - healthDecay, 0, 100);
-                    const newPersonalCash = s.stats.personalCash - totalExpenses;
-                    const newChurchCash = Math.max(0, s.stats.churchCash + offering);
-                    const newAnointing = clamp(s.stats.anointing - anointingDecay, 0, 100);
-                    const newFame = clamp(s.stats.fame - fameDecay, 0, 100);
+                    // Update cash before entropy
+                    const statsWithCash = {
+                        ...s.stats,
+                        personalCash: s.stats.personalCash - totalExpenses,
+                        churchCash: Math.max(0, s.stats.churchCash + offering),
+                    };
+
+                    // Apply Universal Law of Entropy (Decay)
+                    // Maintenance depends on energy spent (assumed high if remaining is low? No, wait)
+                    // Let's assume maintenance is based on how much energy was *left* or just standard.
+                    // For now, let's say maintenance is 60 (average).
+                    const maintenance = 60;
+                    const statsAfterDecay = LAWS.physics.entropy(statsWithCash, maintenance);
+
+                    const newHealth = clamp(statsAfterDecay.health, 0, 10000);
+                    const newAnointing = clamp(statsAfterDecay.anointing, 0, 10000);
+                    const newFame = clamp(statsAfterDecay.fame, 0, 10000);
+                    const newStress = clamp(statsAfterDecay.stress, 0, 10000);
+                    const newInfluence = clamp(statsAfterDecay.influence, 0, 10000);
 
                     // Track weeks at zero health (grace period of 2 years = 104 weeks)
                     const newWeeksAtZeroHealth = newHealth <= 0 ? (s.weeksAtZeroHealth || 0) + 1 : 0;
 
-                    // Death: Scandal 100+ OR starving for 2 years straight
-                    const isDead = s.stats.scandal >= 100 || newWeeksAtZeroHealth >= 104;
+                    // Death: Scandal 10000+ OR starving for 2 years straight
+                    const isDead = s.stats.scandal >= 10000 || newWeeksAtZeroHealth >= 104;
 
                     // Age up every 52 weeks (1 year)
                     const newAge = s.week % 52 === 0 ? s.age + 1 : s.age;
@@ -322,13 +392,16 @@ export const useGameStore = create<GameStore>()(
                         occupation: newOccupation,
                         relationshipWeeks: newRelationshipWeeks,
                         stats: {
-                            ...s.stats,
+                            ...s.stats, // Keep other stats just in case
                             health: newHealth,
-                            personalCash: newPersonalCash,
-                            churchCash: newChurchCash,
+                            personalCash: statsWithCash.personalCash, // Cash already updated
+                            churchCash: statsWithCash.churchCash,
                             anointing: newAnointing,
                             fame: newFame,
-                            energy: 100, // Reset energy weekly
+                            energy: 1000, // Reset energy weekly
+                            stress: newStress,
+                            influence: newInfluence,
+                            scandal: s.stats.scandal, // Scandal doesn't decay naturally (entropy handles logic but let's be safe)
                         },
                         assets: updatedAssets,
                     };
@@ -336,6 +409,31 @@ export const useGameStore = create<GameStore>()(
 
                 // Update social media passive income
                 get().updateSocialMedia();
+
+                // ENGINE UPDATES
+                const currentState = get();
+
+                // 1. Economy: Crypto Prices
+                const newCryptoAssets = simulateCryptoPrices(currentState.engine.economy.cryptoAssets, 'neutral');
+
+                // 2. Realism: Owambe Invitations
+                const newOwambe = generateOwambeInvitation(currentState.week, currentState.stats.fame || 0);
+                const currentOwambes = currentState.engine.realism.upcomingOwambes;
+                const updatedOwambes = newOwambe ? [...currentOwambes, newOwambe] : currentOwambes;
+
+                set((s) => ({
+                    engine: {
+                        ...s.engine,
+                        economy: {
+                            ...s.engine.economy,
+                            cryptoAssets: newCryptoAssets,
+                        },
+                        realism: {
+                            ...s.engine.realism,
+                            upcomingOwambes: updatedOwambes,
+                        }
+                    }
+                }));
             },
 
             // ======================================================================
@@ -349,10 +447,12 @@ export const useGameStore = create<GameStore>()(
                         ? currentValue + amount
                         : amount;
 
-                    // Cash can go negative (debt), other stats clamped 0-100
+                    // Cash can go negative (debt), energy clamps to 1000, other stats clamped 0-10000
                     const clampedValue = stat === 'personalCash' || stat === 'churchCash'
                         ? newValue
-                        : clamp(newValue, 0, 100);
+                        : stat === 'energy'
+                            ? clamp(newValue, 0, 1000)
+                            : clamp(newValue, 0, 10000);
 
                     return {
                         stats: {

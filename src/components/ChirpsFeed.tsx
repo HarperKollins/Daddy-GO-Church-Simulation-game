@@ -9,6 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { useGameStore } from '@/store/useGameStore';
+import ThreeDEmoji from './ThreeDEmoji';
 
 interface Chirp {
     id: string;
@@ -155,6 +156,21 @@ interface ChirpsFeedProps {
     onClose: () => void;
 }
 
+const getAvatarIcon = (type: string, author: string): string => {
+    if (author === 'Trending Topic') return 'fire';
+    if (type === 'positive') return 'angel';
+    if (type === 'negative') return 'devil';
+    if (type === 'neutral') return 'news';
+    return 'person';
+};
+
+const getAvatarFallback = (type: string): string => {
+    if (type === 'positive') return '😇';
+    if (type === 'negative') return '😈';
+    if (type === 'neutral') return '📰';
+    return '👤';
+}
+
 export default function ChirpsFeed({ isOpen, onClose }: ChirpsFeedProps) {
     const { stats, church, name, week } = useGameStore();
     const [chirps, setChirps] = useState<Chirp[]>([]);
@@ -186,8 +202,12 @@ export default function ChirpsFeed({ isOpen, onClose }: ChirpsFeedProps) {
                         chirps.map(chirp => (
                             <div key={chirp.id} className={`chirp-card chirp-${chirp.type}`}>
                                 <div className="chirp-header">
-                                    <div className="chirp-avatar">
-                                        {chirp.author.charAt(0)}
+                                    <div className="mr-3">
+                                        <ThreeDEmoji
+                                            icon={getAvatarIcon(chirp.type, chirp.author)}
+                                            fallback={getAvatarFallback(chirp.type)}
+                                            size={40}
+                                        />
                                     </div>
                                     <div className="chirp-author">
                                         <span className="chirp-name">{chirp.author}</span>

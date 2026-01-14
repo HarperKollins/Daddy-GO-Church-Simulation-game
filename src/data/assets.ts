@@ -80,6 +80,14 @@ export const assets: Asset[] = [
         weeklyMaintenance: 300000,
         fameBonus: 50,
     },
+    {
+        id: 'PRIVATE_JET',
+        name: 'Private Jet (Gulfstream G650)',
+        category: 'vehicle',
+        cost: 2000000000,
+        weeklyMaintenance: 5000000,
+        fameBonus: 100,
+    },
 
     // =========================================================================
     // PROPERTY - Church and personal real estate
