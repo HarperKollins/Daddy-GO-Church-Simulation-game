@@ -7,6 +7,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-Proprietary-red)]()
+[![Live Demo](https://img.shields.io/badge/🎮_Play_Now-Live_Demo-success)](https://daddy-go-church-simulation-game.vercel.app/)
 
 ---
 
@@ -306,7 +307,7 @@ This project is proprietary software. All rights reserved.
 **Collins Somtochukwu (Harper Kollins)**
 
 - Founder & Lead Developer
-- [CeZar Corp](https://github.com/CeZarCorp)
+- [CeZar Corp](https://github.com/hkai)
 
 ---
 
