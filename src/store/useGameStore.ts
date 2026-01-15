@@ -887,9 +887,15 @@ export const useGameStore = create<GameStore>()(
                 }));
             },
 
-            // NEW: Mark onboarding as complete
+            // NEW: Mark onboarding as complete AND ensure fresh start
             setOnboardingComplete: () => {
-                set({ hasCompletedOnboarding: true });
+                const currentName = get().name;
+                set({
+                    ...DEFAULT_PLAYER,
+                    name: currentName,
+                    hasCompletedOnboarding: true,
+                    isAlive: true,
+                });
             },
         }),
         {
