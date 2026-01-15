@@ -14,7 +14,7 @@ interface ThreeDEmojiProps {
  * PROJECT NANO BANANA: Reliable 3D Emojis
  * Uses jsdelivr CDN for high-availability fluent emojis.
  */
-export default function ThreeDEmoji({
+function ThreeDEmoji({
     icon,
     fallback,
     size = 40,
@@ -137,3 +137,6 @@ if (style) {
     `;
     document.head.appendChild(style);
 }
+
+// Memoize to prevent re-renders in lists
+export default React.memo(ThreeDEmoji);
