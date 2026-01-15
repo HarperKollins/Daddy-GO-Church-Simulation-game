@@ -484,6 +484,19 @@ export default function GamePage() {
           onClose={() => setShowRelationships(false)}
         />
       )}
+      {showSkills && (
+        <div className="modal-overlay" onClick={() => setShowSkills(false)}>
+          <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowSkills(false)}
+                style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer' }}
+              >×</button>
+            </div>
+            <SkillsModal />
+          </div>
+        </div>
+      )}
       <DropoutModal
         isOpen={showDropout}
         onConfirm={() => {
