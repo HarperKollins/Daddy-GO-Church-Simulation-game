@@ -449,6 +449,41 @@ export default function GamePage() {
           }}
         />
       )}
+      {showRelationships && (
+        <RelationshipsModal
+          onStartDating={(partner) => {
+            startDating(partner);
+            addToast(`Started dating ${partner.name}! ❤️`, 'success');
+            setShowRelationships(false);
+          }}
+          onPropose={() => {
+            propose();
+            addToast('You proposed! 💍', 'success');
+            setShowRelationships(false);
+          }}
+          onMarry={() => {
+            marry();
+            addToast('Congratulations! You are now married! 🎊', 'success');
+            setShowRelationships(false);
+          }}
+          onBreakup={() => {
+            breakup();
+            addToast('Relationship ended 💔', 'warning');
+            setShowRelationships(false);
+          }}
+          onHookup={(type) => {
+            const result = hookup(type);
+            if (result.pregnant) {
+              addToast(`${result.mamaName} is pregnant with ${result.babyName}! 😱`, 'danger');
+            } else {
+              addToast('Hookup successful... scandal risk increased', 'warning');
+            }
+            modifyStat('scandal', result.scandal);
+            setShowRelationships(false);
+          }}
+          onClose={() => setShowRelationships(false)}
+        />
+      )}
       <DropoutModal
         isOpen={showDropout}
         onConfirm={() => {
