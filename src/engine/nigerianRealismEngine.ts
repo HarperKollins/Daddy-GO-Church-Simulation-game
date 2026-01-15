@@ -74,19 +74,65 @@ export function generateOwambeInvitation(currentWeek: number, fame: number): Owa
 /**
  * Check for infrastructure failure
  */
-export function checkInfrastructureFailure(season: 'dry' | 'rainy'): string | null {
+export interface RealismEvent {
+    id: string;
+    type: 'nepa_failure' | 'police_stop' | 'fuel_scarcity' | 'traffic_jam' | 'japa_opportunity' | 'flood';
+    severity: number;
+    description: string;
+    choices: {
+        id: string;
+        label: string;
+        cost?: number;
+        consequence: string;
+    }[];
+}
+
+/**
+ * Check for infrastructure failure
+ */
+export function checkInfrastructureFailure(season: 'dry' | 'rainy'): RealismEvent | null {
     const roll = Math.random();
 
     if (season === 'rainy' && roll < 0.3) {
-        return "HEAVY_RAIN_FLOOD";
+        return {
+            id: `flood_${Date.now()}`,
+            type: 'flood',
+            severity: 0.9,
+            description: "HEAVY RAIN! Lagos is flooded. Your church venue is leaking.",
+            choices: [
+                { id: 'drain', label: 'Hire Area Boys to Drain', cost: 20000, consequence: 'Venue saved, -20k Cash' },
+                { id: 'ignore', label: 'Preach in the Rain', cost: 0, consequence: '+Spirit, -Health, Members unhappy' },
+                { id: 'online', label: 'Move Service Online', cost: 5000, consequence: 'Safety first. -Offering' }
+            ]
+        };
     }
 
     if (roll < 0.1) {
-        return "GRID_COLLAPSE";
+        return {
+            id: `light_${Date.now()}`,
+            type: 'nepa_failure',
+            severity: 0.8,
+            description: "NEPA has taken the light! The church is now operating in darkness.",
+            choices: [
+                { id: 'gen', label: 'Buy Fuel & Run Generator', cost: 50000, consequence: 'Light restored. -50k Cash' },
+                { id: 'dark', label: 'Hold Vigil in Darkness', cost: 0, consequence: 'Atmosphere intensified! +Spirit, -Comfort' },
+                { id: 'solar', label: 'Install Solar (Expensive)', cost: 5000000, consequence: 'Permanent Power Solution!' }
+            ]
+        };
     }
 
     if (roll < 0.05) {
-        return "FUEL_SCARCITY";
+        return {
+            id: `fuel_${Date.now()}`,
+            type: 'fuel_scarcity',
+            severity: 0.95,
+            description: "FUEL SCARCITY! Queues are 5 hours long.",
+            choices: [
+                { id: 'black_market', label: 'Buy Black Market (3x Price)', cost: 100000, consequence: 'Mobility secured. -100k Cash' },
+                { id: 'trek', label: 'Trek for the Lord', cost: 0, consequence: '-Energy, +Humility' },
+                { id: 'bribe', label: 'Bribe Attendant', cost: 20000, consequence: 'Skipped queue. -Integrity' }
+            ]
+        };
     }
 
     return null;

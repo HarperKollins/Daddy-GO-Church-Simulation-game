@@ -48,13 +48,29 @@ export default function RelationshipsModal({
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>❤️ Relationships</h2>
-                    <button onClick={onClose} className="modal-close">×</button>
+            <div className="modal-sheet" onClick={e => e.stopPropagation()}>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '16px',
+                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                    <h2 style={{ margin: 0, fontSize: '18px' }}>❤️ Relationships</h2>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--text-muted)',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                            padding: '4px'
+                        }}
+                    >×</button>
                 </div>
 
-                <div className="modal-body" style={{ padding: '16px' }}>
+                <div className="modal-body" style={{ padding: '16px', maxHeight: '70vh', overflowY: 'auto' }}>
                     {/* Single - Can Date or Hook Up */}
                     {relationshipStatus === 'Single' && (
                         <>

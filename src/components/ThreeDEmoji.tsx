@@ -1,100 +1,139 @@
 'use client';
 
-import React, { useState } from 'react';
-
-// Using Microsoft Fluent Emojis via a reliable CDN (jsdelivr/github)
-// Base URL: https://raw.githubusercontent.com/TarikUL/fluent-emojis/master/assets
+import React, { useState, useEffect } from 'react';
 
 interface ThreeDEmojiProps {
-    icon: string;         // Keyword identifier (e.g. "prayer", "money")
-    fallback: string;     // The original 2D emoji (e.g. "🙏")
-    size?: number;        // Pixel size (default 24)
+    icon: string;     // The keyword/name of the emoji
+    fallback: string; // The 2D unicode fallback
+    size?: number;
     className?: string;
-    animate?: boolean;    // Whether to float/bounce
+    animate?: boolean;
 }
 
-// Map keywords to specific 3D emoji assets
-// We use a predefined map to ensure quality matches
-const EMOJI_MAP: Record<string, string> = {
-    // Ministry
-    'hold_service': 'hands/folding_hands_3d.png',
-    'pray': 'hands/folding_hands_3d.png',
-    'fast': 'food/plate_with_cutlery_3d.png',
-    'vigil': 'objects/crescent_moon_3d.png',
-    'crusade': 'fire/fire_3d.png',
-    'deliverance': 'smileys/angry_face_with_horns_3d.png',
-    'bible': 'objects/open_book_3d.png',
-    'dove': 'animals/dove_3d.png',
-
-    // Social
-    'family': 'people/house_3d.png',
-    'network': 'hands/handshake_3d.png',
-    'media': 'objects/microphone_3d.png',
-    'love': 'hearts/red_heart_3d.png',
-    'hookup': 'objects/rose_3d.png',
-
-    // Finance
-    'money': 'objects/money_bag_3d.png',
-    'give': 'objects/money_with_wings_3d.png',
-    'invest': 'objects/chart_increasing_with_yen_3d.png', // closest generic chart
-    'land': 'objects/building_construction_3d.png',
-    'bank': 'objects/bank_3d.png',
-    'crypto': 'objects/rocket_3d.png',
-    'poo': 'smileys/pile_of_poo_3d.png', // for bad investments
-    'seed': 'plants/seedling_3d.png',
-
-    // Health
-    'hospital': 'objects/hospital_3d.png',
-    'gym': 'people/flexed_biceps_3d.png',
-    'rest': 'smileys/sleeping_face_3d.png',
-    'food': 'food/pot_of_food_3d.png',
-
-    // Media
-    'youtube': 'objects/television_3d.png', // generic video
-    'live': 'objects/movie_camera_3d.png',
-    'controversy': 'fire/fire_3d.png',
-    'collab': 'objects/mobile_phone_with_arrow_3d.png',
-
-    // Secret
-    'siphon': 'objects/money_with_wings_3d.png',
-    'politics': 'objects/classical_building_3d.png',
-    'yahoo': 'objects/laptop_3d.png',
-    'juju': 'objects/skull_3d.png',
-    'testimony': 'objects/megaphone_3d.png',
-    'warfare': 'objects/crossed_swords_3d.png',
-};
-
-const BASE_URL = 'https://raw.githubusercontent.com/TarikUL/fluent-emojis/master/assets';
-
+/**
+ * PROJECT NANO BANANA: Reliable 3D Emojis
+ * Uses jsdelivr CDN for high-availability fluent emojis.
+ */
 export default function ThreeDEmoji({
     icon,
     fallback,
-    size = 24,
+    size = 40,
     className = "",
     animate = false
 }: ThreeDEmojiProps) {
-    const [error, setError] = useState(false);
+    const [imgSrc, setImgSrc] = useState<string>('');
+    const [hasError, setHasError] = useState(false);
 
-    // If we don't have a 3D mapping or image failed to load, show 2D fallback
-    if (error || !EMOJI_MAP[icon]) {
-        return <span className={`text-[${size}px] ${className}`}>{fallback}</span>;
+    // Map keywords to specific emoji names for CDN
+    // This mapping ensures we get the exact right 3D file
+    const getEmojiFilename = (keyword: string): string => {
+        const map: Record<string, string> = {
+            // Stats
+            'health': 'Red heart',
+            'energy': 'High voltage',
+            'spirit': 'Dove',
+            'fame': 'Star',
+            'scandal': 'Warning',
+            'money': 'Money bag',
+
+            // Actions
+            'pray': 'Folded hands_Light',
+            'preaching': 'Megaphone',
+            'miracle': 'Sparkles',
+            'crusade': 'World map',
+            'donate': 'Coin',
+
+            // Concepts
+            'bible': 'Open book',
+            'church': 'Church',
+            'music': 'Musical note',
+            'youtube': 'Play button',
+            'politics': 'Classical building',
+            'family': 'Family',
+            'love': 'Love letter',
+            'demon': 'Ogre',
+            'angel': 'Baby angel_Light',
+            'ghost': 'Ghost',
+            'fire': 'Fire',
+            'water': 'Droplet',
+            'food': 'Poultry leg',
+            'car': 'Automobile',
+            'house': 'House',
+            'book': 'Notebook',
+            'edit': 'Pencil',
+            'chart': 'Chart increasing',
+            'volcano': 'Volcano',
+            'flood': 'Cloud with rain',
+            'sickness': 'Microbe',
+
+            // People
+            'man': 'Man_Light',
+            'woman': 'Woman_Light',
+            'baby': 'Baby_Light',
+            'police': 'Police officer_Light',
+            'doctor': 'Health worker_Light',
+            'pastor': 'Man in tuxedo_Light', // Close enough proxy
+
+            // Default
+            'default': 'Sparkles'
+        };
+
+        const key = keyword.toLowerCase();
+        // Return mapped name or capitalize first letter as guess
+        return map[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+    };
+
+    useEffect(() => {
+        // Source: Microsoft Fluent UI Emoji (via jsdelivr)
+        // This is much faster and more reliable than raw github contents
+        const filename = getEmojiFilename(icon);
+        const url = `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/${filename}/3D/${filename.replace(/ /g, '_')}_3d.png`;
+
+        setImgSrc(url);
+        setHasError(false);
+    }, [icon]);
+
+    if (hasError) {
+        return (
+            <span
+                style={{ fontSize: `${size * 0.8}px`, lineHeight: 1 }}
+                className={className}
+                role="img"
+                aria-label={icon}
+            >
+                {fallback}
+            </span>
+        );
     }
 
-    const path = EMOJI_MAP[icon];
-    const fullUrl = `${BASE_URL}/${path}`;
-
     return (
-        <div
-            className={`inline-block relative ${animate ? 'hover:animate-bounce-short' : ''} ${className}`}
-            style={{ width: size, height: size }}
-        >
-            <img
-                src={fullUrl}
-                alt={icon}
-                className="w-full h-full object-contain filter drop-shadow-md"
-                onError={() => setError(true)}
-                loading="lazy"
-            />
-        </div>
+        <img
+            src={imgSrc}
+            alt={icon}
+            width={size}
+            height={size}
+            className={className}
+            onError={() => setHasError(true)}
+            style={{
+                display: 'inline-block',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))', // Add depth
+                animation: animate ? 'float 3s ease-in-out infinite' : 'none',
+                transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}
+        />
     );
+}
+
+// Add global style for float animation if not exists
+const style = typeof document !== 'undefined' ? document.createElement('style') : null;
+if (style) {
+    style.innerHTML = `
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+            100% { transform: translateY(0px); }
+        }
+    `;
+    document.head.appendChild(style);
 }

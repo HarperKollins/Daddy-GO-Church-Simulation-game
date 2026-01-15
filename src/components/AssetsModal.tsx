@@ -1,209 +1,133 @@
 /**
- * Assets Marketplace Modal - Clean BitLife Style
- * 
- * Allows player to buy vehicles, properties, and investments using Personal Cash.
- * Uses text-based icons instead of emojis.
+ * AssetsModal Component - Nano Banana Gallery View
+ * High-saturation Unsplash photos in dark cards.
  */
 
 'use client';
 
-import { useState } from 'react';
-import { assets } from '@/data/assets';
+import { useGameStore } from '@/store/useGameStore';
+import { getAssetsByCategory } from '@/data/assets';
 import type { Asset } from '@/types/game';
 
-interface AssetsModalProps {
-    personalCash: number;
-    ownedAssets: Asset[];
-    onBuy: (asset: Asset) => void;
-    onSell: (asset: Asset) => void;
-    onClose: () => void;
-}
+// Unsplash keywords mapped to asset types
+const ASSET_IMAGES: Record<string, string> = {
+    'Toyota Corolla': 'https://images.unsplash.com/photo-1623869675785-654b415b8291?w=800&q=80',
+    'Toyota Camry': 'https://images.unsplash.com/photo-1621007947382-bb3c3968e3bb?w=800&q=80',
+    'Toyota Highlander': 'https://images.unsplash.com/photo-1518987048-93e29699e79a?w=800&q=80',
+    'Lexus RX 350': 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80',
+    'Toyota Land Cruiser': 'https://images.unsplash.com/photo-1594233466450-d416959a8f75?w=800&q=80',
+    'Mercedes S-Class': 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&q=80',
+    'Mercedes G-Wagon': 'https://images.unsplash.com/photo-1520031441872-ddb157228d8d?w=800&q=80',
+    'Rolls Royce Phantom': 'https://images.unsplash.com/photo-1631295868223-63265b40d9e4?w=800&q=80',
+    'Private Jet (Gulfstream G650)': 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=800&q=80',
 
-const formatCash = (amount: number): string => {
-    if (amount >= 1000000) {
-        return `₦${(amount / 1000000).toFixed(1)}M`;
-    }
-    if (amount >= 1000) {
-        return `₦${(amount / 1000).toFixed(0)}K`;
-    }
-    return `₦${amount.toLocaleString()}`;
+    // Properties
+    '3-Bedroom Flat (Lagos)': 'https://images.unsplash.com/photo-1484154218962-a1c002085d2f?w=800&q=80',
+    'Duplex in Lekki': 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80',
+    'Mansion in Banana Island': 'https://images.unsplash.com/photo-1600596542815-2a4d9f0152ba?w=800&q=80',
+    'Estate in Maitama, Abuja': 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
 };
 
-type Category = 'vehicle' | 'property' | 'investment';
+const formatCash = (n: number) => `₦${n.toLocaleString()}`;
 
-// Category icons (text-based)
-const categoryIcons: Record<Category, { icon: string; color: string }> = {
-    vehicle: { icon: 'CAR', color: '#3b82f6' },
-    property: { icon: 'HOM', color: '#10b981' },
-    investment: { icon: 'INV', color: '#a855f7' },
-};
+export default function AssetsModal() {
+    const assets = useGameStore(state => state.assets);
+    const personalCash = useGameStore(state => state.stats.personalCash);
+    const addAsset = useGameStore(state => state.addAsset);
+    const modifyStat = useGameStore(state => state.modifyStat);
 
-export default function AssetsModal({
-    personalCash,
-    ownedAssets,
-    onBuy,
-    onSell,
-    onClose,
-}: AssetsModalProps) {
-    const [activeTab, setActiveTab] = useState<Category>('vehicle');
-
-    const filteredAssets = assets.filter(a => a.category === activeTab);
-
-    const isOwned = (assetId: string) => ownedAssets.some(a => a.id === assetId);
-
-    const getSellPrice = (asset: Asset) => {
-        if (asset.category === 'investment') return asset.cost;
-        return Math.floor(asset.cost * 0.7);
-    };
+    const vehicles = getAssetsByCategory('vehicle');
+    const properties = getAssetsByCategory('property');
+    const allDisplayAssets = [...vehicles, ...properties];
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '460px' }}>
-                <div className="modal-header">
-                    <h2>Assets Market</h2>
-                    <div style={{ fontSize: '13px', color: 'var(--stat-cash)', fontWeight: '600' }}>
+        <div style={{ padding: '16px', paddingBottom: '100px' }}>
+            {/* Header */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '24px'
+            }}>
+                <h2 className="text-h1">Luxury Assets</h2>
+                <div style={{ textAlign: 'right' }}>
+                    <div className="text-label">Liquid Cash</div>
+                    <div className="text-value" style={{ color: 'var(--lime-glow)' }}>
                         {formatCash(personalCash)}
                     </div>
                 </div>
+            </div>
 
-                {/* Category Tabs */}
-                <div className="tab-container" style={{ margin: '0 16px 16px' }}>
-                    {(['vehicle', 'property', 'investment'] as Category[]).map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => setActiveTab(cat)}
-                            className={`tab-button ${activeTab === cat ? 'active' : ''}`}
-                            style={{ textTransform: 'capitalize' }}
-                        >
-                            {cat}s
-                        </button>
-                    ))}
-                </div>
+            {/* Assets List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {allDisplayAssets.map((asset) => {
+                    // Corrected ownership check for flat Asset[] array
+                    const isOwned = assets.some((a: Asset) => a.id === asset.id);
+                    const canAfford = personalCash >= asset.cost;
+                    const imageUrl = ASSET_IMAGES[asset.name] || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80';
 
-                <div className="modal-body">
-                    {filteredAssets.map(asset => {
-                        const owned = isOwned(asset.id);
-                        const catInfo = categoryIcons[asset.category as Category];
+                    return (
+                        <div key={asset.id} className="nano-card" style={{ overflow: 'hidden', padding: 0 }}>
+                            {/* Image Header */}
+                            <div style={{
+                                height: '140px',
+                                background: `url(${imageUrl}) center/cover no-repeat`,
+                                position: 'relative'
+                            }}>
+                                <div style={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(15,23,42,1))'
+                                }} />
 
-                        return (
-                            <div
-                                key={asset.id}
-                                className="list-item"
-                                style={{
-                                    flexDirection: 'column',
-                                    alignItems: 'stretch',
-                                    gap: '12px',
-                                    background: owned && asset.category !== 'investment'
-                                        ? 'rgba(16, 185, 129, 0.1)'
-                                        : 'var(--bg-input)',
-                                    border: owned && asset.category !== 'investment'
-                                        ? '1px solid rgba(16, 185, 129, 0.3)'
-                                        : 'none'
-                                }}
-                            >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <div className="list-item-icon" style={{
-                                            background: `${catInfo.color}20`,
-                                            color: catInfo.color,
-                                            fontSize: '10px'
-                                        }}>
-                                            {catInfo.icon}
-                                        </div>
-                                        <div>
-                                            <div className="list-item-title">{asset.name}</div>
-                                            <div className="list-item-subtitle">
-                                                {asset.category === 'investment'
-                                                    ? `Volatility: ${asset.volatility}%`
-                                                    : `Maint: ${formatCash(asset.weeklyMaintenance)}/wk`}
-                                            </div>
-                                        </div>
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: '12px',
+                                    left: '16px'
+                                }}>
+                                    <div className="text-h2">{asset.name}</div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                                        Maintenance: {formatCash(asset.weeklyMaintenance)}/wk
                                     </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontWeight: '700', color: 'var(--stat-cash)' }}>
-                                            {formatCash(asset.cost)}
-                                        </div>
-                                        {asset.fameBonus > 0 && (
-                                            <div style={{ fontSize: '11px', color: 'var(--stat-fame)' }}>+{asset.fameBonus} Fame</div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    {owned && asset.category !== 'investment' ? (
-                                        <button
-                                            onClick={() => onSell(ownedAssets.find(a => a.id === asset.id)!)}
-                                            style={{
-                                                flex: 1,
-                                                padding: '10px',
-                                                background: 'rgba(239, 68, 68, 0.1)',
-                                                color: 'var(--accent-danger)',
-                                                border: '1px solid rgba(239, 68, 68, 0.2)',
-                                                borderRadius: '8px',
-                                                cursor: 'pointer',
-                                                fontWeight: '500',
-                                                fontSize: '13px'
-                                            }}
-                                        >
-                                            Sell for {formatCash(getSellPrice(asset))}
-                                        </button>
-                                    ) : (
-                                        <button
-                                            disabled={personalCash < asset.cost}
-                                            onClick={() => onBuy(asset)}
-                                            className="btn-primary"
-                                            style={{
-                                                flex: 1,
-                                                padding: '10px',
-                                                opacity: personalCash >= asset.cost ? 1 : 0.5
-                                            }}
-                                        >
-                                            Buy Now
-                                        </button>
-                                    )}
                                 </div>
                             </div>
-                        );
-                    })}
 
-                    {/* Portfolio Section for Investments */}
-                    {activeTab === 'investment' && ownedAssets.filter(a => a.category === 'investment').length > 0 && (
-                        <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                            <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: 'var(--text-muted)' }}>
-                                YOUR PORTFOLIO
-                            </h3>
-                            {ownedAssets.filter(a => a.category === 'investment').map((inv, idx) => (
-                                <div key={`${inv.id}-${idx}`} className="list-item" style={{ padding: '12px' }}>
-                                    <div className="list-item-content">
-                                        <div className="list-item-title">{inv.name}</div>
-                                        <div className="list-item-subtitle">Value: {formatCash(inv.cost)}</div>
-                                    </div>
-                                    <button
-                                        onClick={() => onSell(inv)}
-                                        style={{
-                                            padding: '6px 14px',
-                                            background: 'rgba(239, 68, 68, 0.1)',
-                                            color: 'var(--accent-danger)',
-                                            border: '1px solid rgba(239, 68, 68, 0.2)',
-                                            borderRadius: '6px',
-                                            cursor: 'pointer',
-                                            fontSize: '12px',
-                                            fontWeight: '500'
-                                        }}
-                                    >
-                                        Sell
-                                    </button>
+                            {/* Action Footer */}
+                            <div style={{
+                                padding: '12px 16px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <div className="text-value" style={{ fontSize: '16px' }}>
+                                    {formatCash(asset.cost)}
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
 
-                <div className="modal-footer">
-                    <button className="btn-cancel" style={{ width: '100%' }} onClick={onClose}>
-                        Close Market
-                    </button>
-                </div>
+                                <button
+                                    onClick={() => {
+                                        if (!isOwned && canAfford) {
+                                            modifyStat('personalCash', -asset.cost);
+                                            addAsset(asset);
+                                        }
+                                    }}
+                                    disabled={isOwned || !canAfford}
+                                    style={{
+                                        background: isOwned ? 'rgba(255,255,255,0.1)' : (canAfford ? 'var(--lime-glow)' : 'rgba(255,255,255,0.05)'),
+                                        color: isOwned ? 'var(--text-muted)' : (canAfford ? '#000' : 'var(--text-muted)'),
+                                        padding: '8px 16px',
+                                        borderRadius: '999px',
+                                        border: 'none',
+                                        fontWeight: 700,
+                                        fontSize: '12px',
+                                        cursor: isOwned || !canAfford ? 'default' : 'pointer',
+                                    }}
+                                >
+                                    {isOwned ? 'OWNED' : 'BUY NOW'}
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

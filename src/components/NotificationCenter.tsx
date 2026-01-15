@@ -33,44 +33,52 @@ export default function NotificationCenter() {
     // Track seen events to avoid duplicates
     const [seenOwambes, setSeenOwambes] = useState<Set<string>>(new Set());
 
-    // Effect: Listen for new Owambe invitations
+    // Effect: Listen for new Owambe invitations - LIMITED to prevent spam
     useEffect(() => {
         const upcoming = engine.realism?.upcomingOwambes || [];
 
-        upcoming.forEach(event => {
-            if (!seenOwambes.has(event.id)) {
-                // New Owambe!
-                addNotification({
-                    id: event.id,
-                    type: 'owambe',
-                    title: `✉️ Invitation: ${event.type}`,
-                    message: `${event.host} is inviting you to their ${event.type} in ${event.venue}.`,
-                    icon: 'party', // we need to add this to 3D map or use fallback
-                    fallbackIcon: '🎉',
-                    action: {
-                        label: 'Attend (₦50k)',
-                        onClick: () => handleAttendOwambe(event)
-                    },
-                    secondaryAction: {
-                        label: 'Decline',
-                        onClick: () => dismissNotification(event.id)
-                    }
-                });
-                setSeenOwambes(prev => new Set(prev).add(event.id));
-                audioManager.playEffect('UI_NOTIFICATION');
-            }
-        });
-    }, [engine.realism?.upcomingOwambes, seenOwambes, audioManager]);
+        // Only show the most recent invitation if not already seen
+        const latestEvent = upcoming[upcoming.length - 1];
+
+        if (latestEvent && !seenOwambes.has(latestEvent.id) && notifications.length < 3) {
+            // New Owambe!
+            addNotification({
+                id: latestEvent.id,
+                type: 'owambe',
+                title: `✉️ Invitation: ${latestEvent.type}`,
+                message: `${latestEvent.host} is inviting you to their ${latestEvent.type} in ${latestEvent.venue}.`,
+                icon: 'party',
+                fallbackIcon: '🎉',
+                action: {
+                    label: 'Attend (₦50k)',
+                    onClick: () => handleAttendOwambe(latestEvent)
+                },
+                secondaryAction: {
+                    label: 'Decline',
+                    onClick: () => dismissNotification(latestEvent.id)
+                }
+            });
+            setSeenOwambes(prev => new Set(prev).add(latestEvent.id));
+            audioManager.playEffect('UI_NOTIFICATION');
+        }
+    }, [engine.realism?.upcomingOwambes?.length, seenOwambes, audioManager, notifications.length]);
 
     // Handlers
     const addNotification = (note: Notification) => {
-        setNotifications(prev => [note, ...prev]);
-        // Auto dismiss simple alerts
-        if (note.type === 'alert' || note.type === 'success') {
-            setTimeout(() => {
-                dismissNotification(note.id);
-            }, 5000);
-        }
+        setNotifications(prev => {
+            // Limit to 3 notifications max
+            const updated = [note, ...prev].slice(0, 3);
+            return updated;
+        });
+        // Auto dismiss ALL notifications after some time
+        const dismissTime = note.type === 'owambe' ? 15000 : 5000;
+        setTimeout(() => {
+            dismissNotification(note.id);
+        }, dismissTime);
+    };
+
+    const dismissAll = () => {
+        setNotifications([]);
     };
 
     const dismissNotification = (id: string) => {
@@ -117,24 +125,71 @@ export default function NotificationCenter() {
     if (notifications.length === 0) return null;
 
     return (
-        <div className="fixed top-4 right-4 w-96 z-50 flex flex-col gap-3 pointer-events-none">
+        <div style={{
+            position: 'fixed',
+            top: '16px',
+            right: '16px',
+            width: '320px',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            pointerEvents: 'none'
+        }}>
+            {/* Dismiss All button */}
+            {notifications.length > 1 && (
+                <button
+                    onClick={dismissAll}
+                    style={{
+                        pointerEvents: 'auto',
+                        alignSelf: 'flex-end',
+                        background: 'rgba(0,0,0,0.8)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '6px 12px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                    }}
+                >
+                    Dismiss All ({notifications.length})
+                </button>
+            )}
             {notifications.map(note => (
                 <div
                     key={note.id}
-                    className="bg-white/95 backdrop-blur-md shadow-2xl rounded-xl p-4 border border-white/20 pointer-events-auto transform transition-all animate-slide-in hover:scale-[1.02]"
+                    style={{
+                        pointerEvents: 'auto',
+                        background: 'rgba(17, 17, 24, 0.95)',
+                        backdropFilter: 'blur(8px)',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }}
                 >
-                    <div className="flex gap-4 items-start">
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                         <ThreeDEmoji icon={note.icon} fallback={note.fallbackIcon} size={40} animate={true} />
-                        <div className="flex-1">
-                            <h4 className="font-bold text-gray-900 text-sm mb-1">{note.title}</h4>
-                            <p className="text-gray-600 text-xs leading-relaxed mb-3">{note.message}</p>
+                        <div style={{ flex: 1 }}>
+                            <h4 style={{ fontWeight: 700, color: '#f8fafc', fontSize: '13px', marginBottom: '4px' }}>{note.title}</h4>
+                            <p style={{ color: '#94a3b8', fontSize: '12px', lineHeight: 1.4, marginBottom: '12px' }}>{note.message}</p>
 
                             {(note.action || note.secondaryAction) && (
-                                <div className="flex gap-2">
+                                <div style={{ display: 'flex', gap: '8px' }}>
                                     {note.action && (
                                         <button
                                             onClick={note.action.onClick}
-                                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition shadow-sm"
+                                            style={{
+                                                padding: '6px 12px',
+                                                background: '#3b82f6',
+                                                color: '#fff',
+                                                fontSize: '11px',
+                                                fontWeight: 700,
+                                                borderRadius: '6px',
+                                                border: 'none',
+                                                cursor: 'pointer'
+                                            }}
                                         >
                                             {note.action.label}
                                         </button>
@@ -142,7 +197,16 @@ export default function NotificationCenter() {
                                     {note.secondaryAction && (
                                         <button
                                             onClick={note.secondaryAction.onClick}
-                                            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-lg transition"
+                                            style={{
+                                                padding: '6px 12px',
+                                                background: 'rgba(255,255,255,0.1)',
+                                                color: '#94a3b8',
+                                                fontSize: '11px',
+                                                fontWeight: 700,
+                                                borderRadius: '6px',
+                                                border: 'none',
+                                                cursor: 'pointer'
+                                            }}
                                         >
                                             {note.secondaryAction.label}
                                         </button>
@@ -152,7 +216,13 @@ export default function NotificationCenter() {
                         </div>
                         <button
                             onClick={() => dismissNotification(note.id)}
-                            className="text-gray-400 hover:text-gray-600"
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#64748b',
+                                cursor: 'pointer',
+                                fontSize: '16px'
+                            }}
                         >
                             ✕
                         </button>

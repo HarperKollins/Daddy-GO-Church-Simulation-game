@@ -420,10 +420,13 @@ export const useGameStore = create<GameStore>()(
                 // 1. Economy: Crypto Prices
                 const newCryptoAssets = simulateCryptoPrices(currentState.engine.economy.cryptoAssets, 'neutral');
 
-                // 2. Realism: Owambe Invitations
+                // 2. Realism: Owambe Invitations - LIMITED to 3 max
                 const newOwambe = generateOwambeInvitation(currentState.week, currentState.stats.fame || 0);
                 const currentOwambes = currentState.engine.realism.upcomingOwambes;
-                const updatedOwambes = newOwambe ? [...currentOwambes, newOwambe] : currentOwambes;
+                // Keep only last 3 owambes to prevent spam
+                const updatedOwambes = newOwambe
+                    ? [...currentOwambes, newOwambe].slice(-3)
+                    : currentOwambes.slice(-3);
 
                 set((s) => ({
                     engine: {

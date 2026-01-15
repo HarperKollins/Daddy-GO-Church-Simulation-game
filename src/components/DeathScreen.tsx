@@ -28,7 +28,8 @@ interface DeathScreenProps {
     ribbons: Array<{ id: string; name: string; emoji: string }>;
     timeline: Array<{ week: number; event: string; impact: string }>;
     onRestart: () => void;
-    onShare: () => void;
+    onShare?: () => void;
+    isAlive?: boolean;
 }
 
 const DEATH_MESSAGES: Record<string, { title: string; subtitle: string; emoji: string }> = {
@@ -58,15 +59,18 @@ export default function DeathScreen({
     playerName,
     age,
     weeksPlayed,
-    deathCause,
+    deathCause = 'health',
     stats,
-    ribbons,
-    timeline,
+    ribbons = [],
+    timeline = [],
     onRestart,
     onShare,
+    isAlive = true,
 }: DeathScreenProps) {
+    if (isAlive || !stats) return null;
+
     const death = DEATH_MESSAGES[deathCause] || DEATH_MESSAGES.health;
-    const years = Math.floor(weeksPlayed / 52);
+    const years = Math.floor((weeksPlayed || 0) / 52);
 
     // Generate epitaph based on stats
     const getEpitaph = () => {
@@ -163,10 +167,10 @@ export default function DeathScreen({
                                 <div
                                     key={i}
                                     className={`rounded-lg p-2 text-sm ${entry.impact === 'positive'
-                                            ? 'bg-green-900/30'
-                                            : entry.impact === 'negative'
-                                                ? 'bg-red-900/30'
-                                                : 'bg-white/5'
+                                        ? 'bg-green-900/30'
+                                        : entry.impact === 'negative'
+                                            ? 'bg-red-900/30'
+                                            : 'bg-white/5'
                                         }`}
                                 >
                                     <span className="text-white/60">Week {entry.week}:</span>{' '}
