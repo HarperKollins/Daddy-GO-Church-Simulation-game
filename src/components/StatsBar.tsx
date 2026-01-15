@@ -187,14 +187,14 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
                         overflow: 'hidden',
                     }}>
                         <div style={{
-                            width: `${Math.min(100, stats.health)}%`,
+                            width: `${Math.min(100, stats.health / 100)}%`,
                             height: '100%',
                             background: '#ef4444',
                             borderRadius: '3px',
                         }} />
                     </div>
                     <span style={{ color: '#6b7280', fontSize: '11px', width: '30px', textAlign: 'right' }}>
-                        {Math.round(stats.health)}%
+                        {Math.round(stats.health / 100)}%
                     </span>
                 </div>
 
