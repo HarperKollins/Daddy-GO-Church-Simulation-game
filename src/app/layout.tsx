@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
+import ClientProviders from '@/components/ClientProviders'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,16 +30,18 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
       </head>
       <body className={inter.className} style={{ background: '#0a0a0f' }}>
-        <main style={{
-          minHeight: '100vh',
-          maxWidth: '768px',
-          margin: '0 auto',
-          position: 'relative',
-          overflow: 'hidden',
-          background: '#0a0a0f'
-        }}>
-          {children}
-        </main>
+        <ClientProviders>
+          <main style={{
+            minHeight: '100vh',
+            maxWidth: '768px',
+            margin: '0 auto',
+            position: 'relative',
+            overflow: 'hidden',
+            background: '#0a0a0f'
+          }}>
+            {children}
+          </main>
+        </ClientProviders>
         <Analytics />
       </body>
     </html>
