@@ -105,8 +105,9 @@ const DEFAULT_PLAYER: ExtendedPlayerState = {
     skills: {
         preaching: 1,
         healing: 1,
-        charisma: 1,
-        business: 1,
+        prophecy: 1,
+        administration: 1,
+        music: 1,
         politics: 1,
     },
     socialMedia: {
@@ -785,7 +786,7 @@ export const useGameStore = create<GameStore>()(
                 set((s) => ({
                     skills: {
                         ...s.skills,
-                        [skill]: Math.min(10, s.skills[skill] + amount)
+                        [skill]: Math.min(10, (s.skills[skill] || 1) + amount)
                     }
                 }));
             },

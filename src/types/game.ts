@@ -307,16 +307,7 @@ export interface PlayerState {
     engine: EngineState;
 }
 
-/**
- * Pastor skill levels (1-10 each)
- */
-export interface PastorSkills {
-    preaching: number;   // Cash from sermons
-    healing: number;     // Miracle success rate
-    charisma: number;    // Member recruitment
-    business: number;    // Investment returns
-    politics: number;    // Scandal resistance
-}
+
 
 /**
  * Social media presence
@@ -333,11 +324,12 @@ export interface SocialMediaPresence {
  * Pastor skill levels (1-10 each)
  */
 export interface PastorSkills {
-    preaching: number;   // Cash from sermons
-    healing: number;     // Miracle success rate
-    charisma: number;    // Member recruitment
-    business: number;    // Investment returns
-    politics: number;    // Scandal resistance
+    preaching: number;      // Cash from sermons & Speaking power
+    healing: number;        // Miracle success rate
+    prophecy: number;       // Vision accuracy & Event warnings
+    administration: number; // Reduces costs & Scandal risk
+    music: number;          // Hype generation & Member retention
+    politics: number;       // Influence & Government connections
 }
 
 /**

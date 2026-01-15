@@ -21,9 +21,9 @@ const SKILLS_CONFIG = [
 
 export default function SkillsModal() {
     const { skills, trainSkill, stats } = useGameStore(state => ({
-        skills: state.skills,
+        skills: state.skills || {},
         trainSkill: state.trainSkill,
-        stats: state.stats
+        stats: state.stats || { energy: 0 }
     }));
     const [message, setMessage] = useState<{ text: string; color: string } | null>(null);
 
