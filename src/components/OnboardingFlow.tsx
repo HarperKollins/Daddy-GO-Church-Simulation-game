@@ -169,8 +169,30 @@ export default function OnboardingFlow({ onComplete }: OnboardingProps) {
     ];
 
     return (
-        <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-black flex items-center justify-center p-4 z-50">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-md w-full text-center text-white shadow-2xl">
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(to bottom right, #581c87, #312e81, #000)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            zIndex: 9999,
+        }}>
+            <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(12px)',
+                borderRadius: '16px',
+                padding: '32px',
+                maxWidth: '448px',
+                width: '100%',
+                textAlign: 'center' as const,
+                color: 'white',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            }}>
 
                 {/* INTRO SLIDES */}
                 {step === 'intro' && (

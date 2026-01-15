@@ -72,8 +72,31 @@ export default function CryptoDashboard({ onClose }: CryptoDashboardProps) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-            <div className="bg-gray-900 w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl border border-gray-700 flex flex-col">
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+        }}>
+            <div style={{
+                backgroundColor: '#111827',
+                width: '100%',
+                maxWidth: '896px',
+                maxHeight: '90vh',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                border: '1px solid #374151',
+                display: 'flex',
+                flexDirection: 'column' as const,
+            }}>
                 {/* Header */}
                 <div className="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700">
                     <div>
@@ -109,8 +132,8 @@ export default function CryptoDashboard({ onClose }: CryptoDashboardProps) {
                                         setSelectedAsset(asset);
                                     }}
                                     className={`p-3 rounded-xl cursor-pointer mb-2 transition border ${selectedAsset?.id === asset.id
-                                            ? 'bg-yellow-500/10 border-yellow-500'
-                                            : 'bg-gray-800 border-transparent hover:bg-gray-700'
+                                        ? 'bg-yellow-500/10 border-yellow-500'
+                                        : 'bg-gray-800 border-transparent hover:bg-gray-700'
                                         }`}
                                 >
                                     <div className="flex justify-between items-start">

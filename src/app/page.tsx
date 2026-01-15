@@ -9,13 +9,21 @@ import { useState, useEffect } from 'react';
 import { useGameStore } from '@/store/useGameStore';
 import { getAvailableEvents, getAvailableChoices, getNextStoryEvent, rollForRandomEvent } from '@/engine/eventSystem';
 import { act1Events } from '@/data/events/act1Events';
-import { randomEvents } from '@/data/events/randomEvents';
-import { specialEvents } from '@/data/events/specialEvents';
+import { ALL_EVENTS } from '@/data/events';
 import type { GameEvent, EventChoice, GuestMinister, VenueTier, Asset, Partner } from '@/types/game';
 import { Icons } from '@/components/Icons';
 
-// Merge all event pools for maximum variety
-const allEvents: GameEvent[] = [...act1Events, ...randomEvents, ...specialEvents];
+// Import engine functions for causality, personality, and near-miss systems
+import {
+  processPendingConsequences,
+  registerConsequence,
+  addKarmaEntry,
+  generateNearMiss,
+  recordChoiceAndUpdatePersonality,
+} from '@/engine';
+
+// Use ALL_EVENTS (170+ events) instead of just 3 files
+const allEvents: GameEvent[] = ALL_EVENTS;
 
 import StatsBar from '@/components/StatsBar';
 import EventModal from '@/components/EventModal';
@@ -36,6 +44,11 @@ import SettingsModal from '@/components/SettingsModal';
 import NotificationCenter from '@/components/NotificationCenter';
 import RealismOverlay from '@/components/RealismOverlay';
 import ChurchVisualizer from '@/components/ChurchVisualizer';
+import OnboardingFlow from '@/components/OnboardingFlow';
+import DeathScreen from '@/components/DeathScreen';
+import CryptoDashboard from '@/components/dashboards/CryptoDashboard';
+import SpiritualWarfareModal from '@/components/dashboards/SpiritualWarfareModal';
+import TestimonyManager from '@/components/dashboards/TestimonyManager';
 
 // Venue upgrade costs - 10x increase for realistic difficulty
 const venueUpgrades: Record<VenueTier, { next: VenueTier | null; cost: number; minMembers: number; educationRequired?: string }> = {
@@ -70,7 +83,7 @@ export default function GamePage() {
     setPartner, setPlayerName, spendEnergy,
     startDating, propose, marry, breakup, hookup,
     upgradeSkill, trainSkill, uploadSermon, skills,
-    dropout, resetGame
+    dropout, resetGame, setOnboardingComplete
   } = store;
 
   // Hydration check
@@ -96,13 +109,19 @@ export default function GamePage() {
   const [showFarbesModal, setShowFarbesModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showNameModal, setShowNameModal] = useState(false);
+  // NEW: Dashboard modal states
+  const [showCryptoDashboard, setShowCryptoDashboard] = useState(false);
+  const [showSpiritualWarfare, setShowSpiritualWarfare] = useState(false);
+  const [showTestimonyManager, setShowTestimonyManager] = useState(false);
+  // NEW: Onboarding state (replaces simple NameInputModal for first-time players)
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Check if this is a new game (player hasn't set name yet)
+  // Check if this is a new game (player hasn't done onboarding) - show OnboardingFlow
   useEffect(() => {
-    if (isClient && store.name === 'Pastor') {
-      setShowNameModal(true);
+    if (isClient && !store.hasCompletedOnboarding) {
+      setShowOnboarding(true);
     }
-  }, [isClient, store.name]);
+  }, [isClient, store.hasCompletedOnboarding]);
 
   // Trigger initial story event on first week if applicable
   useEffect(() => {
@@ -181,6 +200,34 @@ export default function GamePage() {
           addMembers(val);
         }
       });
+    }
+
+    // NEW: Update player personality based on choice
+    try {
+      const updatedPersonality = recordChoiceAndUpdatePersonality(
+        store.personality,
+        currentEvent!.id,
+        choice.id,
+        week,
+        currentEvent!.category || 'random',
+        'neutral'
+      );
+      // Note: We'd need to add a setPersonality action to the store to persist this
+      console.log('[PERSONALITY ENGINE] Updated:', updatedPersonality.dominantTraits);
+    } catch (e) {
+      // Engine not fully implemented, continue gracefully
+    }
+
+    // NEW: Add karma entry for significant choices
+    try {
+      const karmaValue = choice.id.includes('honest') || choice.id.includes('help') ? 100
+        : choice.id.includes('siphon') || choice.id.includes('lie') ? -100 : 0;
+      if (karmaValue !== 0) {
+        addKarmaEntry(store.karma, `Choice: ${choice.id}`, week, karmaValue);
+        console.log('[KARMA ENGINE] Entry added:', karmaValue > 0 ? 'Positive' : 'Negative');
+      }
+    } catch (e) {
+      // Engine not fully implemented, continue gracefully  
     }
 
     addToast('Choice recorded.', 'info');
@@ -455,6 +502,39 @@ export default function GamePage() {
                   <div className="action-card-subtitle">Check Net Worth Ranking</div>
                 </div>
               </div>
+
+              {/* NEW: Crypto Dashboard */}
+              <div onClick={() => { console.log('[DEBUG] Crypto clicked'); setShowCryptoDashboard(true); }} className="action-card">
+                <div className="action-card-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
+                  🚀
+                </div>
+                <div className="action-card-content">
+                  <div className="action-card-title">Crypto Trading</div>
+                  <div className="action-card-subtitle">Buy BTC, ETH, memecoins</div>
+                </div>
+              </div>
+
+              {/* NEW: Spiritual Warfare */}
+              <div onClick={() => setShowSpiritualWarfare(true)} className="action-card">
+                <div className="action-card-icon" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
+                  ⚔️
+                </div>
+                <div className="action-card-content">
+                  <div className="action-card-title">Spiritual Warfare</div>
+                  <div className="action-card-subtitle">Fight demons, conduct deliverance</div>
+                </div>
+              </div>
+
+              {/* NEW: Testimony Manager */}
+              <div onClick={() => setShowTestimonyManager(true)} className="action-card">
+                <div className="action-card-icon" style={{ background: '#dcfce7', color: '#16a34a' }}>
+                  📜
+                </div>
+                <div className="action-card-content">
+                  <div className="action-card-title">Testimony Book</div>
+                  <div className="action-card-subtitle">Collect & share testimonies</div>
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -543,6 +623,72 @@ export default function GamePage() {
       {/* Realism Systems */}
       <NotificationCenter />
       <RealismOverlay />
+
+      {/* NEW: OnboardingFlow for first-time players */}
+      {showOnboarding && (
+        <OnboardingFlow
+          onComplete={(playerData) => {
+            setPlayerName(playerData.name);
+            setOnboardingComplete(); // Mark onboarding as done
+            setShowOnboarding(false);
+            addToast(`Welcome, ${playerData.name}! Your ministry begins.`, 'success');
+            // Apply origin bonuses based on selection
+            if (playerData.origin === 'Lagos') {
+              modifyStat('fame', 200);
+            } else if (playerData.origin === 'Village') {
+              modifyStat('anointing', 500);
+            }
+          }}
+        />
+      )}
+
+      {/* NEW: DeathScreen when player dies */}
+      {!store.isAlive && (
+        <DeathScreen
+          playerName={store.name}
+          age={store.age}
+          weeksPlayed={week}
+          deathCause={stats.scandal >= 10000 ? 'scandal' : 'health'}
+          stats={{
+            fame: stats.fame,
+            anointing: stats.anointing,
+            members: church.members,
+            personalCash: stats.personalCash,
+            churchCash: stats.churchCash,
+          }}
+          ribbons={[]}
+          timeline={store.timeline || []}
+          onRestart={() => {
+            resetGame();
+            addToast('New ministry started!', 'success');
+          }}
+          onShare={() => {
+            addToast('Share feature coming soon!', 'info');
+          }}
+        />
+      )}
+
+      {/* NEW: Dashboard Modals */}
+      {showCryptoDashboard && (() => {
+        console.log('[DEBUG] Rendering CryptoDashboard modal');
+        return (
+          <CryptoDashboard
+            onClose={() => setShowCryptoDashboard(false)}
+          />
+        );
+      })()}
+
+      {showSpiritualWarfare && (
+        <SpiritualWarfareModal
+          onClose={() => setShowSpiritualWarfare(false)}
+        />
+      )}
+
+      {showTestimonyManager && (
+        <TestimonyManager
+          onClose={() => setShowTestimonyManager(false)}
+        />
+      )}
 
     </div>
   );

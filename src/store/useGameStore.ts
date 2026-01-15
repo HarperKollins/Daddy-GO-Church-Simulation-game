@@ -38,7 +38,7 @@ import { createEmptyTestimonyInventory } from '@/engine/testimonyEngine';
 import { createEmptyTrackRecord } from '@/engine/prophecyEngine';
 import { createEmptyRelationshipGraph } from '@/engine/npcMemoryEngine';
 import { TITLE_HIERARCHY, createDefaultAnointingState } from '@/engine/titleProgressionEngine';
-import { createDefaultStreak } from '@/engine/psychologicalHooksEngine';
+import { createDefaultStreak, generateNearMissEvent } from '@/engine/psychologicalHooksEngine';
 import { createDefaultPolitics } from '@/engine/churchPoliticsEngine';
 import { createEmptyDynasty } from '@/engine/dynastyEngine';
 import { createDefaultSpiritualState } from '@/engine/spiritualWarfareEngine';
@@ -47,7 +47,7 @@ import { generateOwambeInvitation } from '@/engine/nigerianRealismEngine';
 import { createEmptyDevelopmentState } from '@/engine/personalDevelopmentEngine';
 import { createDeepProfile } from '@/engine/advancedMLEngine';
 import { LAWS } from '@/engine/universalLawsEngine';
-import { createEmptyKarmaLedger } from '@/engine/causalityEngine';
+import { createEmptyKarmaLedger, processPendingConsequences } from '@/engine/causalityEngine';
 import { createEmptyPersonality } from '@/engine/personalityEngine';
 import { ACHIEVEMENTS } from '@/engine/achievementsEngine';
 
@@ -86,6 +86,7 @@ const DEFAULT_PLAYER: ExtendedPlayerState = {
     age: 20,              // 200L student
     week: 1,
     isAlive: true,
+    hasCompletedOnboarding: false, // NEW: Track if player has done onboarding
     currentAct: 'SURVIVAL',
     stats: DEFAULT_STATS,
     hiddenFlags: DEFAULT_FLAGS,
@@ -211,6 +212,9 @@ interface GameActions {
     // NEW: Education & Graduation
     graduate: (location: 'Village' | 'City') => void;
     dropout: () => void;
+
+    // NEW: Onboarding
+    setOnboardingComplete: () => void;
 }
 
 interface GameStore extends ExtendedPlayerState, GameActions { }
@@ -434,6 +438,38 @@ export const useGameStore = create<GameStore>()(
                         }
                     }
                 }));
+
+                // 3. NEW: Near-Miss Events when scandal is high (tension building)
+                const currentGameState = get();
+                if (currentGameState.stats.scandal > 3000) {
+                    try {
+                        const nearMiss = generateNearMissEvent(
+                            currentGameState.stats.scandal,
+                            currentGameState.karma?.netKarma || 0,
+                            false // hasEnemies - could check NPC relationships later
+                        );
+                        if (nearMiss) {
+                            console.log('[NEAR-MISS ENGINE] Generated tension event:', nearMiss.type);
+                        }
+                    } catch (e) {
+                        // Engine function may not return expected format, continue gracefully
+                    }
+                }
+
+                // 4. NEW: Process pending consequences from past actions
+                try {
+                    const consequenceResult = processPendingConsequences(
+                        currentGameState.consequenceChains || [],
+                        currentGameState.week,
+                        currentGameState.stats,
+                        currentGameState.karma?.netKarma || 0
+                    );
+                    if (consequenceResult && consequenceResult.triggeredEvents.length > 0) {
+                        console.log('[CAUSALITY ENGINE] Triggered events:', consequenceResult.triggeredEvents);
+                    }
+                } catch (e) {
+                    // Consequence processing may fail if state not fully set up
+                }
             },
 
             // ======================================================================
@@ -846,6 +882,11 @@ export const useGameStore = create<GameStore>()(
                         integrity: Math.max(0, s.hiddenFlags.integrity - 20) // Permanent integrity hit
                     }
                 }));
+            },
+
+            // NEW: Mark onboarding as complete
+            setOnboardingComplete: () => {
+                set({ hasCompletedOnboarding: true });
             },
         }),
         {

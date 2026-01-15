@@ -80,8 +80,31 @@ export default function TestimonyManager({ onClose }: TestimonyManagerProps) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-            <div className="bg-white text-black w-full max-w-2xl h-[80vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl">
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+        }}>
+            <div style={{
+                backgroundColor: 'white',
+                color: 'black',
+                width: '100%',
+                maxWidth: '672px',
+                height: '80vh',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column' as const,
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            }}>
 
                 {/* Header */}
                 <div className="bg-blue-600 p-6 flex justify-between items-center text-white">

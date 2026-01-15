@@ -68,9 +68,31 @@ export default function SpiritualWarfareModal({ onClose }: SpiritualWarfareModal
     };
 
     return (
-        <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
-            style={{ backgroundImage: 'url(/assets/patterns/noise.png)' }}>
-            <div className="bg-red-950/30 w-full max-w-5xl h-[85vh] rounded-3xl border-2 border-red-500/30 flex overflow-hidden shadow-[0_0_50px_rgba(255,0,0,0.2)] backdrop-blur-md">
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+        }}>
+            <div style={{
+                backgroundColor: 'rgba(69, 10, 10, 0.3)',
+                width: '100%',
+                maxWidth: '1280px',
+                height: '85vh',
+                borderRadius: '24px',
+                border: '2px solid rgba(239, 68, 68, 0.3)',
+                display: 'flex',
+                overflow: 'hidden',
+                boxShadow: '0 0 50px rgba(255, 0, 0, 0.2)',
+                backdropFilter: 'blur(12px)',
+            }}>
 
                 {/* Left Panel: Status */}
                 <div className="w-1/3 bg-black/40 p-6 border-r border-red-500/20 flex flex-col gap-6">

@@ -17,14 +17,14 @@
 import { useGameStore } from '@/store/useGameStore';
 import { Icons } from '@/components/Icons';
 
-// Convert fame number to letter grade
+// Convert fame number to letter grade (scale 0-10000)
 const getFameGrade = (fame: number): { grade: string; color: string } => {
-    if (fame >= 86) return { grade: 'S', color: '#FFD700' }; // Gold
-    if (fame >= 71) return { grade: 'A', color: '#10b981' }; // Green
-    if (fame >= 56) return { grade: 'B', color: '#3b82f6' }; // Blue
-    if (fame >= 41) return { grade: 'C', color: '#8b5cf6' }; // Purple
-    if (fame >= 26) return { grade: 'D', color: '#f59e0b' }; // Orange
-    if (fame >= 11) return { grade: 'E', color: '#ef4444' }; // Red
+    if (fame >= 8600) return { grade: 'S', color: '#FFD700' }; // Gold
+    if (fame >= 7100) return { grade: 'A', color: '#10b981' }; // Green
+    if (fame >= 5600) return { grade: 'B', color: '#3b82f6' }; // Blue
+    if (fame >= 4100) return { grade: 'C', color: '#8b5cf6' }; // Purple
+    if (fame >= 2600) return { grade: 'D', color: '#f59e0b' }; // Orange
+    if (fame >= 1100) return { grade: 'E', color: '#ef4444' }; // Red
     return { grade: 'F', color: '#6b7280' }; // Gray
 };
 
@@ -97,9 +97,9 @@ export default function StatsBar({ onDropoutClick, onSettingsClick }: StatsBarPr
                         <span>HP</span>
                     </div>
                     <div className="stat-bar-container">
-                        <div className="stat-bar-fill health" style={{ width: `${stats.health}%` }} />
+                        <div className="stat-bar-fill health" style={{ width: `${Math.min(100, stats.health / 100)}%` }} />
                     </div>
-                    <span className="stat-bar-value">{stats.health}%</span>
+                    <span className="stat-bar-value">{Math.round(stats.health / 100)}%</span>
                 </div>
 
                 {/* Energy */}
@@ -109,9 +109,9 @@ export default function StatsBar({ onDropoutClick, onSettingsClick }: StatsBarPr
                         <span>NRG</span>
                     </div>
                     <div className="stat-bar-container">
-                        <div className="stat-bar-fill energy" style={{ width: `${stats.energy}%` }} />
+                        <div className="stat-bar-fill energy" style={{ width: `${Math.min(100, stats.energy / 10)}%` }} />
                     </div>
-                    <span className="stat-bar-value">{stats.energy}</span>
+                    <span className="stat-bar-value">{Math.round(stats.energy / 10)}</span>
                 </div>
 
                 {/* Anointing */}
@@ -121,9 +121,9 @@ export default function StatsBar({ onDropoutClick, onSettingsClick }: StatsBarPr
                         <span>SPIRIT</span>
                     </div>
                     <div className="stat-bar-container">
-                        <div className="stat-bar-fill anointing" style={{ width: `${stats.anointing}%` }} />
+                        <div className="stat-bar-fill anointing" style={{ width: `${Math.min(100, stats.anointing / 100)}%` }} />
                     </div>
-                    <span className="stat-bar-value">{stats.anointing}</span>
+                    <span className="stat-bar-value">{Math.round(stats.anointing / 100)}</span>
                 </div>
 
                 {/* Scandal */}
@@ -133,10 +133,10 @@ export default function StatsBar({ onDropoutClick, onSettingsClick }: StatsBarPr
                         <span>SCANDAL</span>
                     </div>
                     <div className="stat-bar-container danger">
-                        <div className="stat-bar-fill scandal" style={{ width: `${stats.scandal}%` }} />
+                        <div className="stat-bar-fill scandal" style={{ width: `${Math.min(100, stats.scandal / 100)}%` }} />
                     </div>
-                    <span className="stat-bar-value" style={{ color: stats.scandal > 50 ? '#ef4444' : 'inherit' }}>
-                        {stats.scandal}%
+                    <span className="stat-bar-value" style={{ color: stats.scandal > 5000 ? '#ef4444' : 'inherit' }}>
+                        {Math.round(stats.scandal / 100)}%
                     </span>
                 </div>
             </div>
