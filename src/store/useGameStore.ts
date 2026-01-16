@@ -87,6 +87,7 @@ const DEFAULT_PLAYER: ExtendedPlayerState = {
     week: 1,
     isAlive: true,
     hasCompletedOnboarding: false, // NEW: Track if player has done onboarding
+    hasSeenStoryIntro: false, // NEW: Track if player has seen story intro
     currentAct: 'SURVIVAL',
     stats: DEFAULT_STATS,
     hiddenFlags: DEFAULT_FLAGS,
@@ -214,8 +215,9 @@ interface GameActions {
     graduate: (location: 'Village' | 'City') => void;
     dropout: () => void;
 
-    // NEW: Onboarding
+    // NEW: Onboarding & Story Intro
     setOnboardingComplete: () => void;
+    setStoryIntroComplete: () => void;
 }
 
 interface GameStore extends ExtendedPlayerState, GameActions { }
@@ -897,6 +899,10 @@ export const useGameStore = create<GameStore>()(
                     hasCompletedOnboarding: true,
                     isAlive: true,
                 });
+            },
+
+            setStoryIntroComplete: () => {
+                set({ hasSeenStoryIntro: true });
             },
         }),
         {

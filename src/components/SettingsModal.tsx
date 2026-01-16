@@ -4,9 +4,10 @@ import { useGameStore } from '@/store/useGameStore';
 interface SettingsModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onHowToPlay?: () => void;
 }
 
-export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
+export default function SettingsModal({ isOpen, onClose, onHowToPlay }: SettingsModalProps) {
     const store = useGameStore();
     const [confirmReset, setConfirmReset] = useState(false);
 
@@ -37,6 +38,37 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         <span style={{ color: '#666' }}>Harper Kollins AI</span>
                     </div>
                 </div>
+
+                {/* How to Play Button */}
+                {onHowToPlay && (
+                    <>
+                        <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
+                        <button
+                            onClick={() => {
+                                onHowToPlay();
+                                onClose();
+                            }}
+                            style={{
+                                width: '100%',
+                                padding: '14px',
+                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                border: 'none',
+                                borderRadius: '12px',
+                                color: '#fff',
+                                fontSize: '1rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginBottom: '10px',
+                            }}
+                        >
+                            ❓ How to Play
+                        </button>
+                    </>
+                )}
 
                 <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
 

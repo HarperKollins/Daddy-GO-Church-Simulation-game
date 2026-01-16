@@ -589,6 +589,7 @@ export interface ExtendedPlayerState extends PlayerState {
     dailyStruggles: DailyStruggles;
     cityLocation: CityLocation;
     hasCompletedOnboarding: boolean; // NEW: Track if player completed onboarding
+    hasSeenStoryIntro: boolean; // NEW: Track if player has seen story intro
 }
 
 // ============================================================================

@@ -27,6 +27,8 @@ import ActionMenu from '@/components/ActionMenu';
 import EventModal from '@/components/EventModal';
 import Toast, { ToastMessage } from '@/components/Toast';
 import OnboardingFlow from '@/components/OnboardingFlow';
+import StoryIntro from '@/components/StoryIntro';
+import HowToPlayModal from '@/components/HowToPlayModal';
 import DeathScreen from '@/components/DeathScreen';
 import RealismOverlay from '@/components/RealismOverlay';
 import NotificationCenter from '@/components/NotificationCenter';
@@ -58,7 +60,8 @@ export default function GamePage() {
     setPartner, setPlayerName, spendEnergy,
     startDating, propose, marry, breakup, hookup,
     upgradeSkill, trainSkill, uploadSermon, skills,
-    dropout, resetGame, setOnboardingComplete
+    dropout, resetGame, setOnboardingComplete, setStoryIntroComplete,
+    hasSeenStoryIntro
   } = store;
 
   // UI State
@@ -85,16 +88,22 @@ export default function GamePage() {
   const [showDropout, setShowDropout] = useState(false);
   const [showFarbes, setShowFarbes] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showStoryIntro, setShowStoryIntro] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Init
   useEffect(() => { setIsClient(true); }, []);
 
-  // Onboarding Trigger
+  // Story Intro & Onboarding Trigger
   useEffect(() => {
-    if (isClient && !store.hasCompletedOnboarding) {
-      setShowOnboarding(true);
+    if (isClient) {
+      if (!hasSeenStoryIntro) {
+        setShowStoryIntro(true);
+      } else if (!store.hasCompletedOnboarding) {
+        setShowOnboarding(true);
+      }
     }
-  }, [isClient, store.hasCompletedOnboarding]);
+  }, [isClient, hasSeenStoryIntro, store.hasCompletedOnboarding]);
 
   // Initial Event Trigger (Week 1)
   useEffect(() => {
@@ -399,12 +408,27 @@ export default function GamePage() {
       )}
 
       {/* Onboarding */}
+      {showStoryIntro && (
+        <StoryIntro onComplete={() => {
+          setStoryIntroComplete();
+          setShowStoryIntro(false);
+          // Onboarding will trigger via useEffect when hasSeenStoryIntro becomes true
+        }} />
+      )}
+
       {showOnboarding && <OnboardingFlow onComplete={(data) => {
         setPlayerName(data.name);
         setOnboardingComplete();
         setShowOnboarding(false);
         addToast(`Welcome, ${data.name}!`, 'success');
       }} />}
+
+      {showHowToPlay && (
+        <HowToPlayModal
+          isOpen={showHowToPlay}
+          onClose={() => setShowHowToPlay(false)}
+        />
+      )}
 
       {/* Dashboards */}
       {showCrypto && <CryptoDashboard onClose={() => setShowCrypto(false)} />}
@@ -438,7 +462,13 @@ export default function GamePage() {
         }}
         onClose={() => setShowSiphon(false)}
       />}
-      {showSettings && <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />}
+      {showSettings && (
+        <SettingsModal
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          onHowToPlay={() => setShowHowToPlay(true)}
+        />
+      )}
       {showSocial && (
         <SocialMediaModal
           isOpen={showSocial}
