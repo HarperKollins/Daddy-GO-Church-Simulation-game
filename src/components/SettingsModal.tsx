@@ -49,20 +49,18 @@ export default function SettingsModal({ isOpen, onClose, onHowToPlay }: Settings
                                 onClose();
                             }}
                             style={{
-                                width: '100%',
-                                padding: '14px',
-                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                border: 'none',
-                                borderRadius: '12px',
-                                color: '#fff',
-                                fontSize: '1rem',
-                                fontWeight: 700,
-                                cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '10px',
                                 marginBottom: '10px',
+                                width: '100%',
+                                padding: '12px',
+                                background: '#1a1a2e',
+                                color: '#e0e0e0',
+                                border: '1px solid #333',
+                                borderRadius: '8px',
+                                cursor: 'pointer'
                             }}
                         >
                             ❓ How to Play
@@ -110,6 +108,6 @@ export default function SettingsModal({ isOpen, onClose, onHowToPlay }: Settings
                     Close
                 </button>
             </div>
-        </div>
+        </div >
     );
 }

@@ -105,11 +105,29 @@ RPG-style battles against demonic entities with tiered difficulty:
 - **Construction Projects** — Build auditoriums with contractor drama
 - **Church Mothers** — Powerful women with demands and gossip networks
 
-### 🧠 Advanced ML-Lite Engine
-- Player behavior pattern detection
-- Dynamic difficulty adjustment
-- Frustration and engagement tracking
-- Predicted endings based on choices
+### 🧠 "Project EVE" Neuro-Engine (v2.0)
+The game is powered by a client-side Neuro-Symbolic AI architecture that runs entirely on your device (CPU-Optimized).
+
+#### 1. The "Vibe" Space (Emotional State Vectors)
+- Every event, sermon, and interaction exists in a 6-dimensional vector space:
+  `[FAITH, GREED, FEAR, LOYALTY, SKEPTICISM, UNITY]`
+- **The Church has a Soul:** The collective emotional state of your congregation is tracked in real-time.
+- **Visual Feedback:** The "SPIRIT" indicator on the top bar shows the dominant egregor (e.g., "SPIRIT: GREED").
+
+#### 2. Neuro-Genetics & Evolution
+- The church is not just a number; it's a population of evolving Genotypes.
+- **Natural Selection:** Preach "Prosperity" too often? You will breed a church of "Transactional" members who leave if you stop sharing money.
+- **Feedback Loop:** The congregation's collective DNA physically pushes back against your influence.
+
+#### 3. Neuro-Grammar (Smart Narrative)
+- Replaces static text with a **Context-Free Grammar Engine**.
+- Generates unique "Thought Bubbles" and "Gossip" based on the current Vibe.
+- *Example:* A "Fearful" church will generate rumors about witches; a "Faithful" church will whisper about miracles.
+
+#### 4. The RL Director (Reinforcement Learning)
+- An adversarial AI Agent (PPO) watches your gameplay.
+- **Dynamic Pacing:** If you are too comfortable, it triggers a CRISIS. If you are quitting, it grants a MIRACLE.
+- Learns from your engagement patterns to maximize addiction.
 
 ### ⚖️ Causality System
 - Every action has delayed consequences
@@ -260,6 +278,7 @@ We welcome **"Laborers in the Vineyard"** (Contributors)!
 ## 📋 Roadmap
 
 ### ✅ Completed
+- **Project EVE (Neuro-Symbolic AI Core)**
 - Full life cycle simulation (student to G.O.)
 - 15+ interconnected game engines
 - Venue progression system

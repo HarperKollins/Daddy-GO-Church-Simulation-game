@@ -1,11 +1,14 @@
 /**
  * StatsBar Component - Matching Reference Design
  * Dark theme with date/age header, status badges, and progress bars.
+ * Updated to include PHASE D: Spiritual Atmosphere (Vibe) Indicator.
  */
 
 'use client';
 
 import { useGameStore } from '@/store/useGameStore';
+import { useMLEngine } from '@/context/MLEngineContext';
+import { getDominantVibe } from '@/engine/neuro/EmotionalState';
 
 const formatCash = (amount: number): string => {
     if (amount >= 1e9) return `₦${(amount / 1e9).toFixed(1)}B`;
@@ -19,7 +22,11 @@ interface StatsBarProps {
 }
 
 export default function StatsBar({ onSettingsClick }: StatsBarProps) {
-    const { stats, week, church, partner, age, relationshipStatus } = useGameStore();
+    const { stats, week, church, age, relationshipStatus, isAlive } = useGameStore();
+
+    // Neuro-Engine Hook
+    const { globalVibe } = useMLEngine();
+    const dominantVibe = globalVibe ? getDominantVibe(globalVibe.vector) : 'NEUTRAL';
 
     // Calculate date from weeks
     const startDate = new Date(2026, 0, 1); // Jan 1, 2026
@@ -40,7 +47,7 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
 
     // Relationship status
     const getRelationshipStatus = () => {
-        return relationshipStatus.toUpperCase();
+        return relationshipStatus ? relationshipStatus.toUpperCase() : 'SINGLE';
     };
 
     // University level (simplified)
@@ -52,6 +59,8 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
         if (yearInUni >= 1) return '200L';
         return '100L';
     };
+
+    if (!isAlive) return null;
 
     return (
         <div style={{
@@ -88,6 +97,11 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
                 }}>
                     <span style={{ fontSize: '16px' }}>👤</span>
                     <span style={{ fontWeight: 600 }}>AGE {age || 20}</span>
+                </div>
+
+                {/* VIBE INDICATOR (Phase D) */}
+                <div className={`px-2 py-1 rounded text-[10px] font-bold border ${getVibeColor(dominantVibe)} ml-2 flex items-center`}>
+                    <span className="mr-1">🛐</span> {dominantVibe}
                 </div>
 
                 {/* Spacer */}
@@ -325,4 +339,19 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
             </div>
         </div>
     );
+}
+
+// Helper for Vibe Styling
+// Using Tailwind Classes here since we are inside basic strings, 
+// ensuring they match the game's dark neon aesthetic.
+function getVibeColor(vibe: string) {
+    switch (vibe) {
+        case 'GREED': return 'bg-emerald-900/50 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]';
+        case 'FEAR': return 'bg-purple-900/50 text-purple-400 border-purple-500/30 shadow-[0_0_10px_rgba(147,51,234,0.2)]';
+        case 'FAITH': return 'bg-amber-900/50 text-amber-400 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]';
+        case 'LOYALTY': return 'bg-blue-900/50 text-blue-400 border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]';
+        case 'SKEPTICISM': return 'bg-red-900/50 text-red-400 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]';
+        case 'UNITY': return 'bg-pink-900/50 text-pink-400 border-pink-500/30 shadow-[0_0_10px_rgba(236,72,153,0.2)]';
+        default: return 'bg-slate-800 text-slate-400 border-slate-600';
+    }
 }

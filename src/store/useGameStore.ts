@@ -218,6 +218,9 @@ interface GameActions {
     // NEW: Onboarding & Story Intro
     setOnboardingComplete: () => void;
     setStoryIntroComplete: () => void;
+
+    // NEW: Timeline Injection (Neuro-Engine)
+    addTimelineEvent: (event: any) => void;
 }
 
 interface GameStore extends ExtendedPlayerState, GameActions { }
@@ -903,6 +906,12 @@ export const useGameStore = create<GameStore>()(
 
             setStoryIntroComplete: () => {
                 set({ hasSeenStoryIntro: true });
+            },
+
+            addTimelineEvent: (event) => {
+                set((s) => ({
+                    timeline: [...(s.timeline || []), { ...event, week: s.week, id: `evt_${Date.now()}` }]
+                }));
             },
         }),
         {

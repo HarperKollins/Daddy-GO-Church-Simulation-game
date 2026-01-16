@@ -29,10 +29,10 @@ export default function AudioControls() {
                 onClick={() => setShowPanel(!showPanel)}
                 style={{
                     position: 'fixed',
-                    bottom: '90px',
+                    top: '100px',
                     right: '16px',
-                    width: '48px',
-                    height: '48px',
+                    width: '40px',
+                    height: '40px',
                     borderRadius: '50%',
                     background: isMuted ? 'rgba(239, 68, 68, 0.9)' : 'rgba(34, 197, 94, 0.9)',
                     border: 'none',

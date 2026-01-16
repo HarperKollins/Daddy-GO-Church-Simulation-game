@@ -12,6 +12,8 @@
 // TESTIMONY DEFINITIONS
 // ============================================================================
 
+import { EmotionalState, getDominantVibe } from './neuro/EmotionalState';
+
 export interface Testimony {
     id: string;
     type: TestimonyType;
@@ -27,6 +29,7 @@ export interface Testimony {
     timesShared: number;
     hasBeenExposed: boolean;
     exposureWeek?: number;
+    generatedByNeuro?: boolean; // New flag for AI-authored
 }
 
 export type TestimonyType =
@@ -204,13 +207,71 @@ const TESTIMONY_TEMPLATES: Record<TestimonyType, { titles: string[], description
  * Generate a new testimony (real or fabricated)
  */
 export function generateTestimony(
-    type: TestimonyType,
-    truthPercentage: number,
-    week: number,
-    playerFame: number,
+    typeOrWeek: TestimonyType | number,
+    truthOrFame: number,
+    weekOrVibe?: number | EmotionalState,
+    playerFame?: number,
     witnesses: string[] = []
 ): Testimony {
-    const template = TESTIMONY_TEMPLATES[type];
+    // 1. Determine Logic Path (Legacy vs Neuro)
+    let type: TestimonyType = 'healing';
+    let truthPercentage = 80;
+    let week = 1;
+    let fame = 0;
+    let vibe: EmotionalState | undefined;
+
+    // Detect if called with Neuro Signature: (week, fame, vibe)
+    if (typeof typeOrWeek === 'number' && typeof truthOrFame === 'number') {
+        const isNeuro = (weekOrVibe && typeof weekOrVibe === 'object');
+
+        week = typeOrWeek;
+        fame = truthOrFame; // In neuro sig, 2nd arg is fame
+
+        if (isNeuro) {
+            vibe = weekOrVibe as EmotionalState;
+            // NEURO LOGIC
+            const dominant = getDominantVibe(vibe.vector);
+            switch (dominant) {
+                case 'GREED':
+                    type = 'financial_breakthrough';
+                    truthPercentage = 40;
+                    break;
+                case 'FEAR':
+                    type = 'deliverance';
+                    truthPercentage = 90;
+                    break;
+                case 'FAITH':
+                    type = 'prophecy_fulfilled';
+                    truthPercentage = 60;
+                    break;
+                case 'SKEPTICISM':
+                    type = Math.random() > 0.5 ? 'healing' : 'job_promotion';
+                    truthPercentage = 30;
+                    break;
+                default:
+                    type = 'child_miracle';
+            }
+        } else {
+            // Legacy Randomizer (Original logic)
+            const roll = Math.random();
+            if (roll < 0.3) type = 'healing';
+            else if (roll < 0.5) type = 'financial_breakthrough';
+            else if (roll < 0.7) type = 'deliverance';
+            else if (roll < 0.85) type = 'child_miracle'; // Fixed from 'miracle'
+            else if (roll < 0.95) type = 'visa_miracle'; // Fixed from 'conversion'
+            else type = 'enemy_defeated'; // Fixed from 'resurrection'
+            truthPercentage = 50 + Math.floor(Math.random() * 50);
+        }
+    } else {
+        // Called with Full Signature (Legacy explicit)
+        type = typeOrWeek as TestimonyType;
+        truthPercentage = truthOrFame;
+        week = weekOrVibe as number || 1;
+        fame = playerFame || 0;
+    }
+
+    // Safety Fallback for template access
+    const template = TESTIMONY_TEMPLATES[type] || TESTIMONY_TEMPLATES['healing'];
     const title = template.titles[Math.floor(Math.random() * template.titles.length)];
     const description = template.descriptions[Math.floor(Math.random() * template.descriptions.length)];
 
@@ -219,7 +280,7 @@ export function generateTestimony(
 
     // Believability depends on: fame, consistency, and embellishment
     // Higher fame = more believable (people trust famous pastors)
-    const fameBonus = playerFame / 200;  // 0-50 points
+    const fameBonus = fame / 200;  // 0-50 points
     const consistencyBonus = truthPercentage * 0.3;  // 0-30 points
     const embellishmentPenalty = embellishmentLevel * 0.2;  // 0-20 penalty
     const believabilityScore = Math.min(100, Math.max(0,
