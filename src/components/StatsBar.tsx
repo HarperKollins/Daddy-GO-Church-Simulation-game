@@ -225,17 +225,14 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
                         position: 'relative',
                     }}>
                         <div style={{
-                            position: 'absolute',
-                            right: '4px',
-                            top: '-2px',
-                            width: '6px',
-                            height: '6px',
+                            width: `${Math.min(100, (stats.energy / 150) * 100)}%`,
+                            height: '100%',
                             background: '#fbbf24',
-                            borderRadius: '50%',
+                            borderRadius: '3px',
                         }} />
                     </div>
                     <span style={{ color: '#fbbf24', fontSize: '11px', width: '30px', textAlign: 'right' }}>
-                        {Math.round(stats.energy / 10)}
+                        {Math.round(stats.energy)}
                     </span>
                 </div>
 

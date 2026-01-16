@@ -62,7 +62,7 @@ const DEFAULT_STATS: CoreStats = {
     anointing: 2000,       // Some spiritual foundation (20%)
     fame: 0,               // Nobody knows you yet
     scandal: 0,            // Clean slate
-    energy: 1000,          // Fresh start (max 1000)
+    energy: 150,           // Capped at 150 as per balance Update
     stress: 3000,          // Student life stress (30%)
     influence: 0,          // No political power yet
 };
@@ -408,7 +408,7 @@ export const useGameStore = create<GameStore>()(
                             churchCash: statsWithCash.churchCash,
                             anointing: newAnointing,
                             fame: newFame,
-                            energy: 1000, // Reset energy weekly
+                            energy: 150, // Reset energy weekly to new cap
                             stress: newStress,
                             influence: newInfluence,
                             scandal: s.stats.scandal, // Scandal doesn't decay naturally (entropy handles logic but let's be safe)
