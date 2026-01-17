@@ -31,7 +31,6 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
     if (!mounted || !isOpen) return null;
 
     return createPortal(
-    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
             <div className="absolute inset-0" onClick={onClose} />
             <Card className={`relative w-full max-w-lg max-h-[85vh] flex flex-col bg-app border-t border-x border-border-prominent sm:border shadow-2xl animate-in slide-in-from-bottom-full sm:zoom-in-95 duration-300 rounded-t-2xl rounded-b-none sm:rounded-xl ${className}`}>
