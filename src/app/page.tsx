@@ -269,19 +269,17 @@ export default function GamePage() {
     addToast(`Week ${week + 1} Started`, 'info');
   };
 
+  // ...
   if (!isClient) return null;
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#0a0a0f',
-      paddingBottom: '80px',
-    }}>
+    <div className="min-h-screen bg-app pb-20 max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-border-subtle">
       {/* Stats Header */}
       <StatsBar onSettingsClick={() => setShowSettings(true)} />
 
       {/* Main Content Area - Tab-based */}
-      <main style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <main className="min-h-[calc(100vh-200px)] p-4 space-y-4">
+
         {/* Home Tab - Action Menu */}
         {activeTab === 'home' && (
           <ActionMenu onAction={handleMenuAction} />
@@ -289,49 +287,36 @@ export default function GamePage() {
 
         {/* Church Tab - Skills & Training */}
         {activeTab === 'altar' && (
-          <div style={{ padding: '16px' }}>
-            <h2 style={{ color: '#e0e0e0', marginBottom: '16px', fontSize: '18px' }}>⛪ Church Management</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button
-                onClick={() => setShowSkills(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '16px', background: '#111118', border: 'none',
-                  borderRadius: '12px', cursor: 'pointer', textAlign: 'left'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>📚</span>
-                <div>
-                  <div style={{ color: '#e0e0e0', fontWeight: 700 }}>Train Skills</div>
-                  <div style={{ color: '#6b7280', fontSize: '12px' }}>Improve your pastoral abilities</div>
+          <div className="p-4">
+            <h2 className="text-lg font-bold text-text-primary mb-4">⛪ Church Management</h2>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => setShowSkills(true)} className="text-left group outline-none">
+                <div className="p-4 bg-surface border border-border-subtle rounded-xl flex items-center gap-4 transition-all hover:bg-surface-hover hover:border-brand/50 hover:shadow-lg group-active:scale-95">
+                  <span className="text-2xl bg-brand/10 w-12 h-12 rounded-full flex items-center justify-center">📚</span>
+                  <div>
+                    <div className="text-text-primary font-bold">Train Skills</div>
+                    <div className="text-text-secondary text-xs">Improve your pastoral abilities</div>
+                  </div>
                 </div>
               </button>
-              <button
-                onClick={() => setShowMinisters(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '16px', background: '#111118', border: 'none',
-                  borderRadius: '12px', cursor: 'pointer', textAlign: 'left'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>🎤</span>
-                <div>
-                  <div style={{ color: '#e0e0e0', fontWeight: 700 }}>Guest Ministers</div>
-                  <div style={{ color: '#6b7280', fontSize: '12px' }}>Book famous pastors to preach</div>
+
+              <button onClick={() => setShowMinisters(true)} className="text-left group outline-none">
+                <div className="p-4 bg-surface border border-border-subtle rounded-xl flex items-center gap-4 transition-all hover:bg-surface-hover hover:border-brand/50 hover:shadow-lg group-active:scale-95">
+                  <span className="text-2xl bg-amber-500/10 w-12 h-12 rounded-full flex items-center justify-center">🎤</span>
+                  <div>
+                    <div className="text-text-primary font-bold">Guest Ministers</div>
+                    <div className="text-text-secondary text-xs">Book famous pastors to preach</div>
+                  </div>
                 </div>
               </button>
-              <button
-                onClick={() => setShowWarfare(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '16px', background: '#111118', border: 'none',
-                  borderRadius: '12px', cursor: 'pointer', textAlign: 'left'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>⚔️</span>
-                <div>
-                  <div style={{ color: '#e0e0e0', fontWeight: 700 }}>Spiritual Warfare</div>
-                  <div style={{ color: '#6b7280', fontSize: '12px' }}>Fight spiritual battles</div>
+
+              <button onClick={() => setShowWarfare(true)} className="text-left group outline-none">
+                <div className="p-4 bg-surface border border-border-subtle rounded-xl flex items-center gap-4 transition-all hover:bg-surface-hover hover:border-brand/50 hover:shadow-lg group-active:scale-95">
+                  <span className="text-2xl bg-red-500/10 w-12 h-12 rounded-full flex items-center justify-center">⚔️</span>
+                  <div>
+                    <div className="text-text-primary font-bold">Spiritual Warfare</div>
+                    <div className="text-text-secondary text-xs">Fight spiritual battles</div>
+                  </div>
                 </div>
               </button>
             </div>
@@ -345,49 +330,36 @@ export default function GamePage() {
 
         {/* Social Tab */}
         {activeTab === 'scandal' && (
-          <div style={{ padding: '16px' }}>
-            <h2 style={{ color: '#e0e0e0', marginBottom: '16px', fontSize: '18px' }}>📱 Social & Relationships</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button
-                onClick={() => setShowRelationships(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '16px', background: '#111118', border: 'none',
-                  borderRadius: '12px', cursor: 'pointer', textAlign: 'left'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>❤️</span>
-                <div>
-                  <div style={{ color: '#e0e0e0', fontWeight: 700 }}>Relationships</div>
-                  <div style={{ color: '#6b7280', fontSize: '12px' }}>Dating, marriage, hookups</div>
+          <div className="p-4">
+            <h2 className="text-lg font-bold text-text-primary mb-4">📱 Social & Relationships</h2>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => setShowRelationships(true)} className="text-left group outline-none">
+                <div className="p-4 bg-surface border border-border-subtle rounded-xl flex items-center gap-4 transition-all hover:bg-surface-hover hover:border-brand/50 hover:shadow-lg group-active:scale-95">
+                  <span className="text-2xl bg-pink-500/10 w-12 h-12 rounded-full flex items-center justify-center">❤️</span>
+                  <div>
+                    <div className="text-text-primary font-bold">Relationships</div>
+                    <div className="text-text-secondary text-xs">Dating, marriage, hookups</div>
+                  </div>
                 </div>
               </button>
-              <button
-                onClick={() => setShowSocial(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '16px', background: '#111118', border: 'none',
-                  borderRadius: '12px', cursor: 'pointer', textAlign: 'left'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>📺</span>
-                <div>
-                  <div style={{ color: '#e0e0e0', fontWeight: 700 }}>Social Media</div>
-                  <div style={{ color: '#6b7280', fontSize: '12px' }}>YouTube, Spotify presence</div>
+
+              <button onClick={() => setShowSocial(true)} className="text-left group outline-none">
+                <div className="p-4 bg-surface border border-border-subtle rounded-xl flex items-center gap-4 transition-all hover:bg-surface-hover hover:border-brand/50 hover:shadow-lg group-active:scale-95">
+                  <span className="text-2xl bg-blue-500/10 w-12 h-12 rounded-full flex items-center justify-center">📺</span>
+                  <div>
+                    <div className="text-text-primary font-bold">Social Media</div>
+                    <div className="text-text-secondary text-xs">YouTube, Spotify presence</div>
+                  </div>
                 </div>
               </button>
-              <button
-                onClick={() => setShowSiphon(true)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '16px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                  borderRadius: '12px', cursor: 'pointer', textAlign: 'left'
-                }}
-              >
-                <span style={{ fontSize: '24px' }}>💸</span>
-                <div>
-                  <div style={{ color: '#ef4444', fontWeight: 700 }}>Siphon Funds</div>
-                  <div style={{ color: '#6b7280', fontSize: '12px' }}>Transfer church money (risky!)</div>
+
+              <button onClick={() => setShowSiphon(true)} className="text-left group outline-none">
+                <div className="p-4 bg-danger/5 border border-danger/20 rounded-xl flex items-center gap-4 transition-all hover:bg-danger/10 hover:border-danger/40 hover:shadow-lg group-active:scale-95">
+                  <span className="text-2xl bg-danger/10 w-12 h-12 rounded-full flex items-center justify-center text-danger">💸</span>
+                  <div>
+                    <div className="text-danger font-bold">Siphon Funds</div>
+                    <div className="text-text-secondary text-xs">Transfer church money (risky!)</div>
+                  </div>
                 </div>
               </button>
             </div>
@@ -436,6 +408,7 @@ export default function GamePage() {
       {showTestimony && <TestimonyManager onClose={() => setShowTestimony(false)} />}
       {showAssets && <AssetsModal />}
       {showMinisters && <GuestMinistersModal
+        isOpen={showMinisters}
         currentVenue={church.venue}
         churchCash={stats.churchCash}
         onBook={(minister) => {
@@ -515,17 +488,10 @@ export default function GamePage() {
         />
       )}
       {showSkills && (
-        <div className="modal-overlay" onClick={() => setShowSkills(false)}>
-          <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setShowSkills(false)}
-                style={{ background: 'none', border: 'none', color: '#fff', fontSize: '24px', cursor: 'pointer' }}
-              >×</button>
-            </div>
-            <SkillsModal />
-          </div>
-        </div>
+        <SkillsModal
+          isOpen={showSkills}
+          onClose={() => setShowSkills(false)}
+        />
       )}
       <DropoutModal
         isOpen={showDropout}

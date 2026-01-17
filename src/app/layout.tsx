@@ -9,13 +9,19 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Daddy G.O. Simulator',
   description: 'Become the ultimate Nigerian mega-church pastor in this premium simulation game.',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
-  themeColor: '#0f172a', // Matches var(--bg-void)
   appleWebApp: {
     title: 'Daddy G.O.',
     statusBarStyle: 'black-translucent',
     capable: true,
   },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#0f172a',
 }
 
 export default function RootLayout({

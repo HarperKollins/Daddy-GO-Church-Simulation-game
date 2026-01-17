@@ -5,6 +5,8 @@ import { useGameStore } from '@/store/useGameStore';
 import { createAudioManager } from '@/engine/audioManager';
 import ThreeDEmoji from './ThreeDEmoji';
 import type { OwambeEvent } from '@/types/game';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 // Notification Types
 interface Notification {
@@ -125,109 +127,63 @@ export default function NotificationCenter() {
     if (notifications.length === 0) return null;
 
     return (
-        <div style={{
-            position: 'fixed',
-            top: '16px',
-            right: '16px',
-            width: '320px',
-            zIndex: 9999,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            pointerEvents: 'none'
-        }}>
+        <div className="fixed top-4 right-4 w-80 z-[9999] flex flex-col gap-3 pointer-events-none">
             {/* Dismiss All button */}
             {notifications.length > 1 && (
-                <button
+                <Button
                     onClick={dismissAll}
-                    style={{
-                        pointerEvents: 'auto',
-                        alignSelf: 'flex-end',
-                        background: 'rgba(0,0,0,0.8)',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '6px 12px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                    }}
+                    variant="ghost"
+                    size="sm"
+                    className="pointer-events-auto self-end bg-black/80 text-white hover:bg-black/60 h-7 text-[10px] font-bold"
                 >
                     Dismiss All ({notifications.length})
-                </button>
+                </Button>
             )}
             {notifications.map(note => (
-                <div
+                <Card
                     key={note.id}
-                    style={{
-                        pointerEvents: 'auto',
-                        background: 'rgba(17, 17, 24, 0.95)',
-                        backdropFilter: 'blur(8px)',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                        borderRadius: '12px',
-                        padding: '16px',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                    }}
+                    className="pointer-events-auto bg-surface/95 backdrop-blur-md shadow-2xl border-border-prominent p-4 animate-in slide-in-from-right-full fade-in duration-300"
                 >
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <div className="flex gap-3 items-start">
                         <ThreeDEmoji icon={note.icon} fallback={note.fallbackIcon} size={40} animate={true} />
-                        <div style={{ flex: 1 }}>
-                            <h4 style={{ fontWeight: 700, color: '#f8fafc', fontSize: '13px', marginBottom: '4px' }}>{note.title}</h4>
-                            <p style={{ color: '#94a3b8', fontSize: '12px', lineHeight: 1.4, marginBottom: '12px' }}>{note.message}</p>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-text-primary text-[13px] mb-1">{note.title}</h4>
+                            <p className="text-text-secondary text-xs leading-relaxed mb-3">{note.message}</p>
 
                             {(note.action || note.secondaryAction) && (
-                                <div style={{ display: 'flex', gap: '8px' }}>
+                                <div className="flex gap-2">
                                     {note.action && (
-                                        <button
+                                        <Button
                                             onClick={note.action.onClick}
-                                            style={{
-                                                padding: '6px 12px',
-                                                background: '#3b82f6',
-                                                color: '#fff',
-                                                fontSize: '11px',
-                                                fontWeight: 700,
-                                                borderRadius: '6px',
-                                                border: 'none',
-                                                cursor: 'pointer'
-                                            }}
+                                            size="sm"
+                                            className="h-7 text-[11px] font-bold"
                                         >
                                             {note.action.label}
-                                        </button>
+                                        </Button>
                                     )}
                                     {note.secondaryAction && (
-                                        <button
+                                        <Button
                                             onClick={note.secondaryAction.onClick}
-                                            style={{
-                                                padding: '6px 12px',
-                                                background: 'rgba(255,255,255,0.1)',
-                                                color: '#94a3b8',
-                                                fontSize: '11px',
-                                                fontWeight: 700,
-                                                borderRadius: '6px',
-                                                border: 'none',
-                                                cursor: 'pointer'
-                                            }}
+                                            variant="secondary"
+                                            size="sm"
+                                            className="h-7 text-[11px] font-bold"
                                         >
                                             {note.secondaryAction.label}
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                             )}
                         </div>
-                        <button
+                        <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => dismissNotification(note.id)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#64748b',
-                                cursor: 'pointer',
-                                fontSize: '16px'
-                            }}
+                            className="h-6 w-6 text-text-muted hover:text-text-primary rounded-full -mt-2 -mr-2"
                         >
                             ✕
-                        </button>
+                        </Button>
                     </div>
-                </div>
+                </Card>
             ))}
         </div>
     );

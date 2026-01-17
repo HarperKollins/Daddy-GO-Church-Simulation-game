@@ -7,6 +7,8 @@
 'use client';
 
 import { useGameStore } from '@/store/useGameStore';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 export default function GameOver() {
     const { age, week, stats, church, resetGame } = useGameStore();
@@ -17,56 +19,50 @@ export default function GameOver() {
         : 'You collapsed from exhaustion and hunger. The ministry consumed you.';
 
     return (
-        <div className="game-over">
-            <h1>GAME OVER</h1>
-            <p style={{ marginBottom: '32px' }}>{causeOfDeath}</p>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-500">
+            <div className="w-full max-w-md space-y-8 text-center">
+                <div className="space-y-4">
+                    <h1 className="text-5xl font-black text-danger uppercase tracking-wider animate-pulse">
+                        Game Over
+                    </h1>
+                    <p className="text-text-secondary text-lg leading-relaxed max-w-sm mx-auto">
+                        {causeOfDeath}
+                    </p>
+                </div>
 
-            <div style={{
-                background: 'var(--bg-card)',
-                borderRadius: '12px',
-                padding: '20px',
-                width: '100%',
-                maxWidth: '280px',
-                marginBottom: '24px'
-            }}>
-                <div style={{
-                    fontSize: '12px',
-                    color: 'var(--text-muted)',
-                    marginBottom: '16px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                }}>
-                    Final Stats
-                </div>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '12px',
-                    textAlign: 'left',
-                    fontSize: '14px'
-                }}>
-                    <div>
-                        <span style={{ color: 'var(--text-muted)' }}>Age:</span>{' '}
-                        <strong>{age}</strong>
+                <Card className="bg-surface border-border-prominent p-6 shadow-2xl shadow-black">
+                    <div className="text-xs font-bold text-text-muted uppercase tracking-widest mb-4">
+                        Final Stats
                     </div>
-                    <div>
-                        <span style={{ color: 'var(--text-muted)' }}>Weeks:</span>{' '}
-                        <strong>{week}</strong>
+                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-left">
+                        <div className="flex flex-col">
+                            <span className="text-xs text-text-muted">Age</span>
+                            <span className="font-bold text-lg text-text-primary">{age}</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs text-text-muted">Weeks</span>
+                            <span className="font-bold text-lg text-text-primary">{week}</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs text-text-muted">Members</span>
+                            <span className="font-bold text-lg text-text-primary">{church.members.toLocaleString()}</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs text-text-muted">Net Worth</span>
+                            <span className="font-bold text-lg text-emerald-500">₦{(stats.personalCash + stats.churchCash).toLocaleString()}</span>
+                        </div>
                     </div>
-                    <div>
-                        <span style={{ color: 'var(--text-muted)' }}>Members:</span>{' '}
-                        <strong>{church.members.toLocaleString()}</strong>
-                    </div>
-                    <div>
-                        <span style={{ color: 'var(--text-muted)' }}>Net Worth:</span>{' '}
-                        <strong>₦{(stats.personalCash + stats.churchCash).toLocaleString()}</strong>
-                    </div>
-                </div>
+                </Card>
+
+                <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full text-lg font-bold py-6 bg-white text-black hover:bg-white/90"
+                    onClick={resetGame}
+                >
+                    Try Again
+                </Button>
             </div>
-
-            <button className="btn-primary" onClick={resetGame}>
-                Try Again
-            </button>
         </div>
     );
 }

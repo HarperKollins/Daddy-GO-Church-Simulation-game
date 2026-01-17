@@ -5,6 +5,11 @@ import { useGameStore } from '@/store/useGameStore';
 import { createAudioManager } from '@/engine/audioManager';
 import { fightDemon } from '@/engine/spiritualWarfareEngine';
 import type { DemonEntity } from '@/types/game';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import { Badge } from '@/components/ui/Badge';
 
 interface SpiritualWarfareModalProps {
     onClose: () => void;
@@ -38,10 +43,9 @@ export default function SpiritualWarfareModal({ onClose }: SpiritualWarfareModal
 
         // Simulate battle delay
         setTimeout(() => {
-            // Fix arguments: demon, spiritualState, stats, tactics
             const result = fightDemon(demon, spiritualState, stats, ['fasting', 'midnight_prayer']); // Hardcoded tactics for now
 
-            if (result.victory) { // Was result.won
+            if (result.victory) {
                 audioManager.playVoice('VOICE_FIRE');
                 audioManager.playEffect('MUSIC_VICTORY');
                 setBattleLog(prev => [`✅ VICTORY! ${result.narrative}`, ...prev]);
@@ -50,7 +54,7 @@ export default function SpiritualWarfareModal({ onClose }: SpiritualWarfareModal
             } else {
                 audioManager.playEffect('UI_ERROR');
                 setBattleLog(prev => [`❌ DEFEAT... ${result.narrative}`, ...prev]);
-                modifyStat('health', -result.playerDamage); // Was result.damageTaken
+                modifyStat('health', -result.playerDamage);
                 modifyStat('anointing', -50);
             }
 
@@ -68,120 +72,91 @@ export default function SpiritualWarfareModal({ onClose }: SpiritualWarfareModal
     };
 
     return (
-        <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.95)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
-        }}>
-            <div style={{
-                backgroundColor: 'rgba(69, 10, 10, 0.3)',
-                width: '100%',
-                maxWidth: '1280px',
-                height: '85vh',
-                borderRadius: '24px',
-                border: '2px solid rgba(239, 68, 68, 0.3)',
-                display: 'flex',
-                overflow: 'hidden',
-                boxShadow: '0 0 50px rgba(255, 0, 0, 0.2)',
-                backdropFilter: 'blur(12px)',
-            }}>
+        <Modal isOpen={true} onClose={onClose} title="Warfare Room" className="max-w-4xl h-[80vh]">
+            <div className="flex flex-col md:flex-row gap-6 h-full text-text-primary">
 
                 {/* Left Panel: Status */}
-                <div className="w-1/3 bg-black/40 p-6 border-r border-red-500/20 flex flex-col gap-6">
-                    <div>
-                        <h2 className="text-3xl font-bold text-red-500 font-serif mb-2">WARFARE ROOM</h2>
-                        <p className="text-red-200/60 text-sm">"For we wrestle not against flesh and blood..."</p>
-                    </div>
+                <div className="w-full md:w-1/3 flex flex-col gap-4">
+                    <Card className="bg-red-500/5 border-red-500/20 p-4">
+                        <h3 className="font-bold text-red-500 mb-4 flex items-center gap-2">
+                            <span className="text-xl">🛡️</span> Spiritual State
+                        </h3>
 
-                    <div className="space-y-4">
-                        <div className="bg-red-900/20 p-4 rounded-xl border border-red-500/30">
-                            <label className="text-red-400 text-xs uppercase tracking-widest">Spiritual Protection</label>
-                            <div className="text-2xl font-bold text-white mt-1">{spiritualState.protectionLevel}%</div>
-                            <div className="w-full bg-black h-2 rounded-full mt-2 overflow-hidden">
-                                <div className="bg-red-500 h-full transition-all duration-500" style={{ width: `${spiritualState.protectionLevel}%` }} />
+                        <div className="space-y-4">
+                            <div>
+                                <div className="flex justify-between text-xs font-bold mb-1 uppercase tracking-wider text-text-secondary">Protection</div>
+                                <ProgressBar value={spiritualState.protectionLevel} max={100} variant="danger" className="h-2" />
+                            </div>
+
+                            <div>
+                                <div className="flex justify-between text-xs font-bold mb-1 uppercase tracking-wider text-text-secondary">Anointing</div>
+                                <div className="text-xl font-black text-amber-500">{stats.anointing.toLocaleString()}</div>
                             </div>
                         </div>
+                    </Card>
 
-                        <div className="bg-amber-900/20 p-4 rounded-xl border border-amber-500/30">
-                            <label className="text-amber-400 text-xs uppercase tracking-widest">Current Anointing</label>
-                            <div className="text-2xl font-bold text-white mt-1">{stats.anointing.toLocaleString()}</div>
-                        </div>
-
-                        {spiritualState.activeCurse && (
-                            <div className="bg-purple-900/40 p-4 rounded-xl border border-purple-500/50 animate-pulse">
-                                <label className="text-purple-400 text-xs uppercase tracking-widest">Active Curse</label>
-                                <div className="text-lg font-bold text-white mt-1">{spiritualState.activeCurse.name}</div>
-                                <p className="text-xs text-purple-300 mt-1">Source: {spiritualState.activeCurse.source}</p>
-                            </div>
-                        )}
-                    </div>
+                    {spiritualState.activeCurse && (
+                        <Card className="bg-purple-500/10 border-purple-500/30 p-4 animate-pulse">
+                            <div className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1">Active Curse</div>
+                            <div className="text-lg font-bold text-purple-300">{spiritualState.activeCurse.name}</div>
+                            <p className="text-xs text-purple-400/70 mt-1">Source: {spiritualState.activeCurse.source}</p>
+                        </Card>
+                    )}
 
                     <div className="mt-auto space-y-3">
-                        <button
+                        <Button
                             onClick={handlePray}
-                            className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-600 to-red-600 text-white font-bold hover:scale-105 transition shadow-lg shadow-red-900/20"
+                            variant="default"
+                            className="w-full bg-gradient-to-r from-amber-600 to-red-600 border-none hover:scale-105 transition-transform shadow-lg shadow-red-500/20"
                         >
                             🔥 NOON PRAYERS
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="w-full py-3 rounded-xl border border-white/10 text-white/50 hover:bg-white/5 hover:text-white transition"
-                        >
-                            Return to Safety
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
                 {/* Right Panel: Demons & Battle */}
-                <div className="flex-1 flex flex-col bg-gradient-to-b from-black/60 to-red-950/20">
-                    {/* Battle Log */}
-                    <div className="h-48 bg-black/40 p-4 overflow-y-auto border-b border-red-500/20 font-mono text-sm">
-                        {battleLog.length === 0 && <span className="text-white/20 italic">Waiting for command...</span>}
+                <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+                    {/* Log */}
+                    <Card className="flex-[0.4] bg-black/40 border-border-subtle p-3 overflow-y-auto font-mono text-xs">
+                        {battleLog.length === 0 && <span className="text-text-muted italic">Waiting for command...</span>}
                         {battleLog.map((log, i) => (
-                            <div key={i} className={`mb-1 ${log.includes('VICTORY') ? 'text-green-400' : log.includes('DEFEAT') ? 'text-red-400' : 'text-gray-300'}`}>
+                            <div key={i} className={`mb-1 ${log.includes('VICTORY') ? 'text-success' : log.includes('DEFEAT') ? 'text-danger' : 'text-text-secondary'}`}>
                                 {log}
                             </div>
                         ))}
-                    </div>
+                    </Card>
 
-                    {/* Demon Grid */}
-                    <div className="flex-1 p-6 overflow-y-auto">
-                        <h3 className="text-red-400 font-bold mb-4 uppercase tracking-wider text-sm">Identified Principalities</h3>
-                        <div className="grid grid-cols-2 gap-4">
+                    {/* Demons */}
+                    <div className="flex-1 overflow-y-auto">
+                        <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Principalities in Region</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {KNOWN_DEMONS.map(demon => (
-                                <div key={demon.id} className="group relative bg-black/40 border border-red-900/50 hover:border-red-500 rounded-xl p-4 transition-all hover:-translate-y-1">
-                                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-red-950 text-red-400 text-[10px] border border-red-900 uppercase">
-                                        {demon.tier}
+                                <Card key={demon.id} className="p-3 border-border-subtle hover:border-red-500/50 transition-colors group">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="text-2xl opacity-80 group-hover:scale-110 transition-transform">👿</div>
+                                        <Badge variant="outline" className="text-[10px] border-text-muted text-text-muted uppercase">{demon.tier}</Badge>
                                     </div>
-                                    <div className="text-2xl mb-2">👿</div>
-                                    <h4 className="font-bold text-white mb-1">{demon.name}</h4>
-                                    <p className="text-xs text-red-200/50 mb-4">Domain: {demon.domain}</p>
+                                    <h4 className="font-bold text-text-primary mb-1">{demon.name}</h4>
+                                    <div className="text-xs text-text-secondary mb-3">Domain: {demon.domain}</div>
 
-                                    <div className="flex items-center justify-between mt-2">
-                                        <div className="text-xs text-gray-400">Power: <span className="text-red-400">{demon.strength}</span></div>
-                                        <button
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-[10px] text-text-muted">PWR: <span className="text-danger font-bold">{demon.strength}</span></div>
+                                        <Button
+                                            size="sm"
+                                            variant="destructive"
                                             onClick={() => handleFight(demon)}
                                             disabled={isBattling}
-                                            className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed group-hover:shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+                                            className="h-7 text-[10px] font-bold"
                                         >
-                                            {isBattling ? 'FIGHTING...' : 'BIND & CAST'}
-                                        </button>
+                                            {isBattling ? '...' : 'BIND'}
+                                        </Button>
                                     </div>
-                                </div>
+                                </Card>
                             ))}
                         </div>
                     </div>
                 </div>
-
             </div>
-        </div>
+        </Modal>
     );
 }

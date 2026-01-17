@@ -12,6 +12,9 @@
  */
 
 import React from 'react';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 interface DeathScreenProps {
     playerName: string;
@@ -32,26 +35,30 @@ interface DeathScreenProps {
     isAlive?: boolean;
 }
 
-const DEATH_MESSAGES: Record<string, { title: string; subtitle: string; emoji: string }> = {
+const DEATH_MESSAGES: Record<string, { title: string; subtitle: string; emoji: string; color: string }> = {
     scandal: {
         title: 'DISGRACED',
         subtitle: 'Your sins caught up with you',
         emoji: '📰',
+        color: 'text-danger'
     },
     health: {
         title: 'REST IN PEACE',
         subtitle: 'The body could not continue',
         emoji: '🙏',
+        color: 'text-purple-400'
     },
     old_age: {
         title: 'A LIFE WELL LIVED',
         subtitle: 'You completed your course',
         emoji: '👴',
+        color: 'text-amber-400'
     },
     efcc: {
         title: 'ARRESTED',
         subtitle: 'EFCC finally caught you',
         emoji: '👮',
+        color: 'text-orange-500'
     },
 };
 
@@ -93,66 +100,63 @@ export default function DeathScreen({
     };
 
     return (
-        <div className="fixed inset-0 bg-black flex items-center justify-center p-4 z-50 overflow-y-auto">
-            <div className="max-w-lg w-full text-center text-white py-8">
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 z-[200] overflow-y-auto">
+            <div className="max-w-lg w-full text-center py-8 animate-in slide-in-from-bottom-8 duration-700">
                 {/* Death Header */}
-                <div className="mb-8 animate-fade-in">
-                    <div className="text-6xl mb-4">{death.emoji}</div>
-                    <h1 className="text-4xl font-bold text-red-500 mb-2">{death.title}</h1>
-                    <p className="text-xl text-white/70">{death.subtitle}</p>
+                <div className="mb-8 space-y-2">
+                    <div className="text-6xl mb-4 animate-bounce">{death.emoji}</div>
+                    <h1 className={`text-5xl font-black ${death.color} tracking-tighter`}>{death.title}</h1>
+                    <p className="text-xl text-white/70 font-medium">{death.subtitle}</p>
                 </div>
 
                 {/* Epitaph */}
-                <div className="bg-white/5 rounded-xl p-6 mb-6 border border-white/10">
-                    <div className="text-2xl font-bold mb-2">Pastor {playerName}</div>
-                    <div className="text-white/60">
+                <Card className="bg-white/5 border-white/10 p-6 mb-6">
+                    <div className="text-2xl font-bold text-white mb-2">Pastor {playerName}</div>
+                    <div className="text-white/60 text-sm font-medium uppercase tracking-wide">
                         Age {age} • Ministered for {years} years
                     </div>
-                    <div className="text-lg text-yellow-400 italic mt-4">
+                    <div className="text-lg text-amber-400 italic mt-4 font-serif">
                         &quot;{getEpitaph()}&quot;
                     </div>
-                </div>
+                </Card>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="bg-white/5 rounded-lg p-3">
-                        <div className="text-2xl">⛪</div>
-                        <div className="text-lg font-bold">{stats.members.toLocaleString()}</div>
-                        <div className="text-xs text-white/60">Members</div>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-3">
-                        <div className="text-2xl">⭐</div>
-                        <div className="text-lg font-bold">{Math.floor(stats.fame / 100)}</div>
-                        <div className="text-xs text-white/60">Fame Level</div>
-                    </div>
-                    <div className="bg-white/5 rounded-lg p-3">
-                        <div className="text-2xl">✨</div>
-                        <div className="text-lg font-bold">{Math.floor(stats.anointing / 100)}</div>
-                        <div className="text-xs text-white/60">Anointing</div>
-                    </div>
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                    <Card className="bg-white/5 border-white/10 p-3 flex flex-col items-center">
+                        <div className="text-2xl mb-1">⛪</div>
+                        <div className="text-lg font-bold text-white">{stats.members.toLocaleString()}</div>
+                        <div className="text-[10px] uppercase font-bold text-white/50">Members</div>
+                    </Card>
+                    <Card className="bg-white/5 border-white/10 p-3 flex flex-col items-center">
+                        <div className="text-2xl mb-1">⭐</div>
+                        <div className="text-lg font-bold text-white">{Math.floor(stats.fame / 100)}</div>
+                        <div className="text-[10px] uppercase font-bold text-white/50">Fame Level</div>
+                    </Card>
+                    <Card className="bg-white/5 border-white/10 p-3 flex flex-col items-center">
+                        <div className="text-2xl mb-1">✨</div>
+                        <div className="text-lg font-bold text-white">{Math.floor(stats.anointing / 100)}</div>
+                        <div className="text-[10px] uppercase font-bold text-white/50">Anointing</div>
+                    </Card>
                 </div>
 
                 {/* Net Worth */}
-                <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 rounded-xl p-4 mb-6">
-                    <div className="text-sm text-white/60">Net Worth at Death</div>
-                    <div className="text-3xl font-bold text-green-400">
+                <Card className="bg-gradient-to-r from-emerald-900/40 to-emerald-800/40 border-emerald-500/30 p-4 mb-6">
+                    <div className="text-[10px] uppercase font-bold text-emerald-400/80 mb-1">Net Worth at Death</div>
+                    <div className="text-3xl font-black text-emerald-400">
                         ₦{(stats.personalCash + stats.churchCash).toLocaleString()}
                     </div>
-                </div>
+                </Card>
 
                 {/* Ribbons */}
                 {ribbons.length > 0 && (
                     <div className="mb-6">
-                        <h3 className="text-lg font-bold mb-3">🎖️ Ribbons Earned</h3>
+                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">🎖️ Ribbons Earned</h3>
                         <div className="flex flex-wrap justify-center gap-2">
                             {ribbons.map(ribbon => (
-                                <div
-                                    key={ribbon.id}
-                                    className="bg-white/10 rounded-full px-4 py-2 flex items-center gap-2"
-                                >
-                                    <span>{ribbon.emoji}</span>
-                                    <span className="text-sm">{ribbon.name}</span>
-                                </div>
+                                <Badge key={ribbon.id} className="bg-white/10 text-white hover:bg-white/20 border-white/10 py-1.5 px-3">
+                                    <span className="mr-2">{ribbon.emoji}</span>
+                                    {ribbon.name}
+                                </Badge>
                             ))}
                         </div>
                     </div>
@@ -160,20 +164,20 @@ export default function DeathScreen({
 
                 {/* Key Moments Timeline */}
                 {timeline.length > 0 && (
-                    <div className="mb-6 text-left">
-                        <h3 className="text-lg font-bold mb-3 text-center">📜 Key Moments</h3>
-                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                    <div className="mb-8 text-left">
+                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3 text-center">📜 Key Moments</h3>
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10">
                             {timeline.slice(-5).map((entry, i) => (
                                 <div
                                     key={i}
-                                    className={`rounded-lg p-2 text-sm ${entry.impact === 'positive'
-                                        ? 'bg-green-900/30'
+                                    className={`rounded-lg p-3 text-sm border ${entry.impact === 'positive'
+                                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-100'
                                         : entry.impact === 'negative'
-                                            ? 'bg-red-900/30'
-                                            : 'bg-white/5'
+                                            ? 'bg-rose-500/10 border-rose-500/20 text-rose-100'
+                                            : 'bg-white/5 border-white/10 text-gray-300'
                                         }`}
                                 >
-                                    <span className="text-white/60">Week {entry.week}:</span>{' '}
+                                    <span className="font-mono opacity-50 mr-2 text-xs">Wk {entry.week}:</span>
                                     {entry.event}
                                 </div>
                             ))}
@@ -183,22 +187,24 @@ export default function DeathScreen({
 
                 {/* Action Buttons */}
                 <div className="space-y-3">
-                    <button
+                    <Button
                         onClick={onShare}
-                        className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold hover:from-purple-500 hover:to-pink-500 transition flex items-center justify-center gap-2"
+                        variant="secondary"
+                        className="w-full h-14 font-bold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white border-0"
                     >
                         📱 Share My Legacy
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={onRestart}
-                        className="w-full py-4 bg-yellow-500 text-black rounded-xl font-bold hover:bg-yellow-400 transition"
+                        size="lg"
+                        className="w-full h-14 font-bold bg-amber-400 text-black hover:bg-amber-300 border-0"
                     >
                         🔄 Start New Ministry
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Footer */}
-                <div className="mt-8 text-white/40 text-sm">
+                <div className="mt-8 text-white/20 text-[10px] font-mono uppercase">
                     Daddy G.O. Simulator • A satirical life simulation
                 </div>
             </div>

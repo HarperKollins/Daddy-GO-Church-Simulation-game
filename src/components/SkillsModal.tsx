@@ -1,6 +1,5 @@
 /**
- * SkillsModal Component - Nano Banana Skill Tree
- * Music Inc style colorful progress bars.
+ * SkillsModal Component - Design System Refactor
  */
 
 'use client';
@@ -8,22 +7,30 @@
 import { useState } from 'react';
 import { useGameStore } from '@/store/useGameStore';
 import ThreeDEmoji from './ThreeDEmoji';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { ProgressBar } from '@/components/ui/ProgressBar';
 
-// Skill Configuration with Colors
+interface SkillsModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+// Skill Configuration with Colors - Mapped to Tailwind-ish colors
 const SKILLS_CONFIG = [
-    { id: 'preaching', label: 'Preaching', color: '#a78bfa', icon: 'preaching' }, // Purple
-    { id: 'healing', label: 'Healing', color: '#4ade80', icon: 'health' },       // Green
-    { id: 'prophecy', label: 'Prophecy', color: '#fbbf24', icon: 'vision' },     // Gold
-    { id: 'administration', label: 'Admin', color: '#38bdf8', icon: 'chart' },   // Blue
-    { id: 'music', label: 'Music', color: '#f472b6', icon: 'music' },            // Pink
-    { id: 'politics', label: 'Politics', color: '#94a3b8', icon: 'politics' },   // Slate
+    { id: 'preaching', label: 'Preaching', color: 'text-purple-400', barVariant: 'default', icon: 'preaching' },
+    { id: 'healing', label: 'Healing', color: 'text-green-400', barVariant: 'success', icon: 'health' },
+    { id: 'prophecy', label: 'Prophecy', color: 'text-amber-400', barVariant: 'warning', icon: 'vision' },
+    { id: 'administration', label: 'Admin', color: 'text-blue-400', barVariant: 'default', icon: 'chart' },
+    { id: 'music', label: 'Music', color: 'text-pink-400', barVariant: 'default', icon: 'music' },
+    { id: 'politics', label: 'Politics', color: 'text-slate-400', barVariant: 'secondary', icon: 'politics' },
 ];
 
-export default function SkillsModal() {
+export default function SkillsModal({ isOpen, onClose }: SkillsModalProps) {
     const skills = useGameStore(state => state.skills || {});
     const trainSkill = useGameStore(state => state.trainSkill);
     const stats = useGameStore(state => state.stats || { energy: 0 });
-    const [message, setMessage] = useState<{ text: string; color: string } | null>(null);
+    const [message, setMessage] = useState<{ text: string; type: 'success' | 'warning' | 'error' } | null>(null);
 
     const handleTrain = (skillId: string, skillLabel: string) => {
         const result = trainSkill(skillId as any);
@@ -31,116 +38,86 @@ export default function SkillsModal() {
         if (result.success) {
             setMessage({
                 text: `✅ ${skillLabel} improved! (+${result.skillGain.toFixed(1)}) Cost: ${result.energyCost} NRG`,
-                color: '#22c55e'
+                type: 'success'
             });
         } else if (result.skillGain === 0 && result.energyCost === 0) {
-            setMessage({ text: `🏆 ${skillLabel} is maxed out!`, color: '#fbbf24' });
+            setMessage({ text: `🏆 ${skillLabel} is maxed out!`, type: 'warning' });
         } else {
-            setMessage({ text: `❌ Not enough energy! Need ${result.energyCost} NRG`, color: '#ef4444' });
+            setMessage({ text: `❌ Not enough energy! Need ${result.energyCost} NRG`, type: 'error' });
         }
 
         setTimeout(() => setMessage(null), 3000);
     };
 
     return (
-        <div style={{ padding: '16px', paddingBottom: '100px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#e0e0e0', marginBottom: '8px' }}>Anointing Level</h2>
-            <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '24px' }}>
-                Energy: {stats.energy} NRG
-            </p>
+        <Modal isOpen={isOpen} onClose={onClose} title="Train Skills">
+            <div className="space-y-6">
 
-            {/* Feedback Message */}
-            {message && (
-                <div style={{
-                    padding: '12px 16px',
-                    marginBottom: '16px',
-                    borderRadius: '12px',
-                    background: `${message.color}15`,
-                    border: `1px solid ${message.color}40`,
-                    color: message.color,
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    textAlign: 'center'
-                }}>
-                    {message.text}
+                {/* Header Status */}
+                <div className="flex justify-between items-center bg-surface p-3 rounded-lg border border-border-subtle">
+                    <span className="text-text-secondary text-xs uppercase font-bold tracking-wider">Available Energy</span>
+                    <span className="text-warning font-mono font-bold">{stats.energy} NRG</span>
                 </div>
-            )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {SKILLS_CONFIG.map((skill) => {
-                    const currentLevel = (skills as any)[skill.id] || 0;
-                    const progress = (currentLevel / 10) * 100; // Max level is 10
+                {/* Feedback Message */}
+                {message && (
+                    <div className={`p-3 rounded-lg text-xs font-bold text-center animate-in slide-in-from-top-2 border ${message.type === 'success' ? 'bg-success/10 text-success border-success/20' :
+                            message.type === 'warning' ? 'bg-warning/10 text-warning border-warning/20' :
+                                'bg-danger/10 text-danger border-danger/20'
+                        }`}>
+                        {message.text}
+                    </div>
+                )}
 
-                    return (
-                        <div key={skill.id} className="nano-card" style={{ padding: '16px' }}>
-                            {/* Header */}
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginBottom: '12px'
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <div style={{
-                                        width: '32px', height: '32px',
-                                        background: `${skill.color}20`,
-                                        borderRadius: '8px',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}>
-                                        <ThreeDEmoji icon={skill.icon} fallback="✨" size={20} />
+                {/* Skills Grid */}
+                <div className="space-y-4">
+                    {SKILLS_CONFIG.map((skill) => {
+                        const currentLevel = (skills as any)[skill.id] || 0;
+                        const progress = (currentLevel / 10) * 100; // Max level is 10
+                        const isMaxed = currentLevel >= 10;
+
+                        return (
+                            <div key={skill.id} className="bg-surface/50 p-4 rounded-xl border border-border-subtle hover:border-border-prominent transition-colors">
+                                {/* Header */}
+                                <div className="flex justify-between items-center mb-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-black/30 flex items-center justify-center">
+                                            <ThreeDEmoji icon={skill.icon} fallback="✨" size={20} />
+                                        </div>
+                                        <div>
+                                            <div className="text-sm font-bold text-text-primary">{skill.label}</div>
+                                            <div className={`text-[10px] font-bold ${skill.color} uppercase opacity-80`}>
+                                                Lvl {currentLevel.toFixed(1)}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span style={{ fontWeight: 700, fontSize: '15px', color: '#e0e0e0' }}>{skill.label}</span>
-                                </div>
-                                <div style={{
-                                    color: skill.color,
-                                    fontSize: '18px',
-                                    fontWeight: 700,
-                                    fontFamily: 'monospace'
-                                }}>
-                                    {currentLevel.toFixed(1)}
-                                </div>
-                            </div>
 
-                            {/* Progress Bar */}
-                            <div className="bar-track" style={{ height: '12px', background: 'rgba(255,255,255,0.05)' }}>
-                                <div
-                                    className="bar-fill"
-                                    style={{
-                                        width: `${Math.min(progress, 100)}%`,
-                                        background: skill.color,
-                                        boxShadow: `0 0 10px ${skill.color}60`
-                                    }}
-                                />
-                            </div>
+                                    <Button
+                                        size="sm"
+                                        variant={isMaxed ? 'secondary' : 'default'}
+                                        onClick={() => handleTrain(skill.id, skill.label)}
+                                        disabled={isMaxed}
+                                        className="h-8 text-[10px] font-bold"
+                                    >
+                                        {isMaxed ? 'MAX' : 'TRAIN'}
+                                    </Button>
+                                </div>
 
-                            {/* Train Button */}
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
-                                <button
-                                    onClick={() => handleTrain(skill.id, skill.label)}
-                                    disabled={currentLevel >= 10}
-                                    style={{
-                                        background: currentLevel >= 10 ? 'rgba(100,100,100,0.2)' : 'transparent',
-                                        border: `1px solid ${skill.color}40`,
-                                        color: currentLevel >= 10 ? '#6b7280' : skill.color,
-                                        padding: '6px 16px',
-                                        borderRadius: '99px',
-                                        fontSize: '11px',
-                                        fontWeight: 700,
-                                        cursor: currentLevel >= 10 ? 'not-allowed' : 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px'
-                                    }}
-                                >
-                                    <span>{currentLevel >= 10 ? 'MAXED' : 'TRAIN'}</span>
-                                    {currentLevel < 10 && <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>bolt</span>}
-                                </button>
+                                {/* Padded Bar */}
+                                <div className="px-1">
+                                    <ProgressBar
+                                        value={progress}
+                                        max={100}
+                                        variant={skill.barVariant as any}
+                                        className="h-2"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+        </Modal>
     );
 }
 

@@ -1,12 +1,9 @@
-/**
- * EventModal Component - Premium Crisis Decision Style
- * Bottom sheet modal with scandal/crisis visual treatment
- */
-
-'use client';
-
+// ... imports
 import { useState } from 'react';
 import type { GameEvent, EventChoice } from '@/types/game';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
 
 interface EventModalProps {
     event: GameEvent;
@@ -21,14 +18,6 @@ const scandalImages = [
     'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=200&fit=crop', // Documents
     'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=200&fit=crop', // Money
 ];
-
-// Event category images
-const categoryImages: Record<string, string> = {
-    'scandal': scandalImages[Math.floor(Math.random() * scandalImages.length)],
-    'crisis': 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=200&fit=crop',
-    'opportunity': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=200&fit=crop',
-    'story': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=200&fit=crop',
-};
 
 export default function EventModal({
     event,
@@ -60,199 +49,106 @@ export default function EventModal({
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-sheet animate-slide-up" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
-                {/* Bottom Sheet Handle */}
-                <div className="modal-handle">
-                    <div className="modal-handle-bar" />
+        <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+            <Card className="w-full max-w-md animate-in slide-in-from-bottom-4 zoom-in-95 bg-app border-border-prominent shadow-2xl rounded-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                {/* Header Strip */}
+                <div className={`h-1.5 w-full ${isCrisis ? 'bg-danger' : 'bg-brand'}`} />
+
+                {/* Drag Handle (Visual only since we aren't using a real drawer lib yet) */}
+                <div className="w-full flex justify-center pt-3 pb-1">
+                    <div className="w-12 h-1 bg-border-subtle rounded-full" />
                 </div>
 
-                {/* Crisis Header - Red for scandals */}
-                {isCrisis ? (
-                    <div className="crisis-header">
-                        <h4 className="crisis-header-title">SCANDAL</h4>
-                    </div>
-                ) : (
-                    <div style={{
-                        background: 'var(--primary)',
-                        color: 'white',
-                        padding: '12px 20px',
-                        textAlign: 'center',
-                    }}>
-                        <h4 style={{
-                            fontSize: '11px',
-                            fontWeight: 800,
-                            letterSpacing: '0.2em',
-                            textTransform: 'uppercase',
-                        }}>
-                            {event.category?.toUpperCase() || 'EVENT'}
-                        </h4>
-                    </div>
-                )}
+                <div className="p-5 overflow-y-auto flex-1">
+                    {!showResult ? (
+                        <>
+                            {/* Tag */}
+                            <div className="flex justify-center mb-4">
+                                <Badge variant={isCrisis ? 'destructive' : 'default'} className="uppercase tracking-widest text-[10px] font-bold px-3 py-1 shadow-lg shadow-black/20">
+                                    {event.category?.toUpperCase() || 'EVENT'}
+                                </Badge>
+                            </div>
 
-                {!showResult ? (
-                    <>
-                        {/* Content Section */}
-                        <div className="modal-body text-center">
-                            {/* Event Image */}
+                            {/* Image */}
                             {eventImage && (
-                                <div style={{
-                                    width: '100%',
-                                    maxWidth: '280px',
-                                    margin: '0 auto 20px',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                    border: isCrisis ? '3px solid rgba(220, 38, 38, 0.3)' : '3px solid rgba(34, 197, 94, 0.3)',
-                                }}>
+                                <div className={`relative w-full h-40 rounded-xl overflow-hidden mb-6 border-2 shadow-inner ${isCrisis ? 'border-danger/20' : 'border-brand/20'}`}>
                                     <img
                                         src={eventImage}
                                         alt="Event"
-                                        className="crisis-image"
-                                        style={{ width: '100%', height: '160px', objectFit: 'cover' }}
+                                        className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
                                         onError={(e) => {
                                             (e.target as HTMLImageElement).style.display = 'none';
                                         }}
                                     />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-app/90 via-app/20 to-transparent" />
                                 </div>
                             )}
 
-                            {/* Headline */}
-                            <h3 style={{
-                                fontSize: '1.5rem',
-                                fontWeight: 800,
-                                color: '#f8fafc',
-                                letterSpacing: '-0.02em',
-                                marginBottom: '12px',
-                                lineHeight: 1.2,
-                            }}>
-                                {event.title}
-                            </h3>
+                            {/* Content */}
+                            <div className="text-center mb-8">
+                                <h3 className="text-2xl font-black text-text-primary mb-3 leading-tight tracking-tight">
+                                    {event.title}
+                                </h3>
+                                <p className="text-text-secondary text-[15px] leading-relaxed">
+                                    {event.description}
+                                </p>
+                            </div>
 
-                            {/* Body Text */}
-                            <p style={{
-                                fontSize: '0.9375rem',
-                                color: '#cbd5e1',
-                                lineHeight: 1.6,
-                                marginBottom: '20px',
-                            }}>
-                                {event.description}
-                            </p>
-
-                            {/* Risk Badge (for crisis events) */}
-                            {isCrisis && (
-                                <div className="crisis-risk-badge">
-                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>trending_down</span>
-                                    REPUTATION AT RISK
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Choice Buttons */}
-                        <div style={{ padding: '0 20px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {availableChoices.map((choice, index) => (
-                                <button
-                                    key={choice.id}
-                                    onClick={() => handleChoiceClick(choice)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '14px 20px',
-                                        background: index === 0
-                                            ? (isCrisis ? '#dc2626' : 'var(--primary)')
-                                            : 'transparent',
-                                        color: index === 0 ? 'white' : '#e0e0e0',
-                                        border: index === 0 ? 'none' : '2px solid rgba(255,255,255,0.1)',
-                                        borderRadius: '12px',
-                                        fontSize: '0.9375rem',
-                                        fontWeight: 700,
-                                        cursor: 'pointer',
-                                        transition: 'all 0.15s ease',
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                        <span>{choice.label}</span>
+                            {/* Choices */}
+                            <div className="space-y-3">
+                                {availableChoices.map((choice, index) => (
+                                    <Button
+                                        key={choice.id}
+                                        onClick={() => handleChoiceClick(choice)}
+                                        variant={index === 0 ? (isCrisis ? 'destructive' : 'default') : 'secondary'}
+                                        size="lg"
+                                        className={`w-full h-auto py-4 flex flex-col items-center gap-1 group relative overflow-hidden transition-all duration-300 ${index === 0 ? 'shadow-lg shadow-brand/10 hover:shadow-brand/30' : 'hover:bg-surface-hover'
+                                            }`}
+                                    >
+                                        <span className="text-base font-bold relative z-10">{choice.label}</span>
                                         {(choice as any).cost && (
-                                            <span style={{
-                                                fontSize: '10px',
-                                                opacity: 0.8,
-                                                fontWeight: 500,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.05em',
-                                                marginTop: '4px',
-                                            }}>
-                                                {(choice as any).cost.energy && `${(choice as any).cost.energy} Energy`}
-                                                {(choice as any).cost.personalCash && ` • ₦${(choice as any).cost.personalCash.toLocaleString()}`}
+                                            <span className="text-[10px] font-mono opacity-80 uppercase tracking-wider relative z-10">
+                                                {(choice as any).cost.energy > 0 && `${(choice as any).cost.energy} NRG`}
+                                                {(choice as any).cost.personalCash > 0 && ` • ₦${(choice as any).cost.personalCash.toLocaleString()}`}
                                             </span>
                                         )}
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Footer Meta */}
-                        <div style={{
-                            padding: '0 20px 20px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: 'var(--text-muted)',
-                        }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>balance</span>
-                            <span style={{
-                                fontSize: '9px',
-                                fontWeight: 700,
-                                letterSpacing: '0.1em',
-                                textTransform: 'uppercase',
-                            }}>
-                                {isCrisis ? 'Legal & Morality System' : 'Ministry Decision'}
-                            </span>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        {/* Result Screen */}
-                        <div className="modal-body text-center" style={{ padding: '32px 20px' }}>
-                            <div style={{
-                                width: '64px',
-                                height: '64px',
-                                margin: '0 auto 16px',
-                                borderRadius: '50%',
-                                background: 'rgba(34, 197, 94, 0.15)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#22c55e' }}>check</span>
+                                    </Button>
+                                ))}
                             </div>
-                            <h3 style={{
-                                fontSize: '1.25rem',
-                                fontWeight: 800,
-                                color: 'var(--text-primary)',
-                                marginBottom: '12px',
-                            }}>
-                                {selectedChoice?.label}
-                            </h3>
-                            <p style={{
-                                fontSize: '0.9375rem',
-                                color: 'var(--text-secondary)',
-                                lineHeight: 1.6,
-                            }}>
-                                {selectedChoice?.resultText || "Your decision has been made."}
-                            </p>
-                        </div>
+                        </>
+                    ) : (
+                        <div className="py-8 flex flex-col items-center text-center animate-in fade-in zoom-in-95">
+                            {/* Success Icon */}
+                            <div className="w-24 h-24 rounded-full bg-success/10 text-success flex items-center justify-center mb-6 ring-1 ring-success/20 shadow-[0_0_30px_-10px_rgba(34,197,94,0.3)]">
+                                <span className="text-5xl animate-bounce">✅</span>
+                            </div>
 
-                        <div style={{ padding: '0 20px 24px' }}>
-                            <button
-                                className="action-btn-primary"
-                                onClick={handleContinue}
-                            >
-                                <span className="material-symbols-outlined">arrow_forward</span>
+                            <div className="space-y-2 mb-8">
+                                <h3 className="text-xl font-bold text-text-primary">Decision Recorded</h3>
+                                <h4 className="text-lg font-medium text-brand">{selectedChoice?.label}</h4>
+                            </div>
+
+                            <p className="text-text-secondary leading-relaxed mb-8 max-w-[280px]">
+                                {selectedChoice?.resultText || "Your decision has been noted and will affect the church's future."}
+                            </p>
+
+                            <Button onClick={handleContinue} size="lg" className="w-full font-bold shadow-lg shadow-brand/20">
                                 Continue
-                            </button>
+                            </Button>
                         </div>
-                    </>
+                    )}
+                </div>
+
+                {/* Footer Meta */}
+                {!showResult && (
+                    <div className="p-4 border-t border-border-subtle bg-surface/30 backdrop-blur-md">
+                        <div className="flex items-center justify-center gap-2 text-text-muted text-[10px] font-bold uppercase tracking-widest">
+                            <span className="text-base">⚖️</span>
+                            {isCrisis ? 'Reputation System Active' : 'Ministry Decision'}
+                        </div>
+                    </div>
                 )}
-            </div>
+            </Card>
         </div>
     );
 }

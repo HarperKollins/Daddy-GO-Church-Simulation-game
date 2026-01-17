@@ -1,6 +1,5 @@
 /**
- * SocialMediaModal Component - Premium BitLife Style
- * 
+ * SocialMediaModal Component
  * YouTube and Spotify presence with premium platform cards
  */
 
@@ -8,6 +7,10 @@
 
 import { useGameStore } from '@/store/useGameStore';
 import ThreeDEmoji from './ThreeDEmoji';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 interface SocialMediaModalProps {
     isOpen: boolean;
@@ -31,124 +34,74 @@ export default function SocialMediaModal({ isOpen, onClose, onUploadSermon }: So
     const spotifyIncome = Math.floor((socialMedia.spotifyListeners / 100) * 200);
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div
-                className="modal-sheet animate-slide-up"
-                onClick={e => e.stopPropagation()}
-                style={{ maxHeight: '90vh', overflowY: 'auto' }}
-            >
-                {/* Handle */}
-                <div className="modal-handle">
-                    <div className="modal-handle-bar" />
-                </div>
-
-                {/* Header */}
-                <div className="top-nav border-none">
-                    <div className="top-nav-inner">
-                        <button className="top-nav-btn" onClick={onClose}>
-                            <span className="material-symbols-outlined">close</span>
-                        </button>
-                        <h2 className="top-nav-title">Social Media Ministry</h2>
-                        <div className="w-10" />
-                    </div>
-                </div>
-
-                <div className="px-4 pb-8 space-y-4">
-                    {/* YouTube Section */}
-                    <div className="asset-photo-card" style={{ border: '2px solid rgba(239, 68, 68, 0.2)' }}>
-                        <div style={{
-                            height: '80px',
-                            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), transparent)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '12px',
-                        }}>
-                            <div style={{
-                                width: '48px',
-                                height: '48px',
-                                background: '#ef4444',
-                                borderRadius: '12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <ThreeDEmoji icon="youtube" fallback="▶️" size={28} />
-                            </div>
-                            <div>
-                                <div className="text-lg font-bold text-gray-900">YouTube Channel</div>
-                                <div className="text-sm text-gray-500">{formatNumber(socialMedia.youtubeSubscribers)} subscribers</div>
-                            </div>
+        <Modal isOpen={true} onClose={onClose} title="Social Media Ministry">
+            <div className="space-y-4 text-text-primary">
+                {/* YouTube Section */}
+                <Card className="overflow-hidden border-danger/30 bg-surface">
+                    <div className="h-20 bg-gradient-to-r from-danger/20 to-transparent flex items-center px-4 gap-4">
+                        <div className="w-12 h-12 bg-danger rounded-xl flex items-center justify-center shadow-lg shadow-danger/20">
+                            <ThreeDEmoji icon="youtube" fallback="▶️" size={28} />
                         </div>
-                        <div className="asset-photo-info">
-                            <div className="grid grid-cols-2 gap-3 mb-3">
-                                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                    <div className="text-xl font-black text-gray-900">{socialMedia.sermonsUploaded}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-wide">Sermons</div>
-                                </div>
-                                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                    <div className="text-xl font-black text-gray-900">{formatNumber(socialMedia.weeklyViews)}</div>
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-wide">Weekly Views</div>
-                                </div>
-                            </div>
-                            <div className="alert-banner success">
-                                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>payments</span>
-                                Weekly ad revenue: ₦{youtubeIncome.toLocaleString()}
-                            </div>
+                        <div>
+                            <div className="text-lg font-bold">YouTube Channel</div>
+                            <div className="text-sm text-text-secondary">{formatNumber(socialMedia.youtubeSubscribers)} subscribers</div>
                         </div>
                     </div>
 
-                    {/* Spotify Section */}
-                    <div className="asset-photo-card" style={{ border: '2px solid rgba(30, 215, 96, 0.2)' }}>
-                        <div style={{
-                            height: '80px',
-                            background: 'linear-gradient(135deg, rgba(30, 215, 96, 0.2), transparent)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '12px',
-                        }}>
-                            <div style={{
-                                width: '48px',
-                                height: '48px',
-                                background: '#1ed760',
-                                borderRadius: '12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <ThreeDEmoji icon="media" fallback="🎧" size={28} />
+                    <div className="p-4 bg-surface/50">
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                            <div className="text-center p-3 bg-app rounded-lg border border-border-subtle">
+                                <div className="text-xl font-black">{socialMedia.sermonsUploaded}</div>
+                                <div className="text-[10px] text-text-muted uppercase tracking-wide">Sermons</div>
                             </div>
-                            <div>
-                                <div className="text-lg font-bold text-gray-900">Spotify Podcast</div>
-                                <div className="text-sm text-gray-500">{formatNumber(socialMedia.spotifyListeners)} monthly listeners</div>
+                            <div className="text-center p-3 bg-app rounded-lg border border-border-subtle">
+                                <div className="text-xl font-black">{formatNumber(socialMedia.weeklyViews)}</div>
+                                <div className="text-[10px] text-text-muted uppercase tracking-wide">Weekly Views</div>
                             </div>
                         </div>
-                        <div className="asset-photo-info">
-                            <div className="alert-banner success">
-                                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>payments</span>
-                                Weekly streams revenue: ₦{spotifyIncome.toLocaleString()}
-                            </div>
+                        <div className="flex items-center gap-2 text-success bg-success/10 p-2 rounded-lg text-sm border border-success/20">
+                            <span className="material-symbols-outlined text-base">payments</span>
+                            <span className="font-bold">Weekly Ad Revenue: ₦{youtubeIncome.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Spotify Section */}
+                <Card className="overflow-hidden border-[#1ed760]/30 bg-surface">
+                    <div className="h-20 bg-gradient-to-r from-[#1ed760]/20 to-transparent flex items-center px-4 gap-4">
+                        <div className="w-12 h-12 bg-[#1ed760] rounded-xl flex items-center justify-center shadow-lg shadow-[#1ed760]/20">
+                            <ThreeDEmoji icon="media" fallback="🎧" size={28} />
+                        </div>
+                        <div>
+                            <div className="text-lg font-bold">Spotify Podcast</div>
+                            <div className="text-sm text-text-secondary">{formatNumber(socialMedia.spotifyListeners)} monthly listeners</div>
                         </div>
                     </div>
 
-                    {/* Upload Action */}
-                    <button
-                        onClick={() => {
-                            onUploadSermon();
-                            onClose();
-                        }}
-                        className="action-btn-primary"
-                        style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
-                    >
-                        <span className="material-symbols-outlined">upload</span>
-                        Upload Sermon (40 Energy)
-                    </button>
-                    <p className="text-[11px] text-gray-500 text-center">
-                        Grows subs based on Fame. Higher anointing = more engagement.
-                    </p>
-                </div>
+                    <div className="p-4 bg-surface/50">
+                        <div className="flex items-center gap-2 text-success bg-success/10 p-2 rounded-lg text-sm border border-success/20">
+                            <span className="material-symbols-outlined text-base">payments</span>
+                            <span className="font-bold">Weekly Stream Revenue: ₦{spotifyIncome.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* Upload Action */}
+                <Button
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 border-none shadow-lg shadow-blue-500/20 text-white font-bold"
+                    onClick={() => {
+                        onUploadSermon();
+                        onClose();
+                    }}
+                >
+                    <span className="material-symbols-outlined mr-2">upload</span>
+                    Upload Sermon (40 Energy)
+                </Button>
+                <p className="text-[10px] text-text-muted text-center italic">
+                    Grows subs based on Fame. Higher anointing = more engagement.
+                </p>
             </div>
-        </div>
+        </Modal>
     );
 }

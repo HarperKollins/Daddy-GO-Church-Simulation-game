@@ -9,6 +9,9 @@
 import { useGameStore } from '@/store/useGameStore';
 import { useMLEngine } from '@/context/MLEngineContext';
 import { getDominantVibe } from '@/engine/neuro/EmotionalState';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { ProgressBar } from '@/components/ui/ProgressBar';
 
 const formatCash = (amount: number): string => {
     if (amount >= 1e9) return `₦${(amount / 1e9).toFixed(1)}B`;
@@ -24,7 +27,6 @@ interface StatsBarProps {
 export default function StatsBar({ onSettingsClick }: StatsBarProps) {
     const { stats, week, church, age, relationshipStatus, isAlive } = useGameStore();
 
-    // Neuro-Engine Hook
     const { globalVibe } = useMLEngine();
     const dominantVibe = globalVibe ? getDominantVibe(globalVibe.vector) : 'NEUTRAL';
 
@@ -60,283 +62,111 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
         return '100L';
     };
 
+
+
     if (!isAlive) return null;
 
     return (
-        <div style={{
-            background: '#0a0a0f',
-            padding: '12px 16px',
-            paddingTop: '16px',
-        }}>
-            {/* Row 1: Date | Age | Money | Settings */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '12px',
-            }}>
-                {/* Date Badge */}
-                <div style={{
-                    background: '#1a1a2e',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    color: '#e0e0e0',
-                }}>
-                    {dateString}
+        <Card className="rounded-none border-t-0 border-x-0 border-b border-border-subtle bg-surface/50 backdrop-blur-md sticky top-0 z-50">
+            <div className="p-4 space-y-4">
+                {/* Row 1: Date | Age | Money | Settings */}
+                <div className="flex justify-between items-center">
+                    <Badge variant="secondary" className="font-mono">{dateString}</Badge>
+
+                    <div className="flex items-center gap-2 text-text-secondary text-sm">
+                        <span>👤</span>
+                        <span className="font-semibold text-text-primary">AGE {age || 20}</span>
+                    </div>
+
+                    {/* VIBE INDICATOR */}
+                    <Badge variant="outline" className={`border ${getVibeColor(dominantVibe)}`}>
+                        <span className="mr-1">🛐</span> {dominantVibe}
+                    </Badge>
+
+                    <div className="flex-1" />
+
+                    {/* Money Badge */}
+                    <Badge variant="success" className="mr-2">
+                        💵 {formatCash(stats.personalCash + stats.churchCash)}
+                    </Badge>
+
+                    {/* Settings */}
+                    <button
+                        onClick={onSettingsClick}
+                        className="p-2 rounded-md hover:bg-surface-hover text-text-secondary transition-colors"
+                    >
+                        ⚙️
+                    </button>
                 </div>
 
-                {/* Age Badge */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    color: '#a0a0a0',
-                    fontSize: '13px',
-                }}>
-                    <span style={{ fontSize: '16px' }}>👤</span>
-                    <span style={{ fontWeight: 600 }}>AGE {age || 20}</span>
+                {/* Row 2: University & Relationship */}
+                <div className="flex gap-2">
+                    <Badge variant="default" className="bg-brand/10 text-brand border border-brand/20 hover:bg-brand/20">
+                        📚 {getUniversityLevel()}
+                    </Badge>
+                    <Badge variant="default" className="bg-pink-500/10 text-pink-500 border border-pink-500/20 hover:bg-pink-500/20">
+                        ❤️ {getRelationshipStatus()}
+                    </Badge>
                 </div>
 
-                {/* VIBE INDICATOR (Phase D) */}
-                <div className={`px-2 py-1 rounded text-[10px] font-bold border ${getVibeColor(dominantVibe)} ml-2 flex items-center`}>
-                    <span className="mr-1">🛐</span> {dominantVibe}
+                {/* Row 3: Stat Bars */}
+                <div className="grid grid-cols-2 gap-3">
+                    {/* HP */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-danger font-bold w-6">HP</span>
+                        <div className="flex-1">
+                            <ProgressBar value={stats.health} max={100} variant="danger" className="h-1.5" />
+                        </div>
+                    </div>
+
+                    {/* NRG */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-warning font-bold w-6">NRG</span>
+                        <div className="flex-1">
+                            <ProgressBar value={stats.energy} max={150} variant="warning" className="h-1.5" />
+                        </div>
+                    </div>
+
+                    {/* SPIRIT */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-brand font-bold w-6">SPI</span>
+                        <div className="flex-1">
+                            <ProgressBar value={stats.anointing} max={100} variant="default" className="h-1.5" />
+                        </div>
+                    </div>
+
+                    {/* SCANDAL */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-brand-secondary font-bold w-6 text-orange-500">SCD</span>
+                        <div className="flex-1">
+                            <ProgressBar value={stats.scandal} max={100} variant="default" className="h-1.5 bg-surface-active" />
+                            {/* Custom gradient override for scandal if needed */}
+                            <div className="h-1.5 rounded-full bg-surface-active overflow-hidden mt-[-6px]">
+                                <div style={{ width: `${Math.min(100, stats.scandal)}%` }} className="h-full bg-gradient-to-r from-orange-500 to-red-600" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Spacer */}
-                <div style={{ flex: 1 }} />
+                {/* Row 4: KPI Tickers */}
+                <div className="flex justify-between items-center pt-2 border-t border-border-subtle">
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-warning text-sm">⭐</span>
+                        <span className="text-xs font-bold text-text-secondary">{getFameLevel()} FAME</span>
+                    </div>
 
-                {/* Money Badge */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'rgba(34, 197, 94, 0.15)',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(34, 197, 94, 0.4)',
-                    marginRight: '8px',
-                }}>
-                    <span style={{ color: '#22c55e' }}>💵</span>
-                    <span style={{ color: '#22c55e', fontWeight: 700, fontSize: '13px' }}>
-                        {formatCash(stats.personalCash + stats.churchCash)}
-                    </span>
-                </div>
-
-                {/* Settings */}
-                <button
-                    onClick={onSettingsClick}
-                    style={{
-                        background: '#1a1a2e',
-                        border: 'none',
-                        borderRadius: '8px',
-                        padding: '8px',
-                        cursor: 'pointer',
-                        color: '#a0a0a0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    ⚙️
-                </button>
-            </div>
-
-            {/* Row 2: University Level | Relationship Status */}
-            <div style={{
-                display: 'flex',
-                gap: '10px',
-                marginBottom: '12px',
-            }}>
-                {/* University Badge */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'rgba(139, 92, 246, 0.15)',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(139, 92, 246, 0.4)',
-                }}>
-                    <span style={{ fontSize: '14px' }}>📚</span>
-                    <span style={{ color: '#a78bfa', fontWeight: 700, fontSize: '12px' }}>
-                        {getUniversityLevel()}
-                    </span>
-                </div>
-
-                {/* Relationship Badge */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'rgba(236, 72, 153, 0.15)',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(236, 72, 153, 0.4)',
-                }}>
-                    <span style={{ color: '#ec4899', fontSize: '14px' }}>❤️</span>
-                    <span style={{ color: '#ec4899', fontWeight: 700, fontSize: '12px' }}>
-                        {getRelationshipStatus()}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-info text-sm">👥</span>
+                        <span className="text-xs font-bold text-text-primary">{church.members.toLocaleString()} MEMBERS</span>
+                    </div>
                 </div>
             </div>
-
-            {/* Row 3: Stat Bars */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '8px',
-                marginBottom: '8px',
-            }}>
-                {/* HP Bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: '#ef4444', fontSize: '12px' }}>❤️</span>
-                    <span style={{ color: '#ef4444', fontSize: '11px', fontWeight: 700, width: '22px' }}>HP</span>
-                    <div style={{
-                        flex: 1,
-                        height: '6px',
-                        background: '#1a1a2e',
-                        borderRadius: '3px',
-                        overflow: 'hidden',
-                    }}>
-                        <div style={{
-                            width: `${Math.min(100, stats.health / 100)}%`,
-                            height: '100%',
-                            background: '#ef4444',
-                            borderRadius: '3px',
-                        }} />
-                    </div>
-                    <span style={{ color: '#6b7280', fontSize: '11px', width: '30px', textAlign: 'right' }}>
-                        {Math.round(stats.health / 100)}%
-                    </span>
-                </div>
-
-                {/* NRG Bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: '#fbbf24', fontSize: '12px' }}>⚡</span>
-                    <span style={{ color: '#fbbf24', fontSize: '11px', fontWeight: 700, width: '24px' }}>NRG</span>
-                    <div style={{
-                        flex: 1,
-                        height: '6px',
-                        background: '#1a1a2e',
-                        borderRadius: '3px',
-                        overflow: 'hidden',
-                        position: 'relative',
-                    }}>
-                        <div style={{
-                            width: `${Math.min(100, (stats.energy / 150) * 100)}%`,
-                            height: '100%',
-                            background: '#fbbf24',
-                            borderRadius: '3px',
-                        }} />
-                    </div>
-                    <span style={{ color: '#fbbf24', fontSize: '11px', width: '30px', textAlign: 'right' }}>
-                        {Math.round(stats.energy)}
-                    </span>
-                </div>
-
-                {/* SPIRIT Bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: '#a78bfa', fontSize: '12px' }}>✝️</span>
-                    <span style={{ color: '#a78bfa', fontSize: '11px', fontWeight: 700, width: '38px' }}>SPIRIT</span>
-                    <div style={{
-                        flex: 1,
-                        height: '6px',
-                        background: '#1a1a2e',
-                        borderRadius: '3px',
-                        overflow: 'hidden',
-                    }}>
-                        <div style={{
-                            width: `${Math.min(100, stats.anointing / 100)}%`,
-                            height: '100%',
-                            background: '#a78bfa',
-                            borderRadius: '3px',
-                        }} />
-                    </div>
-                    <span style={{ color: '#6b7280', fontSize: '11px', width: '30px', textAlign: 'right' }}>
-                        {Math.round(stats.anointing / 100)}
-                    </span>
-                </div>
-
-                {/* SCANDAL Bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: '#f97316', fontSize: '12px' }}>⚠️</span>
-                    <span style={{ color: '#f97316', fontSize: '11px', fontWeight: 700, width: '50px' }}>SCANDAL</span>
-                    <div style={{
-                        flex: 1,
-                        height: '6px',
-                        background: '#1a1a2e',
-                        borderRadius: '3px',
-                        overflow: 'hidden',
-                    }}>
-                        <div style={{
-                            width: `${Math.min(100, stats.scandal / 100)}%`,
-                            height: '100%',
-                            background: 'linear-gradient(90deg, #f97316, #ef4444)',
-                            borderRadius: '3px',
-                        }} />
-                    </div>
-                    <span style={{ color: '#f97316', fontSize: '11px', width: '35px', textAlign: 'right' }}>
-                        {Math.round(stats.scandal / 100)}%
-                    </span>
-                </div>
-            </div>
-
-            {/* Row 4: Fame | Net Worth | Members */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '10px',
-            }}>
-                {/* Fame Badge */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: '#1a1a2e',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                }}>
-                    <span style={{ color: '#fbbf24', fontSize: '14px' }}>⭐</span>
-                    <span style={{ color: '#a0a0a0', fontSize: '12px', fontWeight: 700 }}>
-                        {getFameLevel()}
-                    </span>
-                    <span style={{ color: '#6b7280', fontSize: '11px' }}>FAME</span>
-                </div>
-
-                {/* Spacer */}
-                <div style={{ flex: 1 }} />
-
-                {/* Net Worth */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    marginRight: '16px',
-                }}>
-                    <span style={{ color: '#22c55e', fontSize: '14px' }}>💰</span>
-                    <span style={{ color: '#e0e0e0', fontSize: '13px', fontWeight: 700 }}>
-                        {formatCash(stats.personalCash + stats.churchCash)}
-                    </span>
-                </div>
-
-                {/* Members */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                }}>
-                    <span style={{ color: '#38bdf8', fontSize: '14px' }}>👥</span>
-                    <span style={{ color: '#e0e0e0', fontSize: '13px', fontWeight: 700 }}>
-                        {church.members}
-                    </span>
-                </div>
-            </div>
-        </div>
+        </Card>
     );
 }
+
+// ... helper implementation
+
 
 // Helper for Vibe Styling
 // Using Tailwind Classes here since we are inside basic strings, 

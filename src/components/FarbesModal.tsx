@@ -1,6 +1,8 @@
 import React from 'react';
 import { useGameStore } from '@/store/useGameStore';
-import { Icons } from './Icons';
+import { Modal } from '@/components/ui/Modal';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 interface FarbesModalProps {
     isOpen: boolean;
@@ -9,7 +11,7 @@ interface FarbesModalProps {
 
 export default function FarbesModal({ isOpen, onClose }: FarbesModalProps) {
     const store = useGameStore();
-    const { name, occupation, age, stats, assets, church, week } = store;
+    const { name, occupation, age, stats, assets, church } = store;
 
     if (!isOpen) return null;
 
@@ -26,84 +28,83 @@ export default function FarbesModal({ isOpen, onClose }: FarbesModalProps) {
     const dateString = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content" style={{
-                background: '#fff',
-                color: '#000',
-                padding: 0,
-                maxWidth: '400px',
-                borderRadius: '0px',
-                fontFamily: 'serif'
-            }}>
-
+        <Modal isOpen={true} onClose={onClose} title="Farbes Magazine" className="max-w-md bg-white text-black p-0 border border-gray-200">
+            {/* Override standard modal styles for "Magazine" look */}
+            <div className="font-serif bg-white text-black -m-4">
                 {/* Header Black Bar */}
-                <div style={{ background: '#000', color: '#fff', padding: '15px', textAlign: 'center' }}>
-                    <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', fontFamily: 'Times New Roman, serif' }}>Farbes</h1>
+                <div className="bg-black text-white p-4 text-center">
+                    <h1 className="text-3xl font-bold tracking-tight font-serif uppercase">Farbes</h1>
                 </div>
 
                 {/* Profile Header */}
-                <div style={{ padding: '20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ background: '#000', color: '#fff', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>F</div>
-                            <span style={{ fontSize: '12px', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: 'sans-serif' }}>PROFILE</span>
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-black text-white w-6 h-6 flex items-center justify-center font-bold text-xs">F</div>
+                            <span className="text-[10px] tracking-widest uppercase font-sans font-bold">PROFILE</span>
                         </div>
-                        <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>✕</button>
                     </div>
 
-                    <h2 style={{ fontSize: '42px', margin: '0 0 5px 0', fontFamily: 'Times New Roman, serif', fontWeight: '400' }}>{name}</h2>
-                    <div style={{ fontSize: '16px', color: '#666', fontFamily: 'sans-serif', marginBottom: '20px' }}>{occupation}</div>
+                    <h2 className="text-4xl leading-tight font-serif mb-1">{name}</h2>
+                    <div className="text-sm text-gray-600 font-sans mb-6 uppercase tracking-wide">{occupation}</div>
 
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '10px' }}>
-                        <span style={{ fontSize: '32px', fontWeight: 'bold' }}>₦{(netWorth / 1000000).toFixed(1)}M</span>
-                        <div style={{ fontSize: '10px', color: '#666', marginTop: '5px', fontFamily: 'sans-serif' }}>
+                    <div className="flex items-start gap-4 mb-3">
+                        <span className="text-3xl font-bold font-sans">₦{(netWorth / 1000000).toFixed(1)}M</span>
+                        <div className="text-[10px] text-gray-500 font-sans mt-2 leading-tight">
                             <div>Real Time Net Worth</div>
                             <div>as of {dateString}</div>
                         </div>
                     </div>
 
-                    <div style={{ fontSize: '12px', color: '#666', fontFamily: 'sans-serif', marginBottom: '20px' }}>
-                        #{Math.max(1, 10000 - Math.floor(netWorth / 100000))} in the world today
+                    <div className="text-xs text-gray-500 font-sans mb-6">
+                        #{Math.max(1, 10000 - Math.floor(netWorth / 100000)).toLocaleString()} in the world today
                     </div>
 
-                    <hr style={{ border: 'none', borderTop: '1px solid #000', margin: '20px 0' }} />
+                    <hr className="border-black mb-6" />
 
-                    <h3 style={{ fontSize: '18px', margin: '0 0 20px 0', fontFamily: 'sans-serif', fontWeight: 'bold' }}>Personal Stats</h3>
+                    <h3 className="text-lg font-bold font-sans mb-4 uppercase">Personal Stats</h3>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontFamily: 'sans-serif', fontSize: '14px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 'bold' }}>Age</span>
+                    <div className="flex flex-col gap-3 font-sans text-sm">
+                        <div className="flex justify-between border-b border-gray-100 pb-2">
+                            <span className="font-bold">Age</span>
                             <span>{age}</span>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 'bold' }}>Source of Wealth</span>
+                        <div className="flex justify-between border-b border-gray-100 pb-2">
+                            <span className="font-bold">Source of Wealth</span>
                             <span>{occupation.includes('Pastor') || occupation === 'Student' ? 'Ministry' : occupation}</span>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 'bold' }}>Self-Made Score</span>
-                            <span>{selfMadeScore}</span>
+                        <div className="flex justify-between border-b border-gray-100 pb-2">
+                            <span className="font-bold">Self-Made Score</span>
+                            <div className="flex gap-0.5">
+                                {[...Array(10)].map((_, i) => (
+                                    <div key={i} className={`w-1 h-3 ${i < selfMadeScore ? 'bg-black' : 'bg-gray-200'}`} />
+                                ))}
+                            </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 'bold' }}>Philanthropy Score</span>
-                            <span>{philanthropyScore}</span>
+                        <div className="flex justify-between border-b border-gray-100 pb-2">
+                            <span className="font-bold">Philanthropy Score</span>
+                            <div className="flex gap-0.5">
+                                {[...Array(10)].map((_, i) => (
+                                    <div key={i} className={`w-1 h-3 ${i < philanthropyScore ? 'bg-black' : 'bg-gray-200'}`} />
+                                ))}
+                            </div>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 'bold' }}>Church Members</span>
+                        <div className="flex justify-between border-b border-gray-100 pb-2">
+                            <span className="font-bold">Church Members</span>
                             <span>{church.members.toLocaleString()}</span>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ fontWeight: 'bold' }}>Pulpit Fame</span>
+                        <div className="flex justify-between">
+                            <span className="font-bold">Pulpit Fame</span>
                             <span>{stats.fame}/100</span>
                         </div>
                     </div>
-
                 </div>
             </div>
-        </div>
+        </Modal>
     );
 }

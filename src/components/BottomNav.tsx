@@ -17,61 +17,23 @@ const navItems = [
     { id: 'scandal' as const, label: 'Social', icon: '📱' },
 ];
 
+// ... props
 export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     return (
-        <div style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '70px',
-            background: '#0a0a0f',
-            borderTop: '1px solid #1e1e2e',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 100,
-        }}>
-            <div style={{
-                display: 'flex',
-                width: '100%',
-                justifyContent: 'space-evenly',
-            }}>
+        <div className="fixed bottom-0 left-0 right-0 h-[70px] bg-surface/80 backdrop-blur-md border-t border-border-subtle flex justify-center items-center z-50 pb-[env(safe-area-inset-bottom)]">
+            <div className="flex w-full justify-evenly max-w-md">
                 {navItems.map((item) => {
                     const isActive = activeTab === item.id;
                     return (
                         <button
                             key={item.id}
                             onClick={() => onTabChange(item.id)}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '4px',
-                                cursor: 'pointer',
-                                padding: '8px 16px',
-                                transition: 'opacity 0.2s',
-                                opacity: isActive ? 1 : 0.5,
-                            }}
+                            className={`flex flex-col items-center gap-1 p-2 transition-all hover:bg-surface-hover/50 rounded-lg ${isActive ? 'opacity-100 text-brand scale-105' : 'opacity-60 text-text-secondary'}`}
                         >
-                            {/* Icon */}
-                            <span style={{
-                                fontSize: '22px',
-                                filter: isActive ? 'none' : 'grayscale(50%)',
-                            }}>
+                            <span className="text-2xl filter drop-shadow-sm">
                                 {item.icon}
                             </span>
-
-                            {/* Label */}
-                            <span style={{
-                                fontSize: '10px',
-                                fontWeight: isActive ? 700 : 500,
-                                color: isActive ? '#fff' : '#6b7280',
-                                letterSpacing: '0.02em',
-                            }}>
+                            <span className={`text-[10px] uppercase font-bold tracking-widest ${isActive ? 'text-brand' : 'text-text-muted'}`}>
                                 {item.label}
                             </span>
                         </button>

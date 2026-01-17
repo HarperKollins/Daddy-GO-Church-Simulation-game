@@ -8,6 +8,9 @@
 'use client';
 
 import { useState } from 'react';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 interface NameInputModalProps {
     onConfirm: (name: string) => void;
@@ -31,77 +34,47 @@ export default function NameInputModal({ onConfirm }: NameInputModalProps) {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '380px' }}>
-                <div style={{ padding: '32px 24px', textAlign: 'center' }}>
-                    {/* Title Icon - Clean Text */}
-                    <div style={{
-                        width: '60px',
-                        height: '60px',
-                        margin: '0 auto 20px',
-                        background: 'var(--primary)',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '24px',
-                        fontWeight: '700',
-                        color: 'white'
-                    }}>
-                        DG
-                    </div>
+        <Modal isOpen={true} onClose={() => { }} title="Welcome, Man of God">
+            <div className="flex flex-col items-center space-y-6">
+                <div className="w-16 h-16 rounded-full bg-brand flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-brand/20">
+                    DG
+                </div>
 
-                    <h2 style={{
-                        fontSize: '22px',
-                        fontWeight: '700',
-                        marginBottom: '8px',
-                        color: 'var(--text-primary)'
-                    }}>
-                        Welcome, Man of God
-                    </h2>
-                    <p style={{
-                        color: 'var(--text-secondary)',
-                        marginBottom: '28px',
-                        fontSize: '14px',
-                        lineHeight: '1.5'
-                    }}>
+                <div className="text-center space-y-2">
+                    <p className="text-text-secondary text-sm">
                         What should the congregation call you?
                     </p>
-
-                    <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: '20px' }}>
-                            <input
-                                type="text"
-                                value={name}
-                                onChange={(e) => {
-                                    setName(e.target.value);
-                                    setError('');
-                                }}
-                                placeholder="e.g. Pastor David"
-                                autoFocus
-                                style={{ textAlign: 'center' }}
-                            />
-                            {error && (
-                                <div style={{
-                                    color: 'var(--accent-danger)',
-                                    fontSize: '13px',
-                                    marginTop: '10px'
-                                }}>
-                                    {error}
-                                </div>
-                            )}
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            style={{ width: '100%' }}
-                        >
-                            Start Ministry
-                        </button>
-                    </form>
                 </div>
+
+                <form onSubmit={handleSubmit} className="w-full space-y-4">
+                    <div className="space-y-2">
+                        <Input
+                            type="text"
+                            value={name}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                setName(e.target.value);
+                                setError('');
+                            }}
+                            placeholder="e.g. Pastor David"
+                            autoFocus
+                            className="bg-surface text-center font-bold text-lg h-12 text-text-primary border-border-prominent focus:border-brand"
+                        />
+                        {error && (
+                            <p className="text-danger text-xs text-center font-bold animate-in fade-in slide-in-from-top-1">
+                                {error}
+                            </p>
+                        )}
+                    </div>
+
+                    <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full font-bold"
+                    >
+                        Start Ministry
+                    </Button>
+                </form>
             </div>
-        </div>
+        </Modal>
     );
 }

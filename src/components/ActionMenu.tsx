@@ -1,12 +1,9 @@
-/**
- * ActionMenu Component - Reference Design Match
- * Action cards with icons, descriptions, and energy costs.
- */
-
-'use client';
-
+// ... imports
 import { useGameStore } from '@/store/useGameStore';
 import { useState } from 'react';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 interface ActionMenuProps {
     onAction: (action: any) => void;
@@ -20,57 +17,63 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
     const ministryActions = [
         {
             id: 'preach',
-            title: 'Preach the Word',
-            description: 'Gain members & offering',
+            title: 'Preach',
+            description: 'Gain members',
             icon: '📈',
-            iconBg: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            iconBg: 'bg-blue-600',
             energyCost: 20,
-            effects: { members: 5, churchCash: 1000, anointing: 50 }
+            effects: { members: 5, churchCash: 1000, anointing: 50 },
+            tag: 'Growth'
         },
         {
             id: 'sunday_service',
             title: 'Sunday Service',
-            description: 'Major boost to growth',
+            description: 'Weekly boost',
             icon: '🌅',
-            iconBg: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            iconBg: 'bg-amber-500',
             energyCost: 50,
-            effects: { members: 15, churchCash: 5000, anointing: 100 }
+            effects: { members: 15, churchCash: 5000, anointing: 100 },
+            tag: 'Essential'
         },
         {
             id: 'upgrade_venue',
             title: 'Upgrade Venue',
-            description: `To: ${getNextVenue(church.venue)}`,
-            icon: '📈',
-            iconBg: 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+            description: getNextVenue(church.venue),
+            icon: '🏗️',
+            iconBg: 'bg-violet-600',
             energyCost: 0,
-            effects: {}
+            effects: {},
+            tag: 'Scale'
         },
         {
             id: 'pray',
-            title: 'Mountain Prayer',
-            description: 'Increase anointing',
+            title: 'Intense Prayer',
+            description: 'Boost Spirit',
             icon: '🙏',
-            iconBg: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
+            iconBg: 'bg-purple-600',
             energyCost: 15,
-            effects: { anointing: 100, health: 5 }
+            effects: { anointing: 100, health: 5 },
+            tag: 'Spirit'
         },
         {
             id: 'bible_study',
             title: 'Bible Study',
-            description: 'Learn & grow spiritually',
+            description: 'Gain Wisdom',
             icon: '📖',
-            iconBg: 'linear-gradient(135deg, #22c55e, #16a34a)',
+            iconBg: 'bg-green-600',
             energyCost: 10,
-            effects: { anointing: 30, fame: 10 }
+            effects: { anointing: 30, fame: 10 },
+            tag: 'Wisdom'
         },
         {
             id: 'crusade',
-            title: 'Street Crusade',
-            description: 'Evangelize for souls',
+            title: 'City Crusade',
+            description: 'Mass Evangelism',
             icon: '🎤',
-            iconBg: 'linear-gradient(135deg, #ec4899, #be185d)',
+            iconBg: 'bg-pink-600',
             energyCost: 30,
-            effects: { members: 25, fame: 20 }
+            effects: { members: 25, fame: 20 },
+            tag: 'Outreach'
         },
     ];
 
@@ -78,39 +81,43 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
     const lifestyleActions = [
         {
             id: 'rest',
-            title: 'Rest & Refresh',
-            description: 'Restore health & energy',
+            title: 'Deep Rest',
+            description: 'Restore energy',
             icon: '😴',
-            iconBg: 'linear-gradient(135deg, #2dd4bf, #14b8a6)',
+            iconBg: 'bg-teal-500',
             energyCost: 0,
-            effects: { health: 15, energy: 200 }
+            effects: { health: 15, energy: 200 },
+            tag: 'Health'
         },
         {
             id: 'date',
-            title: 'Go on a Date',
-            description: 'Find love or strengthen bond',
+            title: 'Go on Date',
+            description: 'Find love',
             icon: '❤️',
-            iconBg: 'linear-gradient(135deg, #f43f5e, #e11d48)',
+            iconBg: 'bg-rose-500',
             energyCost: 15,
-            effects: { stress: -20 }
+            effects: { stress: -20 },
+            tag: 'Social'
         },
         {
             id: 'gym',
             title: 'Hit the Gym',
-            description: 'Improve health',
+            description: 'Stay fit',
             icon: '💪',
-            iconBg: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            iconBg: 'bg-red-600',
             energyCost: 20,
-            effects: { health: 10 }
+            effects: { health: 10 },
+            tag: 'Health'
         },
         {
             id: 'invest',
-            title: 'Invest Money',
-            description: 'Grow your wealth',
+            title: 'Invest Flow',
+            description: 'Grow wealth',
             icon: '📊',
-            iconBg: 'linear-gradient(135deg, #22c55e, #15803d)',
+            iconBg: 'bg-green-700',
             energyCost: 5,
-            effects: {}
+            effects: {},
+            tag: 'Finance'
         },
     ];
 
@@ -130,150 +137,102 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
     };
 
     return (
-        <div style={{
-            padding: '0 16px',
-            paddingBottom: '100px',
-        }}>
-            {/* Tab Pills */}
-            <div style={{
-                display: 'flex',
-                gap: '8px',
-                marginBottom: '16px',
-                paddingTop: '8px',
-            }}>
-                <button
+        <div className="px-4 pb-32">
+            {/* Tab Switcher */}
+            <div className="flex p-1 bg-surface rounded-xl mb-6 border border-border-subtle shadow-inner">
+                <Button
                     onClick={() => setActiveTab('ministry')}
-                    style={{
-                        background: activeTab === 'ministry' ? '#1e293b' : 'transparent',
-                        color: activeTab === 'ministry' ? '#e0e0e0' : '#64748b',
-                        border: '1px solid',
-                        borderColor: activeTab === 'ministry' ? '#334155' : '#1e293b',
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                    }}
+                    variant={activeTab === 'ministry' ? 'default' : 'ghost'}
+                    size="sm"
+                    className={`flex-1 font-bold rounded-lg transition-all ${activeTab === 'ministry'
+                        ? 'shadow-md'
+                        : 'text-text-secondary hover:bg-surface-hover'
+                        }`}
                 >
                     Values & Ministry
-                </button>
-                <button
+                </Button>
+                <Button
                     onClick={() => setActiveTab('lifestyle')}
-                    style={{
-                        background: activeTab === 'lifestyle' ? '#1e293b' : 'transparent',
-                        color: activeTab === 'lifestyle' ? '#e0e0e0' : '#64748b',
-                        border: '1px solid',
-                        borderColor: activeTab === 'lifestyle' ? '#334155' : '#1e293b',
-                        padding: '8px 16px',
-                        borderRadius: '20px',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                    }}
+                    variant={activeTab === 'lifestyle' ? 'default' : 'ghost'}
+                    size="sm"
+                    className={`flex-1 font-bold rounded-lg transition-all ${activeTab === 'lifestyle'
+                        ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-md'
+                        : 'text-text-secondary hover:bg-surface-hover'
+                        }`}
                 >
                     Lifestyle & Assets
-                </button>
+                </Button>
             </div>
 
-            {/* Action Cards */}
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-            }}>
+            {/* Action Grid */}
+            <div className="grid grid-cols-2 gap-3">
                 {currentActions.map((action) => {
                     const canAfford = stats.energy >= action.energyCost || action.energyCost === 0;
+
                     return (
                         <button
                             key={action.id}
                             onClick={() => handleAction(action)}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
-                                padding: '14px 16px',
-                                background: '#111118',
-                                border: 'none',
-                                borderRadius: '12px',
-                                cursor: canAfford ? 'pointer' : 'not-allowed',
-                                opacity: canAfford ? 1 : 0.5,
-                                transition: 'transform 0.1s, background 0.2s',
-                                textAlign: 'left',
-                            }}
+                            disabled={!canAfford}
+                            className={`text-left transition-all duration-200 group outline-none ${canAfford
+                                ? 'cursor-pointer'
+                                : 'opacity-50 cursor-not-allowed grayscale'
+                                }`}
                         >
-                            {/* Icon */}
-                            <div style={{
-                                width: '44px',
-                                height: '44px',
-                                borderRadius: '10px',
-                                background: action.iconBg,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '22px',
-                                flexShrink: 0,
-                            }}>
-                                {action.icon}
-                            </div>
+                            <Card className={`p-4 h-full border transition-all duration-200 ${canAfford
+                                    ? 'bg-surface border-border-subtle group-hover:border-brand/50 group-hover:-translate-y-1 group-hover:shadow-lg group-active:scale-95'
+                                    : 'bg-surface/50 border-transparent'
+                                }`}>
+                                <div className="flex flex-col gap-3">
+                                    {/* Header */}
+                                    <div className="flex justify-between items-start">
+                                        <div className={`w-10 h-10 rounded-xl ${action.iconBg} bg-opacity-20 flex items-center justify-center text-xl shadow-inner ring-1 ring-white/5`}>
+                                            {action.icon}
+                                        </div>
+                                        <Badge variant="outline" className="text-[10px] px-2 h-5 bg-black/20 font-mono tracking-wide border-0">
+                                            {action.tag}
+                                        </Badge>
+                                    </div>
 
-                            {/* Text */}
-                            <div style={{ flex: 1 }}>
-                                <div style={{
-                                    color: '#e0e0e0',
-                                    fontSize: '15px',
-                                    fontWeight: 700,
-                                    marginBottom: '2px',
-                                }}>
-                                    {action.title}
-                                </div>
-                                <div style={{
-                                    color: '#6b7280',
-                                    fontSize: '12px',
-                                }}>
-                                    {action.description}
-                                </div>
-                            </div>
+                                    {/* Content */}
+                                    <div>
+                                        <h3 className="text-sm font-bold text-text-primary mb-1 leading-tight group-hover:text-brand transition-colors">
+                                            {action.title}
+                                        </h3>
+                                        <p className="text-[11px] text-text-secondary leading-tight line-clamp-2">
+                                            {action.description}
+                                        </p>
+                                    </div>
 
-                            {/* Energy Cost */}
-                            {action.energyCost > 0 && (
-                                <div style={{
-                                    color: canAfford ? '#22c55e' : '#ef4444',
-                                    fontSize: '13px',
-                                    fontWeight: 700,
-                                    whiteSpace: 'nowrap',
-                                }}>
-                                    {action.energyCost} NRG
+                                    {/* Footer */}
+                                    <div className="pt-3 mt-auto border-t border-dashed border-border-subtle/50 flex items-center justify-between">
+                                        <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Cost</span>
+                                        <span className={`text-xs font-black ${action.energyCost === 0 ? 'text-success' : canAfford ? 'text-text-primary' : 'text-danger'
+                                            }`}>
+                                            {action.energyCost === 0 ? 'FREE' : `${action.energyCost} NRG`}
+                                        </span>
+                                    </div>
                                 </div>
-                            )}
+                            </Card>
                         </button>
                     );
                 })}
             </div>
 
-            {/* Start Next Week Button */}
-            <button
-                onClick={() => onAction({ id: 'advance_week', energyCost: 0, effects: {} })}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    width: '100%',
-                    marginTop: '24px',
-                    padding: '14px 24px',
-                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
-                    border: 'none',
-                    borderRadius: '12px',
-                    color: '#fff',
-                    fontSize: '15px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                }}
-            >
-                Start Next Week 📈
-            </button>
+            {/* Next Week Button */}
+            <div className="mt-8 mb-4">
+                <Button
+                    variant="secondary"
+                    size="lg"
+                    className="w-full h-14 text-lg font-black bg-gradient-to-r from-brand to-violet-600 text-white border-0 shadow-lg shadow-brand/20 hover:shadow-brand/40 hover:scale-[1.02] transition-all"
+                    onClick={() => onAction({ id: 'advance_week', energyCost: 0, effects: {} })}
+                >
+                    Start Next Week 📅
+                </Button>
+                <p className="text-center text-[10px] text-text-muted mt-3 font-mono uppercase tracking-widest opacity-60">
+                    Advance time & Reset Energy
+                </p>
+            </div>
         </div>
     );
 }

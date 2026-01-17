@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/store/useGameStore';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -23,91 +26,69 @@ export default function SettingsModal({ isOpen, onClose, onHowToPlay }: Settings
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '400px', textAlign: 'center' }}>
-                <h2>Settings</h2>
-
-                <div style={{ margin: '20px 0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <div className="setting-item">
-                        <label>Game Version</label>
-                        <span style={{ color: '#666' }}>v2.0 (Daddy G.O. Edition)</span>
+        <Modal isOpen={true} onClose={onClose} title="Settings" className="max-w-sm">
+            <div className="space-y-6">
+                <Card className="p-4 bg-surface space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-text-secondary font-medium">Game Version</span>
+                        <span className="text-text-primary font-bold">v2.0 (Daddy G.O.)</span>
                     </div>
-
-                    <div className="setting-item">
-                        <label>Developer</label>
-                        <span style={{ color: '#666' }}>Harper Kollins AI</span>
+                    <div className="w-full h-px bg-border-subtle" />
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-text-secondary font-medium">Developer</span>
+                        <span className="text-text-primary font-bold">Harper Kollins AI</span>
                     </div>
-                </div>
+                </Card>
 
-                {/* How to Play Button */}
                 {onHowToPlay && (
-                    <>
-                        <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
-                        <button
-                            onClick={() => {
-                                onHowToPlay();
-                                onClose();
-                            }}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '10px',
-                                marginBottom: '10px',
-                                width: '100%',
-                                padding: '12px',
-                                background: '#1a1a2e',
-                                color: '#e0e0e0',
-                                border: '1px solid #333',
-                                borderRadius: '8px',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            ❓ How to Play
-                        </button>
-                    </>
+                    <Button
+                        variant="secondary"
+                        className="w-full justify-center gap-2"
+                        onClick={() => {
+                            onHowToPlay();
+                            onClose();
+                        }}
+                    >
+                        <span>❓</span> How to Play
+                    </Button>
                 )}
 
-                <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '20px 0' }} />
-
-                <div style={{ marginBottom: '20px' }}>
-                    <h3 style={{ color: '#ef4444', marginBottom: '10px' }}>Danger Zone</h3>
+                <div className="pt-4 border-t border-border-subtle">
+                    <h3 className="text-danger font-bold text-sm mb-3 flex items-center gap-2">
+                        <span>☠️</span> Danger Zone
+                    </h3>
 
                     {!confirmReset ? (
-                        <button
+                        <Button
+                            variant="destructive"
+                            className="w-full"
                             onClick={handleReset}
-                            className="btn-danger"
-                            style={{ width: '100%', padding: '12px' }}
                         >
                             Start New Game
-                        </button>
+                        </Button>
                     ) : (
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <button
+                        <div className="flex gap-2 animate-in fade-in slide-in-from-bottom-2">
+                            <Button
+                                variant="destructive"
+                                className="flex-1 font-bold"
                                 onClick={handleReset}
-                                className="btn-danger"
-                                style={{ flex: 1, padding: '12px', background: '#dc2626' }}
                             >
                                 Confirm Reset?
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                className="flex-1"
                                 onClick={() => setConfirmReset(false)}
-                                className="btn-secondary"
-                                style={{ flex: 1, padding: '12px' }}
                             >
                                 Cancel
-                            </button>
+                            </Button>
                         </div>
                     )}
-                    <p style={{ fontSize: '11px', color: '#666', marginTop: '8px' }}>
-                        This will wipe all progress and save data.
+                    <p className="text-[10px] text-text-muted mt-2 text-center">
+                        This will permanently wipe all progress.
                     </p>
                 </div>
-
-                <button onClick={onClose} className="btn-secondary" style={{ width: '100%' }}>
-                    Close
-                </button>
             </div>
-        </div >
+        </Modal>
     );
 }

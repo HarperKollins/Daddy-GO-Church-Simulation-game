@@ -1,12 +1,15 @@
 /**
- * SiphonModal Component - Premium BitLife Style
- * 
+ * SiphonModal Component
  * Church-to-personal fund transfer with scandal risk meter
  */
 
 'use client';
 
 import { useState } from 'react';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 interface SiphonModalProps {
     churchCash: number;
@@ -51,131 +54,92 @@ export default function SiphonModal({
 
     // Determine risk level color
     const getRiskColor = () => {
-        if (scandalRisk >= 15) return '#dc2626';
-        if (scandalRisk >= 8) return '#f59e0b';
-        return '#22c55e';
+        if (scandalRisk >= 15) return 'text-danger';
+        if (scandalRisk >= 8) return 'text-warning';
+        return 'text-success';
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div
-                className="modal-sheet animate-slide-up"
-                onClick={e => e.stopPropagation()}
-                style={{ maxHeight: '90vh', overflowY: 'auto' }}
-            >
-                {/* Handle */}
-                <div className="modal-handle">
-                    <div className="modal-handle-bar" />
-                </div>
+        <Modal isOpen={true} onClose={onClose} title="Church Finances">
+            <div className="space-y-6">
+                <p className="text-xs text-text-secondary text-center">
+                    Transfer funds to your personal wallet
+                </p>
 
-                {/* Header */}
-                <div className="top-nav border-none">
-                    <div className="top-nav-inner">
-                        <button className="top-nav-btn" onClick={onClose}>
-                            <span className="material-symbols-outlined">close</span>
-                        </button>
-                        <h2 className="top-nav-title">Church Finances</h2>
-                        <div className="w-10" />
+                {/* Wallet Display */}
+                <div className="flex gap-4 items-center justify-center">
+                    <Card className="flex-1 text-center p-3 bg-surface border-border-subtle">
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Church</p>
+                        <p className="text-lg font-black text-brand">{formatCash(churchCash)}</p>
+                    </Card>
+                    <div className="flex items-center text-text-muted">
+                        →
                     </div>
+                    <Card className="flex-1 text-center p-3 bg-surface border-border-subtle">
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Personal</p>
+                        <p className="text-lg font-black text-success">{formatCash(personalCash)}</p>
+                    </Card>
                 </div>
 
-                <div className="px-4 pb-8">
-                    <p className="text-sm text-gray-500 text-center mb-6">
-                        Transfer funds to your personal wallet
-                    </p>
+                {/* Siphon Amount */}
+                {churchCash > 0 ? (
+                    <>
+                        <div className="space-y-3">
+                            <label className="text-xs text-text-secondary block font-bold">
+                                Amount to transfer:
+                            </label>
+                            <input
+                                type="range"
+                                min={0}
+                                max={maxSiphon}
+                                step={Math.max(100, Math.floor(maxSiphon / 100))}
+                                value={amount}
+                                onChange={(e) => setAmount(Number(e.target.value))}
+                                className="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer accent-brand"
+                            />
+                        </div>
 
-                    {/* Wallet Display */}
-                    <div className="flex gap-3 mb-6">
-                        <div className="dashboard-card flex-1 text-center">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Church</p>
-                            <p className="text-lg font-black text-purple-600">{formatCash(churchCash)}</p>
+                        <div className="text-center p-4 bg-surface rounded-xl border border-border-subtle">
+                            <p className="text-3xl font-black text-white">{formatCash(amount)}</p>
                         </div>
-                        <div className="flex items-center">
-                            <span className="material-symbols-outlined text-gray-300">arrow_forward</span>
+
+                        {/* Scandal Risk Meter */}
+                        {amount > 0 && (
+                            <div className={`flex items-center justify-center gap-2 p-3 rounded-lg border bg-surface ${scandalRisk >= 15 ? 'border-danger/30 bg-danger/5' :
+                                    scandalRisk >= 8 ? 'border-warning/30 bg-warning/5' :
+                                        'border-success/30 bg-success/5'
+                                }`}>
+                                <span className="text-lg">⚠️</span>
+                                <span className={`text-sm font-bold ${getRiskColor()}`}>
+                                    Risk: +{scandalRisk}%
+                                    {scandalRisk >= 15 && ' (DANGEROUS)'}
+                                    {scandalRisk >= 8 && scandalRisk < 15 && ' (Risky)'}
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-3 pt-4">
+                            <Button variant="secondary" onClick={onClose} className="flex-1">
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleSiphon}
+                                disabled={amount <= 0}
+                                className="flex-[2] font-bold"
+                                variant={scandalRisk >= 15 ? 'destructive' : 'default'}
+                            >
+                                {amount > 0 ? `Take ${formatCash(amount)}` : 'Select Amount'}
+                            </Button>
                         </div>
-                        <div className="dashboard-card flex-1 text-center">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Personal</p>
-                            <p className="text-lg font-black text-green-600">{formatCash(personalCash)}</p>
-                        </div>
+                    </>
+                ) : (
+                    <div className="text-center py-8">
+                        <div className="text-4xl grayscale opacity-30 mb-2">💸</div>
+                        <p className="text-text-muted">No church funds available.</p>
                     </div>
-
-                    {/* Siphon Amount */}
-                    {churchCash > 0 ? (
-                        <>
-                            <div className="mb-6">
-                                <label className="text-xs text-gray-500 block mb-3">
-                                    Amount to transfer:
-                                </label>
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={maxSiphon}
-                                    step={Math.max(100, Math.floor(maxSiphon / 100))}
-                                    value={amount}
-                                    onChange={(e) => setAmount(Number(e.target.value))}
-                                    style={{
-                                        width: '100%',
-                                        height: '8px',
-                                        borderRadius: '4px',
-                                        appearance: 'none',
-                                        background: `linear-gradient(to right, var(--primary) ${(amount / maxSiphon) * 100}%, #e5e7eb ${(amount / maxSiphon) * 100}%)`,
-                                    }}
-                                />
-                            </div>
-
-                            <div className="text-center mb-6">
-                                <p className="text-3xl font-black text-green-600">{formatCash(amount)}</p>
-                            </div>
-
-                            {/* Scandal Risk Meter */}
-                            {amount > 0 && (
-                                <div
-                                    className="alert-banner"
-                                    style={{
-                                        background: `${getRiskColor()}15`,
-                                        borderColor: `${getRiskColor()}30`,
-                                        color: getRiskColor(),
-                                        marginBottom: '20px',
-                                    }}
-                                >
-                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>warning</span>
-                                    <span>
-                                        Scandal Risk: +{scandalRisk}%
-                                        {scandalRisk >= 15 && ' (VERY DANGEROUS!)'}
-                                        {scandalRisk >= 8 && scandalRisk < 15 && ' (Risky!)'}
-                                    </span>
-                                </div>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={onClose}
-                                    className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-semibold rounded-xl"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSiphon}
-                                    disabled={amount <= 0}
-                                    className="asset-buy-btn flex-2"
-                                    style={{
-                                        opacity: amount > 0 ? 1 : 0.5,
-                                        flex: 2,
-                                    }}
-                                >
-                                    {amount > 0 ? `Take ${formatCash(amount)}` : 'Select Amount'}
-                                </button>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="text-center py-8">
-                            <span className="material-symbols-outlined text-4xl text-gray-300 mb-3">account_balance_wallet</span>
-                            <p className="text-gray-500">No church funds available to transfer.</p>
-                        </div>
-                    )}
-                </div>
+                )}
             </div>
-        </div>
+        </Modal>
     );
 }
