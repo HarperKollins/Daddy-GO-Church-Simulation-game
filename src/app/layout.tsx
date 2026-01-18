@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import ClientProviders from '@/components/ClientProviders'
+import GlitchOverlay from '@/components/GlitchOverlay';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,6 +38,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className} style={{ background: '#0a0a0f' }}>
         <ClientProviders>
+          <GlitchOverlay />
           <main style={{
             minHeight: '100vh',
             maxWidth: '768px',

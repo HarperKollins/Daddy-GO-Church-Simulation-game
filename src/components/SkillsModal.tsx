@@ -54,16 +54,19 @@ export default function SkillsModal({ isOpen, onClose }: SkillsModalProps) {
             <div className="space-y-6">
 
                 {/* Header Status */}
+                {/* Header Status */}
                 <div className="flex justify-between items-center bg-surface p-3 rounded-lg border border-border-subtle">
-                    <span className="text-text-secondary text-xs uppercase font-bold tracking-wider">Available Energy</span>
-                    <span className="text-warning font-mono font-bold">{stats.energy} NRG</span>
+                    <span className="text-text-secondary text-xs uppercase font-bold tracking-wider">Health Status</span>
+                    <span className={`font-mono font-bold ${stats.health < 3000 ? 'text-danger' : 'text-success'}`}>
+                        {Math.round(stats.health / 100)}%
+                    </span>
                 </div>
 
                 {/* Feedback Message */}
                 {message && (
                     <div className={`p-3 rounded-lg text-xs font-bold text-center animate-in slide-in-from-top-2 border ${message.type === 'success' ? 'bg-success/10 text-success border-success/20' :
-                            message.type === 'warning' ? 'bg-warning/10 text-warning border-warning/20' :
-                                'bg-danger/10 text-danger border-danger/20'
+                        message.type === 'warning' ? 'bg-warning/10 text-warning border-warning/20' :
+                            'bg-danger/10 text-danger border-danger/20'
                         }`}>
                         {message.text}
                     </div>

@@ -21,7 +21,7 @@ import { CoreStats } from '@/types/game';
  * - 4: SPAWN_RIVAL (Challenge player)
  */
 
-const INPUT_SIZE = 16; // 9 stats + 6 vibe + 1 churn
+const INPUT_SIZE = 15; // 8 stats + 6 vibe + 1 churn
 const ACTION_SIZE = 5;
 
 export class RLDirector {
@@ -134,7 +134,7 @@ export class RLDirector {
             stats.anointing / 10000,
             stats.fame / 10000,
             stats.scandal / 10000,
-            stats.energy / 1000,
+            // energy removed
             stats.stress / 10000,
             stats.influence / 10000,
             // Vibe Vector (6 dims)

@@ -13,12 +13,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 
-const formatCash = (amount: number): string => {
-    if (amount >= 1e9) return `₦${(amount / 1e9).toFixed(1)}B`;
-    if (amount >= 1e6) return `₦${(amount / 1e6).toFixed(1)}M`;
-    if (amount >= 1e3) return `₦${(amount / 1e3).toFixed(0)}K`;
-    return `₦${amount.toLocaleString()}`;
-};
+import { formatCurrency, formatNumber } from '@/utils/formatters';
 
 interface StatsBarProps {
     onSettingsClick?: () => void;
@@ -87,7 +82,7 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
 
                     {/* Money Badge */}
                     <Badge variant="success" className="mr-2">
-                        💵 {formatCash(stats.personalCash + stats.churchCash)}
+                        💵 {formatCurrency(stats.personalCash + stats.churchCash)}
                     </Badge>
 
                     {/* Settings */}
@@ -119,13 +114,7 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
                         </div>
                     </div>
 
-                    {/* NRG */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs text-warning font-bold w-6">NRG</span>
-                        <div className="flex-1">
-                            <ProgressBar value={stats.energy} max={150} variant="warning" className="h-1.5" />
-                        </div>
-                    </div>
+
 
                     {/* SPIRIT */}
                     <div className="flex items-center gap-2">
@@ -157,7 +146,7 @@ export default function StatsBar({ onSettingsClick }: StatsBarProps) {
 
                     <div className="flex items-center gap-1.5">
                         <span className="text-info text-sm">👥</span>
-                        <span className="text-xs font-bold text-text-primary">{church.members.toLocaleString()} MEMBERS</span>
+                        <span className="text-xs font-bold text-text-primary">{formatNumber(church.members)} MEMBERS</span>
                     </div>
                 </div>
             </div>

@@ -20,7 +20,7 @@ This is the night where destinies change. Where prayers at midnight break chains
 
 Your members are expecting something EPIC. How will you prepare?`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'week', operator: 'gte', value: 48 }, // Near end of year
         ],
         choices: [
@@ -84,7 +84,7 @@ Your "Yearly Prophecies" video gets 2 MILLION views. Some prophecies are bold. S
 
 What kind of prophecies will you deliver?`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'madeChoice', choiceId: 'CROSSOVER_GO_BIG' },
         ],
         choices: [
@@ -143,7 +143,7 @@ A citywide outdoor revival. Thousands of souls. Miracles. Drama. But also: massi
 
 This could make you... or break you.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'stat', stat: 'fame', operator: 'gte', value: 20 },
             { type: 'week', operator: 'gte', value: 12 },
         ],

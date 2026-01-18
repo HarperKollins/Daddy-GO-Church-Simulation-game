@@ -314,7 +314,7 @@ export function applyEntropy(
         fame: Math.max(0, stats.fame - (stats.fame * decayRate * 0.5)),
         // Scandal doesn't decay - it compounds!
         scandal: stats.scandal,
-        energy: stats.energy,
+        // energy removed
         personalCash: stats.personalCash,
         churchCash: stats.churchCash,
         stress: Math.min(10000, stats.stress + (stats.stress * decayRate * 0.3)),

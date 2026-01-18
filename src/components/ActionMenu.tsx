@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { formatCurrency } from '@/utils/formatters';
 
 interface ActionMenuProps {
     onAction: (action: any) => void;
@@ -21,7 +22,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Gain members',
             icon: '📈',
             iconBg: 'bg-blue-600',
-            energyCost: 20,
             effects: { members: 5, churchCash: 1000, anointing: 50 },
             tag: 'Growth'
         },
@@ -31,7 +31,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Weekly boost',
             icon: '🌅',
             iconBg: 'bg-amber-500',
-            energyCost: 50,
             effects: { members: 15, churchCash: 5000, anointing: 100 },
             tag: 'Essential'
         },
@@ -41,7 +40,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: getNextVenue(church.venue),
             icon: '🏗️',
             iconBg: 'bg-violet-600',
-            energyCost: 0,
             effects: {},
             tag: 'Scale'
         },
@@ -51,7 +49,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Boost Spirit',
             icon: '🙏',
             iconBg: 'bg-purple-600',
-            energyCost: 15,
             effects: { anointing: 100, health: 5 },
             tag: 'Spirit'
         },
@@ -61,7 +58,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Gain Wisdom',
             icon: '📖',
             iconBg: 'bg-green-600',
-            energyCost: 10,
             effects: { anointing: 30, fame: 10 },
             tag: 'Wisdom'
         },
@@ -71,7 +67,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Mass Evangelism',
             icon: '🎤',
             iconBg: 'bg-pink-600',
-            energyCost: 30,
             effects: { members: 25, fame: 20 },
             tag: 'Outreach'
         },
@@ -82,11 +77,10 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
         {
             id: 'rest',
             title: 'Deep Rest',
-            description: 'Restore energy',
+            description: 'Restore health',
             icon: '😴',
             iconBg: 'bg-teal-500',
-            energyCost: 0,
-            effects: { health: 15, energy: 200 },
+            effects: { health: 15 },
             tag: 'Health'
         },
         {
@@ -95,7 +89,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Find love',
             icon: '❤️',
             iconBg: 'bg-rose-500',
-            energyCost: 15,
             effects: { stress: -20 },
             tag: 'Social'
         },
@@ -105,7 +98,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Stay fit',
             icon: '💪',
             iconBg: 'bg-red-600',
-            energyCost: 20,
             effects: { health: 10 },
             tag: 'Health'
         },
@@ -115,7 +107,6 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             description: 'Grow wealth',
             icon: '📊',
             iconBg: 'bg-green-700',
-            energyCost: 5,
             effects: {},
             tag: 'Finance'
         },
@@ -130,9 +121,7 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
     }
 
     const handleAction = (action: any) => {
-        if (stats.energy < action.energyCost && action.energyCost > 0) {
-            return; // Can't afford
-        }
+        // No energy checks needed anymore
         onAction(action);
     };
 
@@ -167,7 +156,7 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
             {/* Action Grid */}
             <div className="grid grid-cols-2 gap-3">
                 {currentActions.map((action) => {
-                    const canAfford = stats.energy >= action.energyCost || action.energyCost === 0;
+                    const canAfford = true; // Use simple logic for now
 
                     return (
                         <button
@@ -180,8 +169,8 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
                                 }`}
                         >
                             <Card className={`p-4 h-full border transition-all duration-200 ${canAfford
-                                    ? 'bg-surface border-border-subtle group-hover:border-brand/50 group-hover:-translate-y-1 group-hover:shadow-lg group-active:scale-95'
-                                    : 'bg-surface/50 border-transparent'
+                                ? 'bg-surface border-border-subtle group-hover:border-brand/50 group-hover:-translate-y-1 group-hover:shadow-lg group-active:scale-95'
+                                : 'bg-surface/50 border-transparent'
                                 }`}>
                                 <div className="flex flex-col gap-3">
                                     {/* Header */}
@@ -206,10 +195,9 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
 
                                     {/* Footer */}
                                     <div className="pt-3 mt-auto border-t border-dashed border-border-subtle/50 flex items-center justify-between">
-                                        <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Cost</span>
-                                        <span className={`text-xs font-black ${action.energyCost === 0 ? 'text-success' : canAfford ? 'text-text-primary' : 'text-danger'
-                                            }`}>
-                                            {action.energyCost === 0 ? 'FREE' : `${action.energyCost} NRG`}
+                                        <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Action</span>
+                                        <span className={'text-xs font-black text-text-primary'}>
+                                            SELECT
                                         </span>
                                     </div>
                                 </div>
@@ -227,10 +215,10 @@ export default function ActionMenu({ onAction }: ActionMenuProps) {
                     className="w-full h-14 text-lg font-black bg-gradient-to-r from-brand to-violet-600 text-white border-0 shadow-lg shadow-brand/20 hover:shadow-brand/40 hover:scale-[1.02] transition-all"
                     onClick={() => onAction({ id: 'advance_week', energyCost: 0, effects: {} })}
                 >
-                    Start Next Week 📅
+                    [ + AGE UP ] &nbsp; Skip Year ⏩
                 </Button>
                 <p className="text-center text-[10px] text-text-muted mt-3 font-mono uppercase tracking-widest opacity-60">
-                    Advance time & Reset Energy
+                    Advances time by 1 Year & Simulates Outcomes
                 </p>
             </div>
         </div>

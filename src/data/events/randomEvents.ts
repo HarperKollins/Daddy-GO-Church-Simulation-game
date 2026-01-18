@@ -691,7 +691,7 @@ By the time you reach Yaba, three people are crying and asking for your church a
                 effects: [
                     { type: 'stat', stat: 'fame', operation: 'add', value: 5 },
                     { type: 'members', operation: 'add', value: 3 },
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 10 },
+                    { type: 'stat', stat: 'stress', operation: 'add', value: 50 },
                 ],
             },
             {

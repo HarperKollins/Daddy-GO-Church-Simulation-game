@@ -122,7 +122,7 @@ export interface ClubActivity {
     cost: number;
     effects: Record<string, number>;
     scandalRisk: number;
-    energyCost: number;
+    // energyCost removed
     description: string;
 }
 
@@ -133,7 +133,7 @@ export const CLUB_ACTIVITIES: ClubActivity[] = [
         cost: 500000,
         effects: { fame: 200, stress: -300 },
         scandalRisk: 30,
-        energyCost: 200,
+
         description: 'Pop champagne. Let them see you.'
     },
     {
@@ -142,7 +142,7 @@ export const CLUB_ACTIVITIES: ClubActivity[] = [
         cost: 50000,
         effects: { stress: -200 },
         scandalRisk: 10,
-        energyCost: 100,
+
         description: 'Enjoy the music. No attention.'
     },
     {
@@ -151,7 +151,7 @@ export const CLUB_ACTIVITIES: ClubActivity[] = [
         cost: 100000,
         effects: { influence: 200, stress: -100 },
         scandalRisk: 20,
-        energyCost: 300,
+
         description: 'Exchange numbers with politicians and businessmen.'
     },
     {
@@ -160,7 +160,7 @@ export const CLUB_ACTIVITIES: ClubActivity[] = [
         cost: 200000,
         effects: { stress: -500, health: -100 },
         scandalRisk: 60,
-        energyCost: 300,
+
         description: 'Who these girls be? Nobody knows.'
     },
     {
@@ -169,7 +169,7 @@ export const CLUB_ACTIVITIES: ClubActivity[] = [
         cost: 2000000,
         effects: { fame: 500, stress: -400 },
         scandalRisk: 50,
-        energyCost: 400,
+
         description: 'Make it rain! Instagram will love this.'
     },
     {
@@ -178,7 +178,7 @@ export const CLUB_ACTIVITIES: ClubActivity[] = [
         cost: 1000000,
         effects: { stress: -600, health: -200 },
         scandalRisk: 80,
-        energyCost: 400,
+
         description: 'What happens in the private room...'
     }
 ];

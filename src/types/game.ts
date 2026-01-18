@@ -35,13 +35,16 @@ export interface CoreStats {
     fame: number;
     /** Risk meter. At 10000 = Game Over/Jail (0-10000) */
     scandal: number;
-    /** Current Energy. Actions cost energy. Resets weekly. (0-1000) */
-    energy: number;
-    /** Stress level - affects health decay and decision quality (0-10000) */
-    stress: number;
     /** Political/Social influence (0-10000) - unlocks political connections */
     influence: number;
+    /** Mental stress level (0-10000). High stress leads to burnout or breakdown. */
+    stress: number;
 }
+
+/**
+ * Game Phases for the Yearly Loop
+ */
+export type GamePhase = 'SIMULATION' | 'YEARLY_REPORT' | 'EVENT_SELECTION' | 'EVENT' | 'GAME_OVER';
 
 /**
  * Hidden flags that track permanent consequences and unlock paths.
@@ -58,6 +61,9 @@ export interface HiddenFlags {
     yahooPath: boolean;
     /** If true, player sowed the seed instead of eating it */
     sowedTheSeed: boolean;
+    /** Risky Hookup Consequences */
+    hasSTD: boolean;
+    spiritSpouseActive: boolean;
 }
 
 /**
@@ -85,13 +91,13 @@ export type VenueTier =
     | 'CITY_STATE';   // End game - owns entire district
 
 /**
- * Game progression acts
+ * Game progression eras (Timeline)
  */
-export type GameAct =
-    | 'SURVIVAL'      // Act 1: University student, preaching at bus stops
-    | 'THE_RISE'      // Act 2: First church, building foundation
-    | 'THE_EMPIRE'    // Act 3: Mega church expansion
-    | 'THE_KINGDOM';  // Act 4: Global power, political influence
+export type GameEra =
+    | 'University'      // Phase 1: Campus Ministry
+    | 'City'            // Phase 2: Urban Expansion
+    | 'Empire'          // Phase 3: National & Global
+    | 'Ultimate';       // Phase 4: Interdimensional / Trillionaire
 
 /**
  * Education status for venue restrictions
@@ -125,9 +131,9 @@ export interface FlagCondition {
     value: boolean;
 }
 
-export interface ActCondition {
-    type: 'act';
-    act: GameAct;
+export interface EraCondition {
+    type: 'era';
+    era: GameEra;
 }
 
 export interface WeekCondition {
@@ -149,7 +155,7 @@ export interface LocationCondition {
 export type EventCondition =
     | StatCondition
     | FlagCondition
-    | ActCondition
+    | EraCondition
     | LocationCondition
     | WeekCondition
     | ChoiceCondition;
@@ -181,9 +187,9 @@ export interface VenueEffect {
     venue: VenueTier;
 }
 
-export interface ActEffect {
-    type: 'act';
-    act: GameAct;
+export interface EraEffect {
+    type: 'era';
+    era: GameEra;
 }
 
 export type EventEffect =
@@ -191,7 +197,7 @@ export type EventEffect =
     | FlagEffect
     | MemberEffect
     | VenueEffect
-    | ActEffect;
+    | EraEffect;
 
 /**
  * A choice the player can make during an event
@@ -258,6 +264,16 @@ export interface Partner {
     description?: string;
 }
 
+export interface Nemesis {
+    id: string;
+    name: string;
+    churchName: string;
+    archetype: 'INTELLECTUAL' | 'MIRACLE_WORKER' | 'TRADITIONALIST' | 'YOUNG_TURK';
+    powerLevel: number; // 0-100 relative to player
+    aggressiveness: number; // 0-100
+    isActive: boolean;
+}
+
 export interface BabyMama {
     name: string;
     childName: string;
@@ -273,19 +289,27 @@ export interface PlayerState {
     age: number;
     week: number;
     isAlive: boolean;
-    currentAct: GameAct;
+    currentEra: GameEra;
+    /** Current game phase (Simulation, Report, Event Selection) */
+    gamePhase: GamePhase;
     stats: CoreStats;
     hiddenFlags: HiddenFlags;
     church: ChurchState;
     permanentChoices: PermanentChoice[];
     /** IDs of one-time events that have been triggered */
     triggeredEvents: string[];
+    /** The batch of 3-5 procedural events generated for this year */
+    currentYearEvents: GameEvent[];
+    /** The specific event currently being interacted with */
+    currentEvent: GameEvent | null;
     /** Owned assets (vehicles, properties, investments) */
     assets: Asset[];
     /** Current romantic partner/spouse */
     partner: Partner | null;
     /** Baby Mamas / Children born out of wedlock */
     babyMamas: BabyMama[];
+    /** Active Rival Pastor */
+    nemesis: Nemesis | null;
     /** Current main occupation (starts as Student) */
     occupation: 'Student' | 'Full-Time Pastor' | 'Graduate' | 'Dropout';
     /** Ministry location (affects difficulty and resources) */
@@ -375,6 +399,8 @@ export interface Asset {
     volatility?: number;
     /** For investments: rug pull probability 0-1 */
     rugPullChance?: number;
+    /** Minimum Era required to purchase */
+    unlockEra?: GameEra;
 }
 
 /**
@@ -757,7 +783,7 @@ export interface LoginStreak {
 
 export interface DailyReward {
     day: number;
-    type: 'cash' | 'anointing' | 'fame' | 'energy' | 'mystery' | 'premium';
+    type: 'cash' | 'anointing' | 'fame' | 'health' | 'mystery' | 'premium';
     baseAmount: number;
     multiplier: number;
     description: string;

@@ -30,7 +30,7 @@ You haven't eaten since yesterday. Your megaphone is heavy in your hands. The cr
 
 What will you preach today?`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'week', operator: 'gte', value: 1 },
         ],
         choices: [
@@ -96,7 +96,7 @@ He finds you in the room, soaking garri with groundnuts. No sugar. The way he lo
 
 You know what "laptop work" means.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'week', operator: 'gte', value: 3 },
             { type: 'stat', stat: 'personalCash', operator: 'lt', value: 1000 },
         ],
@@ -154,7 +154,7 @@ You haven't eaten properly in three days. The money could feed you for two weeks
 
 The other members have left. It's just you and the money.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'week', operator: 'gte', value: 4 },
             { type: 'stat', stat: 'churchCash', operator: 'lt', value: 5000 },
         ],
@@ -216,7 +216,7 @@ You can feel something stirring. Or is it just the pressure? Emeka from the Dram
 
 What do you do?`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'week', operator: 'gte', value: 6 },
             { type: 'stat', stat: 'anointing', operator: 'gte', value: 30 },
             { type: 'flag', flag: 'miracleLock', value: false },
@@ -295,7 +295,7 @@ He becomes your first deacon. His faith is stronger than anyone who can walk.`,
 
 Inside is ₦50,000. No strings attached. Or are there?`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'stat', stat: 'anointing', operator: 'gte', value: 20 },
         ],
         choices: [
@@ -338,7 +338,7 @@ You wonder if you just made a mistake. But your conscience is clear.`,
 
 Your small crowd is watching. This could make or break your campus reputation.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
         ],
         choices: [
             {
@@ -394,7 +394,7 @@ But Mrs. Okafor just called. Her daughter has been possessed by a strange spirit
 
 The exam is 8 AM. The deliverance could take all night.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'week', operator: 'gte', value: 7 },
         ],
         choices: [
@@ -441,7 +441,7 @@ You probably failed. But next Sunday, Mrs. Okafor testifies. The church is FULL.
 
 He leans forward. "If you want to pass my course, you need to sow a seed. Into my life. ₦20,000. Cash. Or you can explain to your congregation why their pastor is a dropout."`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'week', operator: 'gte', value: 10 },
         ],
         choices: [

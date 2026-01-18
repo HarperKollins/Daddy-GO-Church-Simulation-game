@@ -20,10 +20,11 @@ import type {
     HiddenFlags,
     ChurchState,
     ExtendedPlayerState,
-    GameAct,
+    GameEra,
     VenueTier,
     PermanentChoice,
     EventEffect,
+    EraEffect,
     Asset,
     Partner,
     PastorSkills,
@@ -50,6 +51,8 @@ import { LAWS } from '@/engine/universalLawsEngine';
 import { createEmptyKarmaLedger, processPendingConsequences } from '@/engine/causalityEngine';
 import { createEmptyPersonality } from '@/engine/personalityEngine';
 import { ACHIEVEMENTS } from '@/engine/achievementsEngine';
+import { generateYearlyEvents } from '@/engine/storyGenerator';
+import { createNemesis, generateNemesisAction } from '@/engine/nemesisEngine';
 
 // ============================================================================
 // INITIAL STATE DEFAULTS
@@ -62,7 +65,6 @@ const DEFAULT_STATS: CoreStats = {
     anointing: 2000,       // Some spiritual foundation (20%)
     fame: 0,               // Nobody knows you yet
     scandal: 0,            // Clean slate
-    energy: 150,           // Capped at 150 as per balance Update
     stress: 3000,          // Student life stress (30%)
     influence: 0,          // No political power yet
 };
@@ -73,6 +75,8 @@ const DEFAULT_FLAGS: HiddenFlags = {
     embezzlementUnlocked: false,
     yahooPath: false,
     sowedTheSeed: false,
+    hasSTD: false,
+    spiritSpouseActive: false,
 };
 
 const DEFAULT_CHURCH: ChurchState = {
@@ -88,15 +92,19 @@ const DEFAULT_PLAYER: ExtendedPlayerState = {
     isAlive: true,
     hasCompletedOnboarding: false, // NEW: Track if player has done onboarding
     hasSeenStoryIntro: false, // NEW: Track if player has seen story intro
-    currentAct: 'SURVIVAL',
+    currentEra: 'University',
+    gamePhase: 'SIMULATION',
     stats: DEFAULT_STATS,
     hiddenFlags: DEFAULT_FLAGS,
     church: DEFAULT_CHURCH,
     permanentChoices: [],
     triggeredEvents: [],
+    currentYearEvents: [],
+    currentEvent: null,
     assets: [],
     partner: null,
     babyMamas: [],
+    nemesis: null,
     occupation: 'Student',
     ministryLocation: 'Campus',
     weeksAtZeroHealth: 0,
@@ -163,7 +171,7 @@ const DEFAULT_PLAYER: ExtendedPlayerState = {
 
 interface GameActions {
     // Core game loop
-    advanceWeek: () => void;
+    advanceYear: () => void;
 
     // Stat management
     modifyStat: (stat: keyof CoreStats, amount: number, operation?: 'add' | 'set') => void;
@@ -180,7 +188,7 @@ interface GameActions {
     hasMadeChoice: (choiceId: string) => boolean;
 
     // Progression
-    progressToAct: (act: GameAct) => void;
+    progressToEra: (era: GameEra) => void;
 
     // Effect application
     applyEffects: (effects: EventEffect[]) => void;
@@ -201,7 +209,7 @@ interface GameActions {
     propose: () => void;
     marry: () => void;
     breakup: () => void;
-    hookup: (type: 'church' | 'random' | 'uni') => { pregnant: boolean; babyName?: string; mamaName?: string; scandal: number };
+    hookup: (type: 'church' | 'random' | 'uni') => { pregnant: boolean; babyName?: string; mamaName?: string; scandal: number; std?: boolean; spiritSpouse?: boolean };
 
     // NEW: Skills
     upgradeSkill: (skill: keyof PastorSkills, amount: number) => void;
@@ -284,6 +292,36 @@ const calculateWeeklyExpenses = (venue: VenueTier, personalCash: number): number
     return venueRent[venue] + lifestyleCost;
 };
 
+/**
+ * Calculates yearly offering based on members and venue (x52 scaling)
+ */
+const calculateYearlyOffering = (members: number, venue: VenueTier, location: MinistryLocation): number => {
+    const weekly = calculateWeeklyOffering(members, venue, location);
+    return weekly * 52; // YEARLY SCALE
+};
+
+/**
+ * Calculates yearly expenses based on venue and lifestyle (x52 scaling)
+ */
+const calculateYearlyExpenses = (venue: VenueTier, personalCash: number): number => {
+    const venueRent: Record<VenueTier, number> = {
+        'BUS_STOP': 0,
+        'CLASSROOM': 5000,
+        'TENT': 20000,
+        'WAREHOUSE': 100000,
+        'DOME': 500000,
+        'STADIUM': 2000000,
+        'CITY_STATE': 5000000,
+    };
+
+    // Lifestyle creep: spend more as you have more
+    // Annual lifestyle cost = 20% of net worth per year approx (vs 5% weekly)
+    const lifestyleCost = Math.floor(personalCash * 0.20);
+    const annualRent = venueRent[venue] * 52;
+
+    return annualRent + lifestyleCost;
+};
+
 const calculateAssetMaintenance = (assets: Asset[]): number => {
     return assets.reduce((total, asset) => total + asset.weeklyMaintenance, 0);
 };
@@ -307,51 +345,48 @@ export const useGameStore = create<GameStore>()(
             // ======================================================================
 
             /**
-             * Advances the game by one week.
-             * This is the "heartbeat" of the game - called when player clicks [HOLD SERVICE]
+             * Advances the game by one YEAR.
+             * This is the "heartbeat" of the game - called when player clicks [AGE UP]
              * 
              * Handles:
-             * 1. Stat decay (health decreases, anointing fades)
-             * 2. Passive income from offerings
-             * 3. Expenses (rent, lifestyle)
-             * 4. Age progression
-             * 5. Death checks
+             * 1. Massive Stat Shifts (x52 scaling)
+             * 2. Age +1 guaranteed
+             * 3. Event Batch Generation (Neuro-Engine)
              */
-            advanceWeek: () => {
+            advanceYear: () => {
                 const state = get();
                 if (!state.isAlive) return;
 
-                // Calculate changes
-                const offering = calculateWeeklyOffering(state.church.members, state.church.venue, state.ministryLocation);
-                const venueExpenses = calculateWeeklyExpenses(state.church.venue, state.stats.personalCash);
+                // Calculate Year-Scale Financials
+                const offering = calculateYearlyOffering(state.church.members, state.church.venue, state.ministryLocation);
+                const venueExpenses = calculateYearlyExpenses(state.church.venue, state.stats.personalCash);
                 const assetMaintenance = calculateAssetMaintenance(state.assets);
                 const partnerMaintenance = calculatePartnerMaintenance(state.partner);
 
-                // Baby Mama Support: Sum of all weekly support costs
-                const babyMamaSupport = state.babyMamas?.reduce((total, bm) => total + bm.weeklySupport, 0) || 0;
+                // Baby Mama Support: Sum of all weekly support costs x 52
+                const babyMamaSupport = (state.babyMamas?.reduce((total, bm) => total + bm.weeklySupport, 0) || 0) * 52;
 
                 const totalExpenses = venueExpenses + assetMaintenance + partnerMaintenance + babyMamaSupport;
 
                 // Process Asset Value Changes (Investments/Depreciation)
                 const updatedAssets = state.assets.map(asset => {
                     if (asset.category === 'investment') {
-                        const { newValue, rugPulled } = simulateInvestmentReturn(asset, asset.cost);
-                        // If rug pulled, value becomes 0 (or technically close to it, loop handles it)
-                        // In a real app we might want to notify user here, but store just updates state
+                        // Simulate 52 weeks of market movement
+                        const { newValue } = simulateInvestmentReturn(asset, asset.cost);
+                        // Simplified yearly jump for now
                         return { ...asset, cost: newValue };
                     }
-                    return asset; // Real estate/Cars static for now or add depreciation later
+                    return asset;
                 });
 
-                // Health decay (hunger catches up) - scaled to 10000
-                // In Act 1, this is aggressive to create tension
-                const healthDecay = state.currentAct === 'SURVIVAL' ? 800 : 300;
+                // Health decay (Aging takes a toll)
+                const healthDecay = state.currentEra === 'University' ? 2000 : 800; // Harder start
 
-                // Anointing decay (spiritual discipline required)
-                const anointingDecay = 200;
+                // Anointing decay (spiritual discipline fades over a year)
+                const anointingDecay = 500;
 
-                // Fame decay (public forgets quickly)
-                const fameDecay = state.stats.fame > 5000 ? 300 : 100;
+                // Fame decay (public forgets)
+                const fameDecay = state.stats.fame > 5000 ? 1000 : 200;
 
                 // Apply changes
                 set((s) => {
@@ -362,39 +397,42 @@ export const useGameStore = create<GameStore>()(
                         churchCash: Math.max(0, s.stats.churchCash + offering),
                     };
 
-                    // Apply Universal Law of Entropy (Decay)
-                    // Maintenance depends on energy spent (assumed high if remaining is low? No, wait)
-                    // Let's assume maintenance is based on how much energy was *left* or just standard.
-                    // For now, let's say maintenance is 60 (average).
-                    const maintenance = 60;
+                    // Apply Universal Law of Entropy (Yearly Scale)
+                    // Maintenance factor is high since we assume player did "maintenance" actions during the black box year
+                    const maintenance = 80;
                     const statsAfterDecay = LAWS.physics.entropy(statsWithCash, maintenance);
 
-                    const newHealth = clamp(statsAfterDecay.health, 0, 10000);
+                    const newHealth = clamp(statsAfterDecay.health - 500, 0, 10000); // Natural aging penalty
                     const newAnointing = clamp(statsAfterDecay.anointing, 0, 10000);
                     const newFame = clamp(statsAfterDecay.fame, 0, 10000);
                     const newStress = clamp(statsAfterDecay.stress, 0, 10000);
                     const newInfluence = clamp(statsAfterDecay.influence, 0, 10000);
 
-                    // Track weeks at zero health (grace period of 2 years = 104 weeks)
-                    const newWeeksAtZeroHealth = newHealth <= 0 ? (s.weeksAtZeroHealth || 0) + 1 : 0;
+                    // Track weeks at zero health (grace period is now shorter in years context)
+                    const newWeeksAtZeroHealth = newHealth <= 0 ? (s.weeksAtZeroHealth || 0) + 52 : 0;
 
-                    // Death: Scandal 10000+ OR starving for 2 years straight
+                    // Death: Scandal 10000+ OR starving for > 2 years equivalent
                     const isDead = s.stats.scandal >= 10000 || newWeeksAtZeroHealth >= 104;
 
-                    // Age up every 52 weeks (1 year)
-                    const newAge = s.week % 52 === 0 ? s.age + 1 : s.age;
+                    // Age up +1 Year
+                    const newAge = s.age + 1;
+                    const newWeek = s.week + 52; // Keep week tracker for internal math
 
-                    // University progression - graduate after 4 years (208 weeks)
-                    const uniYears: ('200L' | '300L' | '400L' | '500L' | 'Graduate')[] = ['200L', '300L', '400L', '500L', 'Graduate'];
-                    const yearIndex = Math.min(4, Math.floor(s.week / 52));
-                    const newUniYear = s.occupation === 'Student' ? uniYears[yearIndex] : s.uniYear;
+                    // University progression
+                    // If student, 1 click = 1 Level (Year 1 -> Year 2)
+                    const uniYears = ['200L', '300L', '400L', '500L', 'Graduate'] as const;
+                    // Logic: Map current uniYear to next index
+                    const currentUniIndex = uniYears.indexOf(s.uniYear as any);
+                    const nextUniIndex = Math.min(uniYears.length - 1, currentUniIndex + 1);
+
+                    const newUniYear = s.occupation === 'Student' ? uniYears[nextUniIndex] : s.uniYear;
                     const newOccupation = newUniYear === 'Graduate' ? 'Full-Time Pastor' as const : s.occupation;
 
                     // Relationship weeks progress
-                    const newRelationshipWeeks = s.relationshipStatus !== 'Single' ? s.relationshipWeeks + 1 : 0;
+                    const newRelationshipWeeks = s.relationshipStatus !== 'Single' ? s.relationshipWeeks + 52 : 0;
 
                     return {
-                        week: s.week + 1,
+                        week: newWeek,
                         age: newAge,
                         isAlive: !isDead,
                         weeksAtZeroHealth: newWeeksAtZeroHealth,
@@ -402,37 +440,32 @@ export const useGameStore = create<GameStore>()(
                         occupation: newOccupation,
                         relationshipWeeks: newRelationshipWeeks,
                         stats: {
-                            ...s.stats, // Keep other stats just in case
+                            ...s.stats,
                             health: newHealth,
-                            personalCash: statsWithCash.personalCash, // Cash already updated
+                            personalCash: statsWithCash.personalCash,
                             churchCash: statsWithCash.churchCash,
                             anointing: newAnointing,
                             fame: newFame,
-                            energy: 150, // Reset energy weekly to new cap
                             stress: newStress,
                             influence: newInfluence,
-                            scandal: s.stats.scandal, // Scandal doesn't decay naturally (entropy handles logic but let's be safe)
+                            scandal: s.stats.scandal, // Scandal persists
                         },
                         assets: updatedAssets,
                     };
                 });
 
-                // Update social media passive income
+                // Update social media passive income (Yearly dump)
                 get().updateSocialMedia();
 
                 // ENGINE UPDATES
                 const currentState = get();
 
-                // 1. Economy: Crypto Prices
+                // 1. Economy: Crypto Prices (Yearly volatility is high)
                 const newCryptoAssets = simulateCryptoPrices(currentState.engine.economy.cryptoAssets, 'neutral');
 
-                // 2. Realism: Owambe Invitations - LIMITED to 3 max
+                // 2. Realism: Owambe Invitations
+                // In a year, you get many, but we just show the most "important" one
                 const newOwambe = generateOwambeInvitation(currentState.week, currentState.stats.fame || 0);
-                const currentOwambes = currentState.engine.realism.upcomingOwambes;
-                // Keep only last 3 owambes to prevent spam
-                const updatedOwambes = newOwambe
-                    ? [...currentOwambes, newOwambe].slice(-3)
-                    : currentOwambes.slice(-3);
 
                 set((s) => ({
                     engine: {
@@ -443,42 +476,104 @@ export const useGameStore = create<GameStore>()(
                         },
                         realism: {
                             ...s.engine.realism,
-                            upcomingOwambes: updatedOwambes,
+                            upcomingOwambes: newOwambe ? [newOwambe] : [],
                         }
                     }
                 }));
 
-                // 3. NEW: Near-Miss Events when scandal is high (tension building)
-                const currentGameState = get();
-                if (currentGameState.stats.scandal > 3000) {
-                    try {
-                        const nearMiss = generateNearMissEvent(
-                            currentGameState.stats.scandal,
-                            currentGameState.karma?.netKarma || 0,
-                            false // hasEnemies - could check NPC relationships later
-                        );
-                        if (nearMiss) {
-                            console.log('[NEAR-MISS ENGINE] Generated tension event:', nearMiss.type);
-                        }
-                    } catch (e) {
-                        // Engine function may not return expected format, continue gracefully
+                // 3a. Nemesis System (The Rival)
+                let { nemesis } = get();
+
+                // Spawn Check
+                if (!nemesis && get().stats.fame > 5000 && Math.random() < 0.20) {
+                    nemesis = createNemesis(get().stats.fame);
+                    // Notification handled by UI detecting new nemesis? 
+                    // For now just set it.
+                    set({ nemesis });
+                }
+
+                // Nemesis Action
+                if (nemesis && nemesis.isActive) {
+                    const attack = generateNemesisAction(nemesis);
+                    // We apply damage silently here? Or add to "Current Year Events"?
+                    // Let's modify stats directly.
+                    if (attack.damage) {
+                        const currentStats = get().stats;
+                        const currentChurch = get().church;
+
+                        set({
+                            stats: {
+                                ...currentStats,
+                                fame: Math.max(0, currentStats.fame + (attack.damage.fame || 0)),
+                                scandal: Math.min(10000, currentStats.scandal + (attack.damage.scandal || 0)),
+                                health: Math.max(0, currentStats.health + (attack.damage.health || 0)),
+                                anointing: Math.max(0, currentStats.anointing + (attack.damage.anointing || 0)),
+                                churchCash: Math.max(0, currentStats.churchCash + (attack.damage.churchCash || 0))
+                            },
+                            church: {
+                                ...currentChurch,
+                                members: Math.max(0, currentChurch.members + (attack.damage.members || 0))
+                            }
+                        });
                     }
                 }
 
-                // 4. NEW: Process pending consequences from past actions
-                try {
-                    const consequenceResult = processPendingConsequences(
-                        currentGameState.consequenceChains || [],
-                        currentGameState.week,
-                        currentGameState.stats,
-                        currentGameState.karma?.netKarma || 0
-                    );
-                    if (consequenceResult && consequenceResult.triggeredEvents.length > 0) {
-                        console.log('[CAUSALITY ENGINE] Triggered events:', consequenceResult.triggeredEvents);
-                    }
-                } catch (e) {
-                    // Consequence processing may fail if state not fully set up
+                // 3b. Chaos Engine: Mortality Checks (The Grim Reaper)
+                const mortalityRoll = Math.random() * 10000;
+                let deathReason: string | null = null;
+
+                // A. Old Age (Risk increases exponentially after 70)
+                if (get().age > 70) {
+                    const ageRisk = (get().age - 70) * 100; // 1% per year after 70
+                    if (mortalityRoll < ageRisk) deathReason = "Natural Causes";
                 }
+
+                // B. Heart Attack (High Stress)
+                if (get().stats.stress > 9000) {
+                    if (mortalityRoll < 500) deathReason = "Massive Cardiac Arrest"; // 5% chance if super stressed
+                }
+
+                // C. Assassination (High Scandal + High Influence)
+                if (get().stats.scandal > 8000 && get().stats.influence > 5000) {
+                    if (mortalityRoll < 300) deathReason = "Assassinated by Rivals"; // 3% chance
+                }
+
+                if (deathReason || get().stats.health <= 0) {
+                    set({
+                        isAlive: false,
+                        gamePhase: 'GAME_OVER'
+                    });
+                    return; // Stop processing
+                }
+
+                // 4. Era Progression Check
+                const { currentEra, stats, church } = get();
+                let nextEra: GameEra = currentEra;
+
+                if (currentEra === 'University' && get().uniYear === 'Graduate') {
+                    nextEra = 'City';
+                } else if (currentEra === 'City' && church.members >= 5000) {
+                    nextEra = 'Empire';
+                } else if (currentEra === 'Empire' && church.members >= 100000) {
+                    nextEra = 'Ultimate';
+                }
+
+                if (nextEra !== currentEra) {
+                    set({ currentEra: nextEra });
+                }
+
+                // 5. Infinity Engine: Generate Yearly Events
+                // Generate 3 unique scenarios for the player to choose from in the report phase
+                const events = generateYearlyEvents(nextEra, 3, {
+                    fame: stats.fame,
+                    scandal: stats.scandal,
+                    cash: stats.personalCash
+                });
+
+                set({
+                    gamePhase: 'YEARLY_REPORT',
+                    currentYearEvents: events
+                });
             },
 
             // ======================================================================
@@ -492,12 +587,10 @@ export const useGameStore = create<GameStore>()(
                         ? currentValue + amount
                         : amount;
 
-                    // Cash can go negative (debt), energy clamps to 1000, other stats clamped 0-10000
+                    // Cash can go negative (debt), other stats clamped 0-10000
                     const clampedValue = stat === 'personalCash' || stat === 'churchCash'
                         ? newValue
-                        : stat === 'energy'
-                            ? clamp(newValue, 0, 1000)
-                            : clamp(newValue, 0, 10000);
+                        : clamp(newValue, 0, 10000);
 
                     return {
                         stats: {
@@ -572,8 +665,8 @@ export const useGameStore = create<GameStore>()(
             // PROGRESSION
             // ======================================================================
 
-            progressToAct: (act) => {
-                set({ currentAct: act });
+            progressToEra: (era) => {
+                set({ currentEra: era });
             },
 
             // ======================================================================
@@ -614,6 +707,13 @@ export const useGameStore = create<GameStore>()(
                                     get().modifyHiddenFlag(effect.stat as keyof HiddenFlags, newValue);
                                 }
                             }
+
+                            // Enoch's Watcher (Meta-Game Check)
+                            if ((effect.stat === 'personalCash' || effect.stat === 'churchCash') &&
+                                effect.operation === 'add' && effect.value > 1000000000) {
+                                // Massive wealth spike detected
+                                get().modifyHiddenFlag('integrity', -100);
+                            }
                             break;
                         }
 
@@ -641,8 +741,8 @@ export const useGameStore = create<GameStore>()(
                             get().upgradeVenue(effect.venue);
                             break;
 
-                        case 'act':
-                            get().progressToAct(effect.act);
+                        case 'era':
+                            get().progressToEra((effect as EraEffect).era);
                             break;
                     }
                 });
@@ -661,12 +761,7 @@ export const useGameStore = create<GameStore>()(
             },
 
             spendEnergy: (amount) => {
-                const { energy } = get().stats;
-                if (energy >= amount) {
-                    get().modifyStat('energy', -amount, 'add');
-                    return true;
-                }
-                return false;
+                return true; // Infinite energy
             },
 
             getDate: () => {
@@ -734,29 +829,47 @@ export const useGameStore = create<GameStore>()(
             hookup: (type) => {
                 const state = get();
 
-                // Scandal and pregnancy chances by type
+                // Scandal, pregnancy, STD, and Spirit Spouse chances
                 const hookupData = {
-                    'church': { scandal: 35, pregnancy: 0.40, cost: 40 },
-                    'random': { scandal: 15, pregnancy: 0.25, cost: 30 },
-                    'uni': { scandal: 5, pregnancy: 0.15, cost: 20 }
+                    'church': { scandal: 35, pregnancy: 0.40, std: 0.05, spiritSpouse: 0.30, cost: 40 },
+                    'random': { scandal: 15, pregnancy: 0.25, std: 0.30, spiritSpouse: 0.05, cost: 30 },
+                    'uni': { scandal: 5, pregnancy: 0.15, std: 0.10, spiritSpouse: 0.01, cost: 20 }
                 };
 
                 const data = hookupData[type];
                 const scandalAmount = data.scandal;
                 const pregnancyRoll = Math.random();
+                const stdRoll = Math.random();
+                const spiritRoll = Math.random();
 
-                // Apply base effects
+                let contractedSTD = false;
+                let spiritSpouseFound = false;
+
+                // Check Risks
+                if (stdRoll < data.std && !state.hiddenFlags.hasSTD) {
+                    contractedSTD = true;
+                }
+
+                if (spiritRoll < data.spiritSpouse && !state.hiddenFlags.spiritSpouseActive) {
+                    spiritSpouseFound = true;
+                }
+
+                // Apply base effects & flags
                 set((s) => ({
+                    hiddenFlags: {
+                        ...s.hiddenFlags,
+                        hasSTD: s.hiddenFlags.hasSTD || contractedSTD,
+                        spiritSpouseActive: s.hiddenFlags.spiritSpouseActive || spiritSpouseFound
+                    },
                     stats: {
                         ...s.stats,
                         scandal: Math.min(100, s.stats.scandal + scandalAmount),
-                        health: Math.max(0, s.stats.health - 5) // Toll on body
+                        health: Math.max(0, s.stats.health - (contractedSTD ? 20 : 5))
                     }
                 }));
 
                 // Check for pregnancy
                 if (pregnancyRoll < data.pregnancy) {
-                    // PREGNANCY! Add baby mama
                     const babyMamaNames = [
                         'Sister Blessing', 'Sister Grace', 'Sister Joy', 'Sister Peace',
                         'Chioma', 'Ngozi', 'Amara', 'Funke', 'Tola', 'Jennifer'
@@ -769,7 +882,7 @@ export const useGameStore = create<GameStore>()(
                     const newBabyMama: BabyMama = {
                         name: mamaName,
                         childName: childName,
-                        weeklySupport: 5000 + (state.babyMamas.length * 2000), // Escalating costs
+                        weeklySupport: 5000 + (state.babyMamas.length * 2000),
                         scandalThreat: type === 'church' ? 40 : 20
                     };
 
@@ -777,10 +890,10 @@ export const useGameStore = create<GameStore>()(
                         babyMamas: [...(s.babyMamas || []), newBabyMama]
                     }));
 
-                    return { pregnant: true, babyName: childName, mamaName: mamaName, scandal: scandalAmount };
+                    return { pregnant: true, babyName: childName, mamaName: mamaName, scandal: scandalAmount, std: contractedSTD, spiritSpouse: spiritSpouseFound };
                 }
 
-                return { pregnant: false, scandal: scandalAmount };
+                return { pregnant: false, scandal: scandalAmount, std: contractedSTD, spiritSpouse: spiritSpouseFound };
             },
 
             // ======================================================================
@@ -798,34 +911,29 @@ export const useGameStore = create<GameStore>()(
 
             trainSkill: (skill) => {
                 const state = get();
-                const currentLevel = state.skills[skill];
+                // Training is now "Study/Practice" over time, maybe add stress instead of energy cost?
+                // For now, free action but maybe limited by something else later.
 
-                // Calculate energy cost based on skill level (harder to train at high levels)
-                let energyCost = 30;
-                if (currentLevel >= 7) energyCost = 50;
-                else if (currentLevel >= 4) energyCost = 40;
+                // 100% success for now
+                const success = true;
+                const skillGain = 0.5; // Slow growth
 
-                // Check if player has enough energy
-                if (state.stats.energy < energyCost) {
-                    return { success: false, energyCost, skillGain: 0 };
-                }
+                set(s => ({
+                    skills: {
+                        ...s.skills,
+                        [skill]: Math.min(10, (s.skills[skill] || 1) + skillGain)
+                    },
+                    stats: {
+                        ...s.stats,
+                        // Training adds a bit of stress
+                        stress: Math.min(10000, s.stats.stress + 50)
+                    }
+                }));
 
-                // Calculate skill gain with diminishing returns
-                let skillGain = 0.3;
-                if (currentLevel >= 7) skillGain = 0.1;
-                else if (currentLevel >= 4) skillGain = 0.2;
-
-                // Max level is 10
-                if (currentLevel >= 10) {
-                    return { success: false, energyCost: 0, skillGain: 0 };
-                }
-
-                // Spend energy and increase skill
-                get().spendEnergy(energyCost);
-                get().upgradeSkill(skill, skillGain);
-
-                return { success: true, energyCost, skillGain };
+                return { success, energyCost: 0, skillGain };
             },
+
+
 
             // ======================================================================
             // SOCIAL MEDIA

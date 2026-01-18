@@ -139,9 +139,9 @@ export default function NotificationCenter() {
                     Dismiss All ({notifications.length})
                 </Button>
             )}
-            {notifications.map(note => (
+            {notifications.map((note, index) => (
                 <Card
-                    key={note.id}
+                    key={`${note.id}_${index}`}
                     className="pointer-events-auto bg-surface/95 backdrop-blur-md shadow-2xl border-border-prominent p-4 animate-in slide-in-from-right-full fade-in duration-300"
                 >
                     <div className="flex gap-3 items-start">

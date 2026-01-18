@@ -61,8 +61,7 @@ export const evaluateCondition = (
         case 'location':
             return state.ministryLocation === condition.location;
 
-        case 'act':
-            return state.currentAct === condition.act;
+
 
         case 'week': {
             const weekValue = state.week;

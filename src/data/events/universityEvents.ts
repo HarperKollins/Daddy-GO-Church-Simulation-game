@@ -27,7 +27,7 @@ Your textbooks are still wrapped in nylon. CHM 201 is tomorrow.
 Your roommate offers you "WAEC runs" for ₦20,000.
 "Just the answers. Nobody will know."`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' }
+            { type: 'era', era: 'University' }
         ],
         choices: [
             {
@@ -46,7 +46,7 @@ Your roommate offers you "WAEC runs" for ₦20,000.
                 resultText: 'You crammed 4 months of work in 12 hours. Got a C. Survived!',
                 effects: [
                     { type: 'stat', stat: 'health', operation: 'subtract', value: 500 },
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 800 }
+                    { type: 'stat', stat: 'stress', operation: 'add', value: 800 }
                 ]
             },
             {
@@ -77,7 +77,7 @@ He slides a paper across: ₦50,000.
 
 If you fail this course, you carry it over. Graduation delays by 1 year.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'stat', stat: 'personalCash', operator: 'gte', value: 30000 }
         ],
         choices: [
@@ -126,7 +126,7 @@ Your supervisor warned you: "He eats religious students for breakfast."
 He's looking at your laptop. Frowning.
 "So you're saying prayer affects grades? Where's your scientific evidence?"`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'stat', stat: 'fame', operator: 'gte', value: 1000 }
         ],
         choices: [
@@ -178,7 +178,7 @@ The choir members support you. The Bible study group supports him.
 
 It's 50-50. Some are suggesting you "mobilize" your supporters with "refreshments."`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' }
+            { type: 'era', era: 'University' }
         ],
         choices: [
             {
@@ -228,7 +228,7 @@ At 2 AM, campus security arrived.
 They're threatening to arrest you. Some students are panicking.
 The security man is eyeing your "appreciation" possibilities.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' }
+            { type: 'era', era: 'University' }
         ],
         choices: [
             {
@@ -312,7 +312,7 @@ Both are threatening to resign.`,
                 resultText: 'After 3 hours of "counseling," they hugged. Crisis averted!',
                 effects: [
                     { type: 'stat', stat: 'fame', operation: 'add', value: 200 },
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 300 }
+                    { type: 'stat', stat: 'stress', operation: 'add', value: 300 }
                 ]
             }
         ],
@@ -340,7 +340,7 @@ Refuse, and... well, campus can be dangerous at night."
 
 The leader smiled. His scar glinted in the moonlight.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'stat', stat: 'fame', operator: 'gte', value: 2000 }
         ],
         choices: [
@@ -395,7 +395,7 @@ A small axe symbol was drawn at the bottom.
 
 Your roommate is terrified. Some fellowship members want to relocate.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'stat', stat: 'fame', operator: 'gte', value: 1500 }
         ],
         choices: [
@@ -445,7 +445,7 @@ Chuka's eyes were pleading. But also threatening.
 
 You share this room. You share everything.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' }
+            { type: 'era', era: 'University' }
         ],
         choices: [
             {
@@ -504,7 +504,7 @@ Your roommate offered you a plate of rice... for ₦500 you don't have.
 You have a fellowship meeting tonight. You're supposed to preach.
 Your stomach is making the loudest sounds.`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' },
+            { type: 'era', era: 'University' },
             { type: 'stat', stat: 'personalCash', operator: 'lte', value: 500 }
         ],
         choices: [
@@ -532,7 +532,7 @@ Your stomach is making the loudest sounds.`,
                 resultText: 'You typed assignments for ₦3,000. Survived another week.',
                 effects: [
                     { type: 'stat', stat: 'personalCash', operation: 'add', value: 3000 },
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 400 }
+                    { type: 'stat', stat: 'stress', operation: 'add', value: 400 }
                 ]
             }
         ],
@@ -552,7 +552,7 @@ Fumigation costs ₦8,000. A new mattress is ₦15,000.
 The bites are visible. People at fellowship are asking questions.
 "Pastor, is that a rash or...?"`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' }
+            { type: 'era', era: 'University' }
         ],
         choices: [
             {
@@ -599,7 +599,7 @@ Yes, they stole your BIBLE. The one with all your notes.
 Your roommate claims he was "at the library."
 But he's wearing new shoes...`,
         conditions: [
-            { type: 'act', act: 'SURVIVAL' }
+            { type: 'era', era: 'University' }
         ],
         choices: [
             {

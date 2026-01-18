@@ -20,7 +20,7 @@ const venueLabels: Record<VenueTier, string> = {
 };
 
 export default function StatusCard() {
-    const { age, church, currentAct } = useGameStore();
+    const { age, church, currentEra } = useGameStore();
 
     return (
         <div className="status-card">

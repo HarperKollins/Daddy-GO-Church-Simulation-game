@@ -87,13 +87,13 @@ const STORY_SLIDES = [
         section: 'HOW TO PLAY'
     },
     {
-        emoji: 'hold_service',
-        fallback: '⚡',
-        title: 'Energy System',
-        subtitle: 'Every Action Costs Energy',
-        text: 'You have LIMITED ENERGY each week. Preaching, praying, hustling - everything costs energy. Rest wisely. Your energy resets when you "Hold Sunday Service" to advance the week.',
-        gradient: 'linear-gradient(135deg, #eab308, #ca8a04, #713f12)',
-        highlight: '#facc15',
+        emoji: 'brain',
+        fallback: '😫',
+        title: 'Stress & Health',
+        subtitle: 'Don\'t Burn Out!',
+        text: 'Managing your church empire is stressful. High stress damages your health. If your HEALTH drops to zero, you die. Use rest and relaxation to keep your stress low.',
+        gradient: 'linear-gradient(135deg, #ef4444, #b91c1c, #991b1b)',
+        highlight: '#f87171',
         section: 'HOW TO PLAY'
     },
     {

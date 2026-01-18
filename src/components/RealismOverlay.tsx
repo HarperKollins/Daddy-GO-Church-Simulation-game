@@ -52,10 +52,10 @@ export default function RealismOverlay() {
         }
 
         // Apply stat consequences based on keywords (Simplified logic)
-        if (choice.consequence.includes('+Spirit')) modifyStat('anointing', 50);
-        if (choice.consequence.includes('-Health')) modifyStat('health', -10);
-        if (choice.consequence.includes('-Energy')) modifyStat('energy', -20);
-        if (choice.consequence.includes('-Integrity')) modifyStat('scandal', 200); // Corruption risk
+        if (choice.consequence.includes('+Spirit')) modifyStat('anointing', 200);
+        if (choice.consequence.includes('-Health')) modifyStat('health', -500);
+        if (choice.consequence.includes('-Energy')) modifyStat('stress', 500); // Energy drain = Stress
+        if (choice.consequence.includes('-Integrity')) modifyStat('scandal', 500); // Corruption risk
 
         setActiveEvent(null);
     };

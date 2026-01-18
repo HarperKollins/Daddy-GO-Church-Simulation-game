@@ -1,19 +1,23 @@
 /**
- * Story Generator - Procedural Event Generation
+ * Story Generator - The Infinity Engine
  * 
- * This creates infinite unique events by:
- * - Using template patterns with variable substitution
- * - Generating dynamic amounts, names, and scenarios
- * - Combining elements for emergent storytelling
+ * Procedural Event Generation System V2
+ * 
+ * Capability:
+ * - Era-specific event filtering
+ * - Dynamic variable injection based on context
+ * - "Template Mixing" for infinite variations
+ * - Yearly Event Batching
  */
 
-import type { GameEvent, EventChoice } from '@/types/game';
+import type { GameEvent, EventChoice, GameEra } from '@/types/game';
 
 // ============================================================================
-// VARIABLE POOLS
+// 1. CONTEXTUAL VARIABLE POOLS
 // ============================================================================
 
 const VARIABLE_POOLS = {
+    // People
     familyMember: [
         'your mother', 'your father', 'Uncle Chidi', 'Aunty Nkechi',
         'your younger brother Emeka', 'your cousin Obinna', 'Grandma',
@@ -24,22 +28,16 @@ const VARIABLE_POOLS = {
         'Sister Grace', 'the choir leader', 'a founding member', 'your protocol officer',
         'the women\'s leader', 'a wealthy businessman member'
     ],
-    moneyAmount: [
-        50000, 100000, 200000, 350000, 500000, 800000, 1000000, 2000000, 5000000
-    ],
-    reason: [
-        'hospital bills', 'school fees', 'business capital', 'rent issues',
-        'wedding expenses', 'funeral costs', 'visa processing', 'car repairs',
-        'debt payment', 'emergency surgery'
-    ],
+
+    // University Era Variables
+    lecturer: ['Dr. Uche', 'Prof. Balogun', 'the HOD', 'the Dean', 'that strict invigilator'],
+    campusLocation: ['Lecture Hall 3', 'the hostel', 'the SUG building', 'Love Garden', 'the library'],
+    campusCrisis: ['missing scripts', 'cultist clash', 'SUG riot', 'ASUU strike', 'hostel raiding'],
+
+    // City/Empire Era Variables
     location: [
         'Lagos', 'Abuja', 'Port Harcourt', 'Enugu', 'Ibadan',
-        'Kano', 'Benin City', 'Calabar', 'the village', 'overseas'
-    ],
-    accusation: [
-        'stealing church funds', 'having an affair', 'faking miracles',
-        'being a ritualist', 'practicing yahoo', 'embezzlement',
-        'impregnating a choir member', 'buying a fake degree'
+        'Kano', 'Benin City', 'Calabar', 'the village', 'London', 'Houston'
     ],
     mediaOutlet: [
         'Instablog9ja', 'Linda Ikeji Blog', 'Sahara Reporters', 'The Punch',
@@ -49,28 +47,42 @@ const VARIABLE_POOLS = {
         'leaked voice note', 'viral video', 'anonymous letter', 'WhatsApp screenshots',
         'bank statement leak', 'confession from an insider'
     ],
+
+    // Generic
+    moneyAmount: [50000, 100000, 200000, 500000, 1000000, 5000000, 10000000],
+    reason: [
+        'hospital bills', 'school fees', 'business capital', 'rent issues',
+        'wedding expenses', 'funeral costs', 'visa processing'
+    ],
     blessing: [
         'a wealthy diaspora member', 'a senator', 'a bank MD', 'a tech billionaire',
         'an oil magnate', 'a Nollywood actress', 'a music star'
     ],
-    crisis: [
-        'flooding', 'fire outbreak', 'robbery attack', 'cult clash',
-        'epidemic', 'kidnapping', 'building collapse'
+    accusation: [
+        'stealing church funds', 'having an affair', 'faking miracles',
+        'being a ritualist', 'practicing yahoo', 'embezzlement',
+        'impregnating a choir member', 'buying a fake degree'
     ]
 };
 
 // ============================================================================
-// EVENT TEMPLATES
+// 2. TEMPLATE INTERFACES
 // ============================================================================
 
-interface EventTemplate {
+export interface EventTemplate {
     id: string;
     titlePattern: string;
     descriptionPattern: string;
-    category: 'money' | 'scandal' | 'opportunity' | 'family' | 'spiritual' | 'crisis';
+    allowedEras: GameEra[];
+    category: 'money' | 'scandal' | 'opportunity' | 'family' | 'spiritual' | 'crisis' | 'campus';
     choiceTemplates: ChoiceTemplate[];
-    priority: number;
+    priority: number; // Higher = more likely if conditions met
     oneTime: boolean;
+    conditions?: {
+        minFame?: number;
+        minScandal?: number;
+        minCash?: number;
+    };
 }
 
 interface ChoiceTemplate {
@@ -78,192 +90,339 @@ interface ChoiceTemplate {
     labelPattern: string;
     resultTextPattern: string;
     effects: {
-        stat: string;
+        stat: string; // matches keys in CoreStats
         operation: 'add' | 'subtract';
         valueRange: [number, number];
     }[];
 }
 
+// ============================================================================
+// 3. THE TEMPLATE VAULT
+// ============================================================================
+
 const EVENT_TEMPLATES: EventTemplate[] = [
-    // Money request template
+    // -------------------------------------------------------------------------
+    // UNIVERSITY ERA EVENTS
+    // -------------------------------------------------------------------------
     {
-        id: 'MONEY_REQUEST',
-        titlePattern: '💸 {familyMember} Needs Help',
-        descriptionPattern: `{familyMember} just called you.
-
-"My child, I need your help urgently. The issue is {reason}. 
-I need ₦{moneyAmount} by this week or else...!"
-
-They are crying on the phone. You can hear the desperation in their voice.`,
+        id: 'CAMPUS_FELLOWSHIP_CRISIS',
+        titlePattern: '🔥 Fellowship Drama at {campusLocation}',
+        descriptionPattern: `Chaos in the fellowship!
+        
+        {lecturer} has threatened to ban your gathering at {campusLocation} because of "noise pollution".
+        
+        The students are angry. They want to protest.
+        "Pastor, should we spiritualize it or radicalize it?"`,
+        allowedEras: ['University'],
+        category: 'campus',
+        priority: 5,
+        oneTime: false,
+        choiceTemplates: [
+            {
+                id: 'protest',
+                labelPattern: '✊ Aluta Continua! (Protest)',
+                resultTextPattern: 'The students marched. The school bowed. You are a hero, but the school hates you.',
+                effects: [
+                    { stat: 'fame', operation: 'add', valueRange: [20, 50] },
+                    { stat: 'stress', operation: 'add', valueRange: [10, 20] }
+                ]
+            },
+            {
+                id: 'pray',
+                labelPattern: '🙏 Night Vigil Warfare',
+                resultTextPattern: 'You prayed till dawn. The lecturer fell sick the next day. Fear gripped everyone.',
+                effects: [
+                    { stat: 'anointing', operation: 'add', valueRange: [30, 60] },
+                    { stat: 'influence', operation: 'add', valueRange: [10, 30] }
+                ]
+            },
+            {
+                id: 'bribe',
+                labelPattern: '💰 "Sort" the Lecturer',
+                resultTextPattern: 'Money solved it quietly. But your treasurer gave you a side eye.',
+                effects: [
+                    { stat: 'personalCash', operation: 'subtract', valueRange: [20000, 50000] },
+                    { stat: 'scandal', operation: 'add', valueRange: [5, 15] }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'MISSING_FUNDS_UNI',
+        titlePattern: '💸 Treasury Issues',
+        descriptionPattern: `The fellowship treasurer reports that ₦{moneyAmount} is missing.
+        
+        They claim it was "spiritual attack" on the offering box.
+        Everyone is looking at you.`,
+        allowedEras: ['University'],
         category: 'money',
         priority: 6,
         oneTime: false,
         choiceTemplates: [
             {
-                id: 'send_full',
-                labelPattern: '💳 Send the full amount',
-                resultTextPattern: '{familyMember} thanked you with tears. "God will bless you!"',
+                id: 'audit',
+                labelPattern: '🔍 Public Audit',
+                resultTextPattern: 'You exposed them. It was ugly, but trust was restored.',
                 effects: [
-                    { stat: 'personalCash', operation: 'subtract', valueRange: [0, 0] },
-                    { stat: 'anointing', operation: 'add', valueRange: [100, 300] }
+                    { stat: 'stress', operation: 'add', valueRange: [20, 40] },
+                    { stat: 'influence', operation: 'add', valueRange: [20, 50] }
                 ]
             },
             {
-                id: 'send_half',
-                labelPattern: '💰 Send half',
-                resultTextPattern: 'They accepted it gratefully. "It is still help."',
+                id: 'cover',
+                labelPattern: '🤫 Cover it up (Pay it yourself)',
+                resultTextPattern: 'You depleted your savings to save face. "God will replenish."',
                 effects: [
-                    { stat: 'personalCash', operation: 'subtract', valueRange: [0, 0] },
-                    { stat: 'stress', operation: 'add', valueRange: [100, 200] }
-                ]
-            },
-            {
-                id: 'refuse',
-                labelPattern: '❌ "I don\'t have money now"',
-                resultTextPattern: 'Long silence. Then they hung up. The relationship may never recover.',
-                effects: [
-                    { stat: 'stress', operation: 'add', valueRange: [300, 500] }
+                    { stat: 'personalCash', operation: 'subtract', valueRange: ([5000, 20000] as [number, number]) }, // Smaller amounts for uni
+                    { stat: 'anointing', operation: 'add', valueRange: [10, 20] }
                 ]
             }
         ]
     },
 
-    // Scandal template
+    // -------------------------------------------------------------------------
+    // CITY & EMPIRE ERA EVENTS
+    // -------------------------------------------------------------------------
     {
-        id: 'MEDIA_SCANDAL',
-        titlePattern: '📰 Scandal Alert: {mediaOutlet}',
-        descriptionPattern: `Your phone is blowing up!
-
-{mediaOutlet} just posted: "BREAKING: Famous pastor accused of {accusation}"
-
-A {scandal} has gone viral. Your face is everywhere.
-Church members are calling. Family is panicking. Sponsors are waiting.
-
-Comments are pouring in. #PastorExposed is trending.`,
-        category: 'scandal',
-        priority: 9,
+        id: 'MONEY_REQUEST',
+        titlePattern: '📞 {familyMember} Calling...',
+        descriptionPattern: `{familyMember} is crying on the phone.
+        
+        "They want to kill me! I need ₦{moneyAmount} for {reason} right now!"
+        
+        They know you have the money.`,
+        allowedEras: ['City', 'Empire', 'Ultimate'],
+        category: 'money',
+        priority: 4,
         oneTime: false,
+        choiceTemplates: [
+            {
+                id: 'pay_full',
+                labelPattern: '💳 Send everything',
+                resultTextPattern: 'You sent the money. They blessed you. Your bank account wept.',
+                effects: [
+                    { stat: 'personalCash', operation: 'subtract', valueRange: [0, 0] }, // Dynamic in code
+                    { stat: 'anointing', operation: 'add', valueRange: [50, 100] }
+                ]
+            },
+            {
+                id: 'block',
+                labelPattern: '🚫 Block Number',
+                resultTextPattern: 'You chose peace. The family group chat is on fire though.',
+                effects: [
+                    { stat: 'stress', operation: 'subtract', valueRange: [10, 30] },
+                    { stat: 'scandal', operation: 'add', valueRange: [10, 20] }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'MEDIA_SCANDAL_V2',
+        titlePattern: '📱 Trending: {mediaOutlet}',
+        descriptionPattern: `Bad news. {mediaOutlet} just dropped a bombshell.
+        
+        "Popular Pastor accused of {accusation}!"
+        
+        It's trending #1. Your phone is vibrating off the table.`,
+        allowedEras: ['City', 'Empire', 'Ultimate'], // Not uni
+        category: 'scandal',
+        priority: 8,
+        oneTime: false,
+        conditions: { minFame: 2000 },
         choiceTemplates: [
             {
                 id: 'deny',
-                labelPattern: '🙅 Deny everything publicly',
-                resultTextPattern: '"It is the attack of the enemy!" Some believed. Some didn\'t.',
-                effects: [
-                    { stat: 'scandal', operation: 'add', valueRange: [200, 400] },
-                    { stat: 'fame', operation: 'add', valueRange: [100, 300] }
-                ]
-            },
-            {
-                id: 'confess',
-                labelPattern: '😢 Confess and apologize',
-                resultTextPattern: 'You cried on live video. The internet was divided. Some called it manipulation.',
-                effects: [
-                    { stat: 'scandal', operation: 'subtract', valueRange: [100, 300] },
-                    { stat: 'anointing', operation: 'add', valueRange: [200, 400] }
-                ]
-            },
-            {
-                id: 'sue',
-                labelPattern: '⚖️ Threaten to sue',
-                resultTextPattern: 'Your lawyers sent a letter. They took down the post. But screenshots are forever.',
+                labelPattern: '😤 Deny & Threaten Lawsuit',
+                resultTextPattern: 'Your lawyers spoke grammar. The blog deleted it, but the screenshots remain.',
                 effects: [
                     { stat: 'personalCash', operation: 'subtract', valueRange: [500000, 2000000] },
-                    { stat: 'scandal', operation: 'add', valueRange: [100, 200] }
+                    { stat: 'scandal', operation: 'subtract', valueRange: [100, 300] }
+                ]
+            },
+            {
+                id: 'silence',
+                labelPattern: '😶 Ignore it',
+                resultTextPattern: '"The Lord will fight for me." The internet dragged you for a week then forgot.',
+                effects: [
+                    { stat: 'scandal', operation: 'add', valueRange: [200, 500] },
+                    { stat: 'stress', operation: 'add', valueRange: [50, 100] }
                 ]
             }
         ]
     },
-
-    // Big opportunity template
     {
-        id: 'BIG_OPPORTUNITY',
-        titlePattern: '✨ {blessing} Wants to Join',
-        descriptionPattern: `{blessing} attended your service last Sunday.
-
-They were moved by the spirit. They want to join your church AND support your ministry.
-
-They're talking about:
-- Monthly donations of ₦{moneyAmount}
-- Connections to powerful people in {location}
-- A new church project
-
-But they have... "conditions." They want influence.`,
-        category: 'opportunity',
+        id: 'POLITICAL_PROPHESY',
+        titlePattern: '🗳️ Election Year Prophesy',
+        descriptionPattern: `The Governor visited your church.
+        
+        He wants a "special prophesy" for the upcoming election. 
+        He dropped a "seed" of ₦{moneyAmount}.`,
+        allowedEras: ['City', 'Empire', 'Ultimate'],
+        category: 'scandal',
         priority: 7,
-        oneTime: true,
+        oneTime: false,
+        conditions: { minFame: 5000 },
         choiceTemplates: [
             {
-                id: 'accept_all',
-                labelPattern: '✅ Accept everything',
-                resultTextPattern: 'The money flowed. So did the complications.',
+                id: 'endorse',
+                labelPattern: '📢 Prophesy Victory',
+                resultTextPattern: 'You declared him winner. He won. You are now a "State Prophet".',
                 effects: [
-                    { stat: 'churchCash', operation: 'add', valueRange: [1000000, 5000000] },
+                    { stat: 'churchCash', operation: 'add', valueRange: [0, 0] }, // Uses dynamic amount
                     { stat: 'influence', operation: 'add', valueRange: [500, 1000] },
-                    { stat: 'anointing', operation: 'subtract', valueRange: [200, 400] }
+                    { stat: 'scandal', operation: 'add', valueRange: [100, 300] }
                 ]
             },
             {
-                id: 'negotiate',
-                labelPattern: '🤝 Negotiate terms',
-                resultTextPattern: 'You reached a compromise. Less money, more independence.',
+                id: 'reject',
+                labelPattern: '❌ "I see what I see"',
+                resultTextPattern: 'You refused to be bought. He lost. Now his boys are watching you.',
                 effects: [
-                    { stat: 'churchCash', operation: 'add', valueRange: [500000, 2000000] },
-                    { stat: 'influence', operation: 'add', valueRange: [200, 400] }
-                ]
-            },
-            {
-                id: 'refuse',
-                labelPattern: '❌ "My ministry is not for sale"',
-                resultTextPattern: 'They left. Others respected your stance. The money went to your rival.',
-                effects: [
-                    { stat: 'anointing', operation: 'add', valueRange: [300, 500] },
-                    { stat: 'fame', operation: 'subtract', valueRange: [100, 300] }
+                    { stat: 'anointing', operation: 'add', valueRange: [200, 500] },
+                    { stat: 'stress', operation: 'add', valueRange: [100, 200] }
                 ]
             }
         ]
     },
 
-    // Community crisis template
+    // -------------------------------------------------------------------------
+    // NEW TEMPLATES (EXPANSION)
+    // -------------------------------------------------------------------------
     {
-        id: 'COMMUNITY_CRISIS',
-        titlePattern: '🚨 Crisis in {location}',
-        descriptionPattern: `A {crisis} just happened in {location}.
-
-Hundreds are affected. Some are your church members.
-The community is looking to you for leadership.
-
-"Pastor, what will the church do? People are suffering!"
-
-The media is watching. Your response will define your ministry.`,
-        category: 'crisis',
-        priority: 8,
+        id: 'EXAM_MALPRACTICE',
+        titlePattern: '📝 The "Expo" Offer',
+        descriptionPattern: `Exam week is here. {lecturer} is setting "Format".
+        
+        Your fellowship members have contributed ₦{moneyAmount} to "sort" the paper.
+        "Pastor, we need a miracle... or a leak."`,
+        allowedEras: ['University'],
+        category: 'campus',
+        priority: 6,
         oneTime: false,
         choiceTemplates: [
             {
-                id: 'major_help',
-                labelPattern: '💪 Lead major relief effort',
-                resultTextPattern: 'Your church became a beacon of hope. Media coverage was massive.',
+                id: 'pay',
+                labelPattern: '💸 Pay for the "Leak"',
+                resultTextPattern: 'Everyone passed. The fellowship grew. But your conscience is heavy.',
                 effects: [
-                    { stat: 'churchCash', operation: 'subtract', valueRange: [500000, 2000000] },
-                    { stat: 'fame', operation: 'add', valueRange: [500, 1000] },
-                    { stat: 'anointing', operation: 'add', valueRange: [300, 500] }
+                    { stat: 'personalCash', operation: 'subtract', valueRange: [10000, 20000] },
+                    { stat: 'influence', operation: 'add', valueRange: [20, 50] },
+                    { stat: 'anointing', operation: 'subtract', valueRange: [50, 100] }
                 ]
             },
             {
-                id: 'prayer_only',
-                labelPattern: '🙏 Organize prayer and vigil',
-                resultTextPattern: 'The prayer was powerful. But some said "prayer without action is dead."',
+                id: 'prayer',
+                labelPattern: '🙏 "Read your books!"',
+                resultTextPattern: 'Half the fellowship failed. They said your God does not save.',
+                effects: [
+                    { stat: 'influence', operation: 'subtract', valueRange: [30, 60] },
+                    { stat: 'stress', operation: 'add', valueRange: [20, 40] }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'LAND_DISPUTE_LAGOS',
+        titlePattern: '🏗️ Omo Onile Attack',
+        descriptionPattern: `You bought land for the new headquarters in {location}.
+        
+        The 'Omo Onile' (Land Grabbers) are here properly. 
+        They are demanding ₦{moneyAmount} settlement or they will bulldoze the foundation.`,
+        allowedEras: ['City', 'Empire'],
+        category: 'crisis',
+        priority: 7,
+        oneTime: false,
+        conditions: { minCash: 1000000 },
+        choiceTemplates: [
+            {
+                id: 'settle',
+                labelPattern: '💰 Pay them off',
+                resultTextPattern: 'They praised you as "Baba for the boys". Construction continued.',
+                effects: [
+                    { stat: 'churchCash', operation: 'subtract', valueRange: [0, 0] },
+                    { stat: 'stress', operation: 'add', valueRange: [20, 50] }
+                ]
+            },
+            {
+                id: 'police',
+                labelPattern: '👮 Call the Commissioner',
+                resultTextPattern: 'The Police arrested them. But now you owe the Commissioner a favor.',
+                effects: [
+                    { stat: 'influence', operation: 'add', valueRange: [100, 200] },
+                    { stat: 'churchCash', operation: 'subtract', valueRange: [100000, 200000] }
+                ]
+            },
+            {
+                id: 'spiritual',
+                labelPattern: '🔥 Holy Ghost Fire (Curse Them)',
+                resultTextPattern: 'Their leader fell sick instantly. They fled. The testimony was massive.',
                 effects: [
                     { stat: 'anointing', operation: 'add', valueRange: [200, 400] },
-                    { stat: 'fame', operation: 'subtract', valueRange: [100, 300] }
+                    { stat: 'fame', operation: 'add', valueRange: [100, 300] }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'JET_SCANDAL',
+        titlePattern: '✈️ The Private Jet Debate',
+        descriptionPattern: `You just unveiled your new Private Jet. 
+        
+        {mediaOutlet} writes: "Pastor flies luxury while members trek to church."
+        
+        The public is outraged.`,
+        allowedEras: ['Empire', 'Ultimate'],
+        category: 'scandal',
+        priority: 8,
+        oneTime: false,
+        conditions: { minFame: 10000 },
+        choiceTemplates: [
+            {
+                id: 'defend',
+                labelPattern: '🎤 "It is for Evangelism!"',
+                resultTextPattern: 'You quoted scripture. The core members cheered. The public jeered.',
+                effects: [
+                    { stat: 'scandal', operation: 'add', valueRange: [200, 400] },
+                    { stat: 'anointing', operation: 'add', valueRange: [100, 200] }
                 ]
             },
             {
-                id: 'ignore',
-                labelPattern: '💬 Issue statement only',
-                resultTextPattern: '"We stand with the victims." Twitter was not impressed.',
+                id: 'charity',
+                labelPattern: '🏥 "I use it for Medical Aid"',
+                resultTextPattern: 'Visible PR stunt. You flew a sick child abroad. The heat died down.',
                 effects: [
-                    { stat: 'scandal', operation: 'add', valueRange: [100, 300] }
+                    { stat: 'personalCash', operation: 'subtract', valueRange: [5000000, 10000000] },
+                    { stat: 'fame', operation: 'add', valueRange: [500, 1000] },
+                    { stat: 'scandal', operation: 'subtract', valueRange: [200, 400] }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'TRANSHUMANISM_OFFER',
+        titlePattern: '🧬 The Eternal Upload',
+        descriptionPattern: 'Tech billionaire Elon Musk (aged 109) offers to upload your consciousness to the Cloud. "Immortality," he promises. "But you leave your body behind."',
+        allowedEras: ['Ultimate'],
+        category: 'opportunity',
+        priority: 100, // Guarantees it appears if condition met
+        oneTime: true, // Only happens once
+        conditions: { minCash: 100000000000 },
+        choiceTemplates: [
+            {
+                id: 'accept_upload',
+                labelPattern: '⚡ Upload Consciousness (Become an AI God)',
+                resultTextPattern: 'Flesh is weak. You are now pure data. The church is infinite.',
+                effects: [
+                    { stat: 'anointing', operation: 'add', valueRange: [10000, 10000] }, // Infinite power
+                    { stat: 'health', operation: 'add', valueRange: [100000, 100000] } // Digital life
+                ]
+            },
+            {
+                id: 'reject_upload',
+                labelPattern: '🛑 Refuse. Flesh is Sacred.',
+                resultTextPattern: 'You chose humanity. You will die one day, but you will die a man.',
+                effects: [
+                    { stat: 'anointing', operation: 'add', valueRange: [50, 100] }
                 ]
             }
         ]
@@ -271,26 +430,17 @@ The media is watching. Your response will define your ministry.`,
 ];
 
 // ============================================================================
-// STORY GENERATION FUNCTIONS
+// 4. ENGINE LOGIC
 // ============================================================================
 
-/**
- * Select random item from array
- */
 function randomFrom<T>(arr: T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/**
- * Select random number in range
- */
 function randomInRange(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/**
- * Fill template with random variables
- */
 function fillTemplate(pattern: string, variables: Record<string, string | number>): string {
     let result = pattern;
     for (const [key, value] of Object.entries(variables)) {
@@ -300,44 +450,56 @@ function fillTemplate(pattern: string, variables: Record<string, string | number
 }
 
 /**
- * Generate a unique event from template
+ * Generates variables relevant to the template and current era
  */
-export function generateEventFromTemplate(template: EventTemplate): GameEvent {
-    // Generate random variables
-    const variables: Record<string, string | number> = {
+function generateVariables(era: GameEra): Record<string, string | number> {
+    const isUni = era === 'University';
+
+    return {
+        // People
         familyMember: randomFrom(VARIABLE_POOLS.familyMember),
         churchMember: randomFrom(VARIABLE_POOLS.churchMember),
-        moneyAmount: randomFrom(VARIABLE_POOLS.moneyAmount),
-        reason: randomFrom(VARIABLE_POOLS.reason),
+        lecturer: randomFrom(VARIABLE_POOLS.lecturer),
+
+        // Locations
         location: randomFrom(VARIABLE_POOLS.location),
+        campusLocation: randomFrom(VARIABLE_POOLS.campusLocation),
+
+        // Issues
+        reason: randomFrom(VARIABLE_POOLS.reason),
         accusation: randomFrom(VARIABLE_POOLS.accusation),
+        campusCrisis: randomFrom(VARIABLE_POOLS.campusCrisis),
         mediaOutlet: randomFrom(VARIABLE_POOLS.mediaOutlet),
-        scandal: randomFrom(VARIABLE_POOLS.scandal),
+
+        // Money (Scale based on Era)
+        moneyAmount: isUni
+            ? randomFrom([5000, 10000, 20000, 50000])
+            : randomFrom(VARIABLE_POOLS.moneyAmount),
+
         blessing: randomFrom(VARIABLE_POOLS.blessing),
-        crisis: randomFrom(VARIABLE_POOLS.crisis),
     };
+}
 
-    // Generate unique ID
-    const uniqueId = `${template.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+/**
+ * Creates a playable GameEvent from a template
+ */
+export function instantiateEvent(template: EventTemplate, era: GameEra): GameEvent {
+    const variables = generateVariables(era);
+    const uniqueId = `${template.id}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
-    // Generate choices
-    const choices: EventChoice[] = template.choiceTemplates.map(ct => {
-        const effects = ct.effects.map(e => ({
+    const choices: EventChoice[] = template.choiceTemplates.map(ct => ({
+        id: `${ct.id}_${uniqueId}`,
+        label: fillTemplate(ct.labelPattern, variables),
+        resultText: fillTemplate(ct.resultTextPattern, variables),
+        effects: ct.effects.map(e => ({
             type: 'stat' as const,
-            stat: e.stat as 'personalCash',
+            stat: e.stat as any,
             operation: e.operation,
-            value: e.stat === 'personalCash' && e.valueRange[0] === 0
+            value: (e.stat === 'personalCash' || e.stat === 'churchCash') && e.valueRange[0] === 0
                 ? variables.moneyAmount as number
                 : randomInRange(e.valueRange[0], e.valueRange[1])
-        }));
-
-        return {
-            id: `${ct.id}_${uniqueId}`,
-            label: fillTemplate(ct.labelPattern, variables),
-            resultText: fillTemplate(ct.resultTextPattern, variables),
-            effects,
-        };
-    });
+        }))
+    }));
 
     return {
         id: uniqueId,
@@ -350,31 +512,52 @@ export function generateEventFromTemplate(template: EventTemplate): GameEvent {
         oneTime: template.oneTime,
         category: template.category === 'money' ? 'random' :
             template.category === 'scandal' ? 'crisis' :
-                template.category as 'story' | 'random' | 'crisis' | 'opportunity',
+                template.category as any,
     };
 }
 
+export const generateEventFromTemplate = instantiateEvent;
+
+
+// ============================================================================
+// 5. PUBLIC API
+// ============================================================================
+
 /**
- * Generate random event based on game state
+ * Generates a batch of events for a simulation year
+ * @param era Current Game Era
+ * @param count Number of events to generate (default 3)
+ * @param context Additional context (fame, scandal, cash) to weight events
  */
-export function generateProceduralEvent(
-    fame: number,
-    scandal: number,
-    week: number
-): GameEvent {
-    // Weight templates based on game state
-    const weights: Record<string, number> = {
-        MONEY_REQUEST: 1.0,
-        MEDIA_SCANDAL: scandal > 3000 ? 1.5 : 0.5,
-        BIG_OPPORTUNITY: fame > 5000 ? 1.5 : 0.3,
-        COMMUNITY_CRISIS: fame > 3000 ? 1.0 : 0.3,
-    };
+export function generateYearlyEvents(
+    era: GameEra,
+    count: number = 3,
+    context: { fame: number, scandal: number, cash: number }
+): GameEvent[] {
+    // 1. Filter templates by Era and Conditions
+    const validTemplates = EVENT_TEMPLATES.filter(t => {
+        const eraMatch = t.allowedEras.includes(era);
+        if (!eraMatch) return false;
 
-    // Simple weighted selection
-    const templates = EVENT_TEMPLATES.filter(t => Math.random() < (weights[t.id] || 0.5));
-    const selectedTemplate = templates.length > 0 ? randomFrom(templates) : EVENT_TEMPLATES[0];
+        if (t.conditions) {
+            if (t.conditions.minFame && context.fame < t.conditions.minFame) return false;
+            if (t.conditions.minScandal && context.scandal < t.conditions.minScandal) return false;
+        }
+        return true;
+    });
 
-    return generateEventFromTemplate(selectedTemplate);
+    if (validTemplates.length === 0) return [];
+
+    // 2. Select Weighted Templates
+    const selectedEvents: GameEvent[] = [];
+
+    for (let i = 0; i < count; i++) {
+        // Simple random selection for now - could be improved with weights
+        const template = randomFrom(validTemplates);
+        selectedEvents.push(instantiateEvent(template, era));
+    }
+
+    return selectedEvents;
 }
 
 export { EVENT_TEMPLATES, VARIABLE_POOLS };

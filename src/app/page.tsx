@@ -47,6 +47,8 @@ import SocialMediaModal from '@/components/SocialMediaModal';
 import GraduationModal from '@/components/GraduationModal';
 import DropoutModal from '@/components/DropoutModal';
 import FarbesModal from '@/components/FarbesModal';
+import YearlyReportModal from '@/components/YearlyReportModal';
+import GameOverModal from '@/components/GameOverModal';
 
 // Data
 const allEvents: GameEvent[] = ALL_EVENTS;
@@ -55,13 +57,13 @@ export default function GamePage() {
   const store = useGameStore();
   const {
     week, stats, assets, church, partner,
-    advanceWeek, applyEffects, modifyStat,
+    advanceYear, applyEffects, modifyStat,
     addMembers, upgradeVenue, addAsset, removeAsset,
     setPartner, setPlayerName, spendEnergy,
     startDating, propose, marry, breakup, hookup,
     upgradeSkill, trainSkill, uploadSermon, skills,
     dropout, resetGame, setOnboardingComplete, setStoryIntroComplete,
-    hasSeenStoryIntro
+    hasSeenStoryIntro, gamePhase
   } = store;
 
   // UI State
@@ -166,14 +168,11 @@ export default function GamePage() {
   const handleMenuAction = (action: any) => {
     // Handle week advance
     if (action.id === 'advance_week') {
-      handleAdvanceWeek();
+      handleAdvanceYear();
       return;
     }
 
-    if (action.energyCost > 0 && stats.energy < action.energyCost) {
-      addToast("Not enough energy!", "danger");
-      return;
-    }
+
 
     // Handle specific actions
     if (action.id === 'invest') {
@@ -185,7 +184,6 @@ export default function GamePage() {
     if (action.id === 'date') {
       if (partner) {
         modifyStat('stress', -20);
-        spendEnergy(action.energyCost);
         addToast(`Went on a date with ${partner.name}! ❤️`, 'success');
       } else {
         setShowRelationships(true);
@@ -232,10 +230,7 @@ export default function GamePage() {
       return;
     }
 
-    // Spend energy first
-    if (action.energyCost > 0) {
-      spendEnergy(action.energyCost);
-    }
+
 
     // Apply immediate effects
     if (action.effects) {
@@ -263,10 +258,10 @@ export default function GamePage() {
   };
 
   // Week Advance
-  const handleAdvanceWeek = () => {
-    advanceWeek();
+  const handleAdvanceYear = () => {
+    advanceYear();
     checkForEvents();
-    addToast(`Week ${week + 1} Started`, 'info');
+    addToast(`Year ${2026 + Math.floor(week / 52)} Started`, 'info');
   };
 
   // ...
@@ -403,6 +398,8 @@ export default function GamePage() {
       )}
 
       {/* Dashboards */}
+      {gamePhase === 'YEARLY_REPORT' && <YearlyReportModal />}
+      {gamePhase === 'GAME_OVER' && <GameOverModal />}
       {showCrypto && <CryptoDashboard onClose={() => setShowCrypto(false)} />}
       {showWarfare && <SpiritualWarfareModal onClose={() => setShowWarfare(false)} />}
       {showTestimony && <TestimonyManager onClose={() => setShowTestimony(false)} />}
@@ -475,12 +472,19 @@ export default function GamePage() {
             setShowRelationships(false);
           }}
           onHookup={(type) => {
+            // @ts-ignore - Dynamic return type update
             const result = hookup(type);
+
             if (result.pregnant) {
               addToast(`${result.mamaName} is pregnant with ${result.babyName}! 😱`, 'danger');
+            } else if (result.std) {
+              addToast('Use protection! You contracted an infection. 🦠', 'danger');
+            } else if (result.spiritSpouse) {
+              addToast('Spiritual Attack! A Marine Spirit followed you home. 🧜‍♀️', 'danger');
             } else {
               addToast('Hookup successful... scandal risk increased', 'warning');
             }
+
             modifyStat('scandal', result.scandal);
             setShowRelationships(false);
           }}

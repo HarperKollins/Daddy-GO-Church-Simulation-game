@@ -16,7 +16,7 @@
 
 export interface DailyReward {
     day: number;            // 1-7, then resets
-    type: 'cash' | 'anointing' | 'fame' | 'energy' | 'mystery' | 'premium';
+    type: 'cash' | 'anointing' | 'fame' | 'health' | 'mystery' | 'premium';
     baseAmount: number;
     multiplier: number;     // Streak multiplier
     description: string;
@@ -34,7 +34,7 @@ export interface LoginStreak {
 const DAILY_REWARDS: DailyReward[] = [
     { day: 1, type: 'cash', baseAmount: 10000, multiplier: 1.0, description: '₦10,000 blessing' },
     { day: 2, type: 'anointing', baseAmount: 50, multiplier: 1.2, description: 'Anointing boost' },
-    { day: 3, type: 'energy', baseAmount: 200, multiplier: 1.3, description: 'Energy refill' },
+    { day: 3, type: 'health', baseAmount: 500, multiplier: 1.3, description: 'Divine Health' },
     { day: 4, type: 'fame', baseAmount: 100, multiplier: 1.4, description: 'Fame boost' },
     { day: 5, type: 'cash', baseAmount: 50000, multiplier: 1.5, description: '₦50,000 breakthrough' },
     { day: 6, type: 'mystery', baseAmount: 0, multiplier: 2.0, description: 'Mystery box!' },

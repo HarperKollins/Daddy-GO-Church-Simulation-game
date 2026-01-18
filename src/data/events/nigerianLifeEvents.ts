@@ -28,7 +28,7 @@ The children are crying. Adults are fanning themselves in the heat.
 
 "Is this attack of the enemy or just normal NEPA?" your assistant whispers.`,
         conditions: [
-            { type: 'stat', stat: 'energy', operator: 'gte', value: 200 }
+            { type: 'stat', stat: 'health', operator: 'gte', value: 200 }
         ],
         choices: [
             {
@@ -285,7 +285,7 @@ Black market sellers are offering ₦2,000/liter. "Quality guaranteed, pastor!"`
                 resultText: 'After 8 hours in queue, you got fuel at ₦1,500/liter. Your time wasted.',
                 effects: [
                     { type: 'stat', stat: 'churchCash', operation: 'subtract', value: 525000 },
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 400 },
+                    { type: 'stat', stat: 'stress', operation: 'add', value: 300 },
                     { type: 'stat', stat: 'stress', operation: 'add', value: 500 }
                 ]
             },
@@ -354,7 +354,7 @@ Total deducted: ₦30,800
                 resultText: '2 hours on hold. "Your call is important to us." Nothing resolved.',
                 effects: [
                     { type: 'stat', stat: 'personalCash', operation: 'subtract', value: 30800 },
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 200 },
+                    // energy cost removed
                     { type: 'stat', stat: 'stress', operation: 'add', value: 300 }
                 ]
             },
@@ -440,7 +440,7 @@ Workers are angry. Some haven't eaten in 3 days.`,
                 label: '📋 Lodge official complaint',
                 resultText: 'After 2 weeks and 47 phone calls, money was reversed. Victory!',
                 effects: [
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 300 },
+                    // energy cost removed
                     { type: 'stat', stat: 'stress', operation: 'add', value: 400 }
                 ]
             },

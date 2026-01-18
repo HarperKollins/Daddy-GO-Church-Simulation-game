@@ -7,10 +7,11 @@
 
 import { useGameStore } from '@/store/useGameStore';
 import { getAssetsByCategory } from '@/data/assets';
-import type { Asset } from '@/types/game';
+import type { Asset, GameEra } from '@/types/game';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { formatCurrency } from '@/utils/formatters';
 
 // Unsplash keywords mapped to asset types
 const ASSET_IMAGES: Record<string, string> = {
@@ -23,25 +24,48 @@ const ASSET_IMAGES: Record<string, string> = {
     'Mercedes G-Wagon': 'https://images.unsplash.com/photo-1520031441872-ddb157228d8d?w=800&q=80',
     'Rolls Royce Phantom': 'https://images.unsplash.com/photo-1631295868223-63265b40d9e4?w=800&q=80',
     'Private Jet (Gulfstream G650)': 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=800&q=80',
+    'Private Jet (Challenger)': 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=800&q=80',
 
     // Properties
     '3-Bedroom Flat (Lagos)': 'https://images.unsplash.com/photo-1484154218962-a1c002085d2f?w=800&q=80',
     'Duplex in Lekki': 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80',
     'Mansion in Banana Island': 'https://images.unsplash.com/photo-1600596542815-2a4d9f0152ba?w=800&q=80',
     'Estate in Maitama, Abuja': 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80',
+    'Half Plot in Lekki': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+    'Mansion in Asokoro': 'https://images.unsplash.com/photo-1600596542815-2a4d9f0152ba?w=800&q=80',
+
+    // Ultimate
+    'The Space Ark': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80',
+    'Atmospheric Controller': 'https://images.unsplash.com/photo-1590907047706-ee9c08cf3189?w=800&q=80',
+    'Sovereign Island Nation': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&q=80',
+    'Spirit Realm Gateway': 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&q=80',
+
+    // University
+    'Used Dell Laptop': 'https://images.unsplash.com/photo-1531297461136-82lw4241?w=800&q=80',
+    'Small Hostel Fridge': 'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=800&q=80',
+    'Theology Textbooks': 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&q=80',
 };
 
-const formatCash = (n: number) => `₦${n.toLocaleString()}`;
+const ERA_ORDER: GameEra[] = ['University', 'City', 'Empire', 'Ultimate'];
+
+const checkEraRequirement = (current: GameEra, required?: GameEra): boolean => {
+    if (!required) return true;
+    const currentIdx = ERA_ORDER.indexOf(current);
+    const requiredIdx = ERA_ORDER.indexOf(required);
+    return currentIdx >= requiredIdx;
+};
 
 export default function AssetsModal() {
     const assets = useGameStore(state => state.assets);
     const personalCash = useGameStore(state => state.stats.personalCash);
     const addAsset = useGameStore(state => state.addAsset);
     const modifyStat = useGameStore(state => state.modifyStat);
+    const currentEra = useGameStore(state => state.currentEra);
 
     const vehicles = getAssetsByCategory('vehicle');
     const properties = getAssetsByCategory('property');
-    const allDisplayAssets = [...vehicles, ...properties];
+    const investments = getAssetsByCategory('investment');
+    const allDisplayAssets = [...vehicles, ...properties, ...investments];
 
     return (
         <div className="px-4 pb-24">
@@ -51,7 +75,7 @@ export default function AssetsModal() {
                 <div className="text-right">
                     <div className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Liquid Cash</div>
                     <div className="text-lg font-black text-success">
-                        {formatCash(personalCash)}
+                        {formatCurrency(personalCash)}
                     </div>
                 </div>
             </div>
@@ -60,11 +84,12 @@ export default function AssetsModal() {
             <div className="space-y-4">
                 {allDisplayAssets.map((asset) => {
                     const isOwned = assets.some((a: Asset) => a.id === asset.id);
+                    const isEraUnlocked = checkEraRequirement(currentEra, asset.unlockEra);
                     const canAfford = personalCash >= asset.cost;
                     const imageUrl = ASSET_IMAGES[asset.name] || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80';
 
                     return (
-                        <Card key={asset.id} className="overflow-hidden border-border-subtle p-0 group">
+                        <Card key={asset.id} className={`overflow-hidden border-border-subtle p-0 group ${!isEraUnlocked ? 'opacity-60 grayscale' : ''}`}>
                             {/* Image Header */}
                             <div className="h-36 relative bg-gray-900">
                                 <img
@@ -74,12 +99,25 @@ export default function AssetsModal() {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
+                                {!isEraUnlocked && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                                        <Badge variant="outline" className="border-white/20 text-white bg-black/50 px-3 py-1 uppercase tracking-widest font-bold">
+                                            LOCKED: {asset.unlockEra?.toUpperCase()} ERA
+                                        </Badge>
+                                    </div>
+                                )}
+
                                 <div className="absolute bottom-3 left-4 right-4">
                                     <h3 className="text-lg font-bold text-white mb-0.5">{asset.name}</h3>
                                     <div className="flex items-center gap-2">
                                         <Badge variant="secondary" className="backdrop-blur-md bg-white/10 border-white/10 text-white text-[10px] h-5">
-                                            {formatCash(asset.weeklyMaintenance)}/wk
+                                            {formatCurrency(asset.weeklyMaintenance)}/wk
                                         </Badge>
+                                        {asset.fameBonus > 0 && (
+                                            <Badge variant="secondary" className="backdrop-blur-md bg-brand/20 border-brand/20 text-brand-foreground text-[10px] h-5">
+                                                +{asset.fameBonus} Fame
+                                            </Badge>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -87,23 +125,22 @@ export default function AssetsModal() {
                             {/* Action Footer */}
                             <div className="p-4 flex justify-between items-center bg-surface">
                                 <div className="text-base font-bold text-text-primary">
-                                    {formatCash(asset.cost)}
+                                    {formatCurrency(asset.cost)}
                                 </div>
 
                                 <Button
                                     onClick={() => {
-                                        if (!isOwned && canAfford) {
+                                        if (!isOwned && canAfford && isEraUnlocked) {
                                             modifyStat('personalCash', -asset.cost);
                                             addAsset(asset);
                                         }
                                     }}
-                                    disabled={isOwned || !canAfford}
-                                    variant={isOwned ? "secondary" : canAfford ? "default" : "secondary"}
+                                    disabled={isOwned || !canAfford || !isEraUnlocked}
+                                    variant={isOwned ? "secondary" : canAfford && isEraUnlocked ? "default" : "secondary"}
                                     size="sm"
-                                    className={`font-bold min-w-[100px] ${!isOwned && !canAfford ? 'opacity-50' : ''
-                                        }`}
+                                    className={`font-bold min-w-[100px] ${(!isOwned && (!canAfford || !isEraUnlocked)) ? 'opacity-50' : ''}`}
                                 >
-                                    {isOwned ? 'OWNED' : 'BUY NOW'}
+                                    {isOwned ? 'OWNED' : isEraUnlocked ? 'BUY NOW' : 'LOCKED'}
                                 </Button>
                             </div>
                         </Card>

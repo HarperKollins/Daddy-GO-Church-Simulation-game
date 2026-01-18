@@ -14,7 +14,38 @@ import type { Asset } from '@/types/game';
 
 export const assets: Asset[] = [
     // =========================================================================
-    // VEHICLES - Progression of flex
+    // UNIVERSITY ERA (Survival Essentials)
+    // =========================================================================
+    {
+        id: 'USED_LAPTOP',
+        name: 'Used Dell Laptop',
+        category: 'property',
+        cost: 50000,
+        weeklyMaintenance: 0,
+        fameBonus: 1,
+        unlockEra: 'University'
+    },
+    {
+        id: 'FRIDGE',
+        name: 'Small Hostel Fridge',
+        category: 'property',
+        cost: 80000,
+        weeklyMaintenance: 1000,
+        fameBonus: 1,
+        unlockEra: 'University'
+    },
+    {
+        id: 'TEXTBOOKS',
+        name: 'Theology Textbooks',
+        category: 'property',
+        cost: 30000,
+        weeklyMaintenance: 0,
+        fameBonus: 2, // Knowledge flex
+        unlockEra: 'University'
+    },
+
+    // =========================================================================
+    // CITY ERA (The Rise) - Cars & Land
     // =========================================================================
     {
         id: 'COROLLA',
@@ -22,7 +53,8 @@ export const assets: Asset[] = [
         category: 'vehicle',
         cost: 3000000,
         weeklyMaintenance: 5000,
-        fameBonus: 2,
+        fameBonus: 5,
+        unlockEra: 'City'
     },
     {
         id: 'CAMRY',
@@ -30,103 +62,110 @@ export const assets: Asset[] = [
         category: 'vehicle',
         cost: 8000000,
         weeklyMaintenance: 10000,
+        fameBonus: 10,
+        unlockEra: 'City'
+    },
+    {
+        id: 'GENERATOR',
+        name: 'Mikano Generator (Small)',
+        category: 'property',
+        cost: 500000,
+        weeklyMaintenance: 20000, // Fuel is expensive
         fameBonus: 5,
+        unlockEra: 'City'
     },
     {
-        id: 'HIGHLANDER',
-        name: 'Toyota Highlander',
-        category: 'vehicle',
-        cost: 15000000,
-        weeklyMaintenance: 20000,
-        fameBonus: 8,
+        id: 'LAND_LEKKI',
+        name: 'Half Plot in Lekki',
+        category: 'property',
+        cost: 50000000,
+        weeklyMaintenance: 5000,
+        fameBonus: 20,
+        unlockEra: 'City'
     },
-    {
-        id: 'LEXUS_RX',
-        name: 'Lexus RX 350',
-        category: 'vehicle',
-        cost: 25000000,
-        weeklyMaintenance: 35000,
-        fameBonus: 12,
-    },
-    {
-        id: 'LAND_CRUISER',
-        name: 'Toyota Land Cruiser',
-        category: 'vehicle',
-        cost: 45000000,
-        weeklyMaintenance: 50000,
-        fameBonus: 18,
-    },
-    {
-        id: 'MERCEDES_S_CLASS',
-        name: 'Mercedes S-Class',
-        category: 'vehicle',
-        cost: 80000000,
-        weeklyMaintenance: 80000,
-        fameBonus: 25,
-    },
+
+    // =========================================================================
+    // EMPIRE ERA (National Power) - Jets & Media
+    // =========================================================================
     {
         id: 'G_WAGON',
         name: 'Mercedes G-Wagon',
         category: 'vehicle',
         cost: 150000000,
         weeklyMaintenance: 150000,
-        fameBonus: 35,
-    },
-    {
-        id: 'ROLLS_ROYCE',
-        name: 'Rolls Royce Phantom',
-        category: 'vehicle',
-        cost: 500000000,
-        weeklyMaintenance: 300000,
         fameBonus: 50,
+        unlockEra: 'Empire'
     },
     {
         id: 'PRIVATE_JET',
-        name: 'Private Jet (Gulfstream G650)',
+        name: 'Private Jet (Challenger)',
         category: 'vehicle',
-        cost: 2000000000,
+        cost: 3000000000, // 3 Billion
+        weeklyMaintenance: 10000000,
+        fameBonus: 500,
+        unlockEra: 'Empire'
+    },
+    {
+        id: 'TV_STATION',
+        name: 'Satellite TV Station',
+        category: 'property',
+        cost: 500000000, // 500m
         weeklyMaintenance: 5000000,
-        fameBonus: 100,
-    },
-
-    // =========================================================================
-    // PROPERTY - Church and personal real estate
-    // =========================================================================
-    {
-        id: 'FLAT_LAGOS',
-        name: '3-Bedroom Flat (Lagos)',
-        category: 'property',
-        cost: 30000000,
-        weeklyMaintenance: 20000,
-        fameBonus: 3,
+        fameBonus: 1000,
+        unlockEra: 'Empire'
     },
     {
-        id: 'DUPLEX_LEKKI',
-        name: 'Duplex in Lekki',
+        id: 'MANSION_ABUJA',
+        name: 'Mansion in Asokoro',
         category: 'property',
-        cost: 120000000,
-        weeklyMaintenance: 50000,
-        fameBonus: 10,
-    },
-    {
-        id: 'MANSION_BANANA',
-        name: 'Mansion in Banana Island',
-        category: 'property',
-        cost: 500000000,
-        weeklyMaintenance: 200000,
-        fameBonus: 30,
-    },
-    {
-        id: 'ESTATE_ABUJA',
-        name: 'Estate in Maitama, Abuja',
-        category: 'property',
-        cost: 1000000000,
+        cost: 1500000000,
         weeklyMaintenance: 500000,
-        fameBonus: 45,
+        fameBonus: 200,
+        unlockEra: 'Empire'
     },
 
     // =========================================================================
-    // INVESTMENTS - The casino (high risk, high reward)
+    // ULTIMATE ERA (Interdimensional Flex)
+    // =========================================================================
+    {
+        id: 'SPACE_ARK',
+        name: 'The Space Ark',
+        category: 'vehicle',
+        cost: 10000000000000, // 10 Trillion
+        weeklyMaintenance: 1000000000,
+        fameBonus: 50000,
+        unlockEra: 'Ultimate'
+    },
+    {
+        id: 'WEATHER_MACHINE',
+        name: 'Atmospheric Controller',
+        category: 'property',
+        cost: 5000000000000, // 5 Trillion
+        weeklyMaintenance: 500000000,
+        fameBonus: 25000,
+        unlockEra: 'Ultimate'
+    },
+    {
+        id: 'PRIVATE_ISLAND',
+        name: 'Sovereign Island Nation',
+        category: 'property',
+        cost: 200000000000, // 200 Billion
+        weeklyMaintenance: 100000000,
+        fameBonus: 5000,
+        unlockEra: 'Ultimate'
+    },
+    {
+        id: 'INTERDIMENSIONAL_PORTAL',
+        name: 'Spirit Realm Gateway',
+        category: 'investment',
+        cost: 50000000000000, // 50 Trillion
+        weeklyMaintenance: 0,
+        fameBonus: 100000,
+        unlockEra: 'Ultimate'
+    },
+
+    // =========================================================================
+    // INVESTMENTS (Available Mostly from City+)
     // =========================================================================
     {
         id: 'DANGOTE_STOCK',
@@ -137,16 +176,7 @@ export const assets: Asset[] = [
         fameBonus: 0,
         volatility: 15,
         rugPullChance: 0.01,
-    },
-    {
-        id: 'BANK_STOCK',
-        name: 'GTBank Shares',
-        category: 'investment',
-        cost: 5000000,
-        weeklyMaintenance: 0,
-        fameBonus: 0,
-        volatility: 20,
-        rugPullChance: 0.02,
+        unlockEra: 'City'
     },
     {
         id: 'CRYPTO_BTC',
@@ -157,16 +187,7 @@ export const assets: Asset[] = [
         fameBonus: 5,
         volatility: 50,
         rugPullChance: 0.05,
-    },
-    {
-        id: 'GLORY_COIN',
-        name: 'GloryCoin (Shitcoin)',
-        category: 'investment',
-        cost: 5000000,
-        weeklyMaintenance: 0,
-        fameBonus: 0,
-        volatility: 90,
-        rugPullChance: 0.30,
+        unlockEra: 'City'
     },
     {
         id: 'PONZI_SCHEME',
@@ -177,7 +198,8 @@ export const assets: Asset[] = [
         fameBonus: 0,
         volatility: 100,
         rugPullChance: 0.50,
-    },
+        unlockEra: 'City'
+    }
 ];
 
 /**

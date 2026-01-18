@@ -22,7 +22,7 @@ export interface ServiceType {
     category: 'regular' | 'special' | 'mega' | 'healing' | 'deliverance' | 'demographic';
     baseAttendanceMultiplier: number;
     baseTithingMultiplier: number;
-    energyCost: number;
+    // energyCost removed
     preparationWeeks: number;
     cooldownWeeks: number;
     requirements: Record<string, number>;
@@ -37,7 +37,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'regular',
         baseAttendanceMultiplier: 1.0,
         baseTithingMultiplier: 1.0,
-        energyCost: 300,
+
         preparationWeeks: 0,
         cooldownWeeks: 0,
         requirements: {},
@@ -49,7 +49,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'regular',
         baseAttendanceMultiplier: 0.4,
         baseTithingMultiplier: 0.3,
-        energyCost: 200,
+
         preparationWeeks: 0,
         cooldownWeeks: 0,
         requirements: {},
@@ -61,7 +61,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'regular',
         baseAttendanceMultiplier: 0.3,
         baseTithingMultiplier: 0.2,
-        energyCost: 400,
+
         preparationWeeks: 0,
         cooldownWeeks: 0,
         requirements: { anointing: 2000 },
@@ -75,7 +75,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'mega',
         baseAttendanceMultiplier: 5.0,
         baseTithingMultiplier: 4.0,
-        energyCost: 800,
+
         preparationWeeks: 8,
         cooldownWeeks: 52,
         requirements: { members: 500, churchCash: 5000000 },
@@ -87,7 +87,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'mega',
         baseAttendanceMultiplier: 10.0,
         baseTithingMultiplier: 2.0,
-        energyCost: 900,
+
         preparationWeeks: 12,
         cooldownWeeks: 26,
         requirements: { members: 1000, churchCash: 20000000, fame: 5000 },
@@ -99,7 +99,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'special',
         baseAttendanceMultiplier: 2.0,
         baseTithingMultiplier: 1.5,
-        energyCost: 700,
+
         preparationWeeks: 2,
         cooldownWeeks: 13,
         requirements: { anointing: 4000 },
@@ -113,7 +113,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'healing',
         baseAttendanceMultiplier: 3.0,
         baseTithingMultiplier: 2.0,
-        energyCost: 600,
+
         preparationWeeks: 1,
         cooldownWeeks: 4,
         requirements: { anointing: 5000 },
@@ -125,7 +125,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'deliverance',
         baseAttendanceMultiplier: 1.5,
         baseTithingMultiplier: 1.2,
-        energyCost: 700,
+
         preparationWeeks: 1,
         cooldownWeeks: 2,
         requirements: { anointing: 4000, prayerPower: 3000 },
@@ -139,7 +139,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'demographic',
         baseAttendanceMultiplier: 2.5,
         baseTithingMultiplier: 0.8,
-        energyCost: 500,
+
         preparationWeeks: 4,
         cooldownWeeks: 26,
         requirements: { members: 200, fame: 3000 },
@@ -151,7 +151,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'demographic',
         baseAttendanceMultiplier: 2.0,
         baseTithingMultiplier: 1.8,
-        energyCost: 500,
+
         preparationWeeks: 4,
         cooldownWeeks: 26,
         requirements: { members: 300 },
@@ -163,7 +163,7 @@ export const SERVICE_TYPES: ServiceType[] = [
         category: 'demographic',
         baseAttendanceMultiplier: 1.8,
         baseTithingMultiplier: 1.2,
-        energyCost: 400,
+
         preparationWeeks: 2,
         cooldownWeeks: 13,
         requirements: { members: 200, fame: 2000 },
@@ -385,7 +385,7 @@ export function generateHostingEvent(
             choices: [
                 { id: 'vip', label: '🌟 Give them VIP treatment', effects: { donations: 500000, eldersFrustration: 30 } },
                 { id: 'protocol', label: '📋 Follow protocol strictly', effects: { donations: -100000, eldersHappy: 20 } },
-                { id: 'personal', label: '🤝 You personally welcome them', effects: { fame: 50, energy: -100 } }
+                { id: 'personal', label: '🤝 You personally welcome them', effects: { fame: 50, stress: 50 } }
             ]
         },
         {

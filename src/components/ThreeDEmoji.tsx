@@ -21,11 +21,9 @@ function ThreeDEmoji({
     className = "",
     animate = false
 }: ThreeDEmojiProps) {
-    const [imgSrc, setImgSrc] = useState<string>('');
     const [hasError, setHasError] = useState(false);
 
     // Map keywords to specific emoji names for CDN
-    // This mapping ensures we get the exact right 3D file
     const getEmojiFilename = (keyword: string): string => {
         const map: Record<string, string> = {
             // Stats
@@ -65,6 +63,7 @@ function ThreeDEmoji({
             'volcano': 'Volcano',
             'flood': 'Cloud with rain',
             'sickness': 'Microbe',
+            'party': 'Party popper',
 
             // People
             'man': 'Man_Light',
@@ -72,27 +71,21 @@ function ThreeDEmoji({
             'baby': 'Baby_Light',
             'police': 'Police officer_Light',
             'doctor': 'Health worker_Light',
-            'pastor': 'Man in tuxedo_Light', // Close enough proxy
+            'pastor': 'Man in tuxedo_Light',
 
             // Default
             'default': 'Sparkles'
         };
 
         const key = keyword.toLowerCase();
-        // Return mapped name or capitalize first letter as guess
         return map[key] || (key.charAt(0).toUpperCase() + key.slice(1));
     };
 
-    useEffect(() => {
-        // Source: Microsoft Fluent UI Emoji (via jsdelivr)
-        // This is much faster and more reliable than raw github contents
-        const filename = getEmojiFilename(icon);
-        const url = `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/${filename}/3D/${filename.replace(/ /g, '_')}_3d.png`;
+    // Calculate URL synchronously to avoid empty src flash
+    const filename = getEmojiFilename(icon);
+    const imgSrc = `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/${filename}/3D/${filename.replace(/ /g, '_')}_3d.png`;
 
-        setImgSrc(url);
-        setHasError(false);
-    }, [icon]);
-
+    // Always show fallback on error
     if (hasError) {
         return (
             <span
@@ -117,7 +110,7 @@ function ThreeDEmoji({
             style={{
                 display: 'inline-block',
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))', // Add depth
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
                 animation: animate ? 'float 3s ease-in-out infinite' : 'none',
                 transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
             }}

@@ -265,7 +265,7 @@ She's crying now.`,
                 resultText: 'You prayed for 30 minutes. She felt better. You didn\'t.',
                 effects: [
                     { type: 'stat', stat: 'anointing', operation: 'add', value: 50 },
-                    { type: 'stat', stat: 'energy', operation: 'subtract', value: 100 }
+                    { type: 'stat', stat: 'stress', operation: 'add', value: 200 }
                 ]
             }
         ],

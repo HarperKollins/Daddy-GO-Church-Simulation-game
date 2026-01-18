@@ -41,7 +41,7 @@ export {
 // Story Generator
 export {
     generateEventFromTemplate,
-    generateProceduralEvent,
+    generateYearlyEvents,
     EVENT_TEMPLATES,
     VARIABLE_POOLS,
 } from './storyGenerator';
